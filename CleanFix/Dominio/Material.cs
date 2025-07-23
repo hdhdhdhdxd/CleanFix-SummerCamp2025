@@ -1,4 +1,6 @@
-﻿namespace Dominio
+﻿using Dominio.Maintenance;
+
+namespace Dominio
 {
     public class Material
     {

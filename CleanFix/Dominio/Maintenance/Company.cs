@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using System.Security.Cryptography.X509Certificates;
 
-namespace Dominio
+namespace Dominio.Maintenance
 {
     public class Company
     {
@@ -24,13 +24,13 @@ namespace Dominio
             this.id = id;
             this.price = price;
             this.workTime = workTime;
-            this.Issue = issue;
+            Issue = issue;
         }
         //Get issue del apartment
         public List<Company> GetApartmentIssue(IssueType type)
         {
             List<Company> companies = [];
-            return companies.Where(c => c.Issue == type).ToList(); 
+            return companies.Where(c => c.Issue == type).ToList();
         }
     }
 
