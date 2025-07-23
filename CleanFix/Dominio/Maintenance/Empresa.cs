@@ -1,6 +1,4 @@
-﻿
-// See https://aka.ms/new-console-template for more information
-
+﻿// See https://aka.ms/new-console-template for more information
 
 public class Empresa
 {
@@ -23,4 +21,15 @@ public class Empresa
         Coste = coste;
         TiempoTrabajo = tiempoTrabajo;
     }
+    public Empresa()
+    {
+        // Constructor por defecto
+    }
+     
+    // Método para mostrar información de la empresa
+    public string MostrarInformacion()
+    {
+        return $"Nombre: {Nombre}, Dirección: {Direccion}, Teléfono: {Telefono}, Email: {Email}, Coste: {Coste:C}, Tiempo de Trabajo: {TiempoTrabajo.TotalHours} horas";
+    }
+
 }
