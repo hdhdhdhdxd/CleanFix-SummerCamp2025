@@ -262,7 +262,7 @@ while (respuesta != "s")
 }
 
 MostrarRespuesta("Gracias por usar CleanFix. ¡Hasta luego!", ConsoleColor.Cyan);
-
+Thread.Sleep(1000);
 Environment.Exit(0);
 
 static void MostrarRespuesta(string mensaje, ConsoleColor color)
