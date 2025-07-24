@@ -1,6 +1,6 @@
-﻿namespace Dominio
+﻿namespace Dominio.Maintenance
 {
-   public enum IssueType
+    public enum IssueType
     {
         Plumbing,
         Electrical,
@@ -9,5 +9,5 @@
         Flooring,
         Cleaning,
         Ready
-   }
+    }
 }
