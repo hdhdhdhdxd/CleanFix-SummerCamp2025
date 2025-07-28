@@ -54,6 +54,7 @@ var company = new Company();
 
 Empresa Empresa1 = new Empresa()
 {
+    Id = 1,
     Nombre = "Electricidad y Más",
     Direccion = "Calle de la Luz, 123",
     Telefono = "123-456-7890",
@@ -65,6 +66,7 @@ Empresa Empresa1 = new Empresa()
 
 Empresa Empresa2 = new Empresa()
 {
+    Id = 2,
     Nombre = "Fontanería Rápida",
     Direccion = "Avenida del Agua, 456",
     Telefono = "987-654-3210",
@@ -76,6 +78,7 @@ Empresa Empresa2 = new Empresa()
 
 Empresa Empresa3 = new Empresa()
 {
+    Id = 3,
     Nombre = "Carpenterizacion Total",
     Direccion = "Plaza del Clima, 789",
     Telefono = "555-123-4567",
@@ -88,6 +91,7 @@ Empresa Empresa3 = new Empresa()
 
 Empresa Empresa4 = new Empresa()
 {
+    Id= 4,
     Nombre = "Pinturas y Más",
     Direccion = "Calle del Color, 321",
     Telefono = "444-555-6666",
@@ -99,6 +103,7 @@ Empresa Empresa4 = new Empresa()
 
 Empresa Empresa5 = new Empresa()
 {
+    Id = 5,
     Nombre = "Suelo Perfecto",
     Direccion = "Avenida del Suelo, 654",
     Telefono = "333-222-1111",
@@ -110,6 +115,7 @@ Empresa Empresa5 = new Empresa()
 };
 Empresa Empresa6 = new Empresa()
 {
+    Id = 6,
     Nombre = "Limpieza Total",
     Direccion = "Calle de la Limpieza, 987",
     Telefono = "222-333-4444",
@@ -121,6 +127,7 @@ Empresa Empresa6 = new Empresa()
 
 Empresa Empresa7 = new Empresa()
 {
+    Id = 7,
     Nombre = "Fontanería Bros",
     Direccion = "Calle de las Reparaciones, 159",
     Telefono = "111-222-3333",
@@ -132,6 +139,7 @@ Empresa Empresa7 = new Empresa()
 
 Empresa Empresa8 = new Empresa()
 {
+    Id=8,
     Nombre = "Electricidad Express",
     Direccion = "Calle de la Electricidad, 852",
     Telefono = "888-777-6666",
@@ -143,6 +151,7 @@ Empresa Empresa8 = new Empresa()
 
 Empresa Empresa9 = new Empresa()
 {
+    Id = 9,
     Nombre = "Carpintería Creativa",
     Direccion = "Calle de la Madera, 753",
     Telefono = "999-888-7777",

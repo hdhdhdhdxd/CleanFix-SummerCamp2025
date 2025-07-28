@@ -2,6 +2,7 @@
 
 public class Empresa
 {
+    public int Id { get; set; } // Identificador único de la empresa
     public string Nombre { get; set; }
     public string Direccion { get; set; }
     public string Telefono { get; set; }
@@ -11,8 +12,9 @@ public class Empresa
     public TimeSpan TiempoTrabajo { get; set; }
 
     // Constructor estándar
-    public Empresa(string nombre, string direccion, string telefono, string email, string tipo, decimal coste, TimeSpan tiempoTrabajo)
+    public Empresa(int id, string nombre, string direccion, string telefono, string email, string tipo, decimal coste, TimeSpan tiempoTrabajo)
     {
+        Id = id;
         Nombre = nombre;
         Direccion = direccion;
         Telefono = telefono;
@@ -29,7 +31,7 @@ public class Empresa
     // Método para mostrar información de la empresa
     public string MostrarInformacion()
     {
-        return $"Nombre: {Nombre}, Dirección: {Direccion}, Teléfono: {Telefono}, Email: {Email}, Coste: {Coste:C}, Tiempo de Trabajo: {TiempoTrabajo.TotalHours} horas";
+        return $"Id: {Id}, Nombre: {Nombre}, Dirección: {Direccion}, Teléfono: {Telefono}, Email: {Email}, Coste: {Coste:C}, Tiempo de Trabajo: {TiempoTrabajo.TotalHours} horas";
     }
 
 }
