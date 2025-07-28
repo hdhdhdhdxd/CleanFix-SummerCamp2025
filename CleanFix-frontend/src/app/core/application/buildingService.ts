@@ -1,16 +1,16 @@
-import { IBuildingRepository } from '@/core/domain/repositories/IBuildingRepository';
+import { BuildingRepository } from '@/core/domain/repositories/BuildingRepository'
 
-let buildingRepository: IBuildingRepository;
+let buildingRepository: BuildingRepository
 
-const init = (repository: IBuildingRepository) => {
-  buildingRepository = repository;
-};
+const init = (repository: BuildingRepository) => {
+  buildingRepository = repository
+}
 
-const getAllBuildings = async () => {
-  return buildingRepository.getAllBuildings();
-};
+const getAll = async () => {
+  return buildingRepository.getAll()
+}
 
 export const buildingService = {
   init,
-  getAllBuildings,
-};
+  getAll,
+}

@@ -14,6 +14,6 @@ export class Home implements OnInit {
   buildings = signal<Building[]>([])
 
   async ngOnInit() {
-    this.buildings.set(await this.buildingService.getAllBuildings())
+    this.buildings.set(await this.buildingService.getAll())
   }
 }

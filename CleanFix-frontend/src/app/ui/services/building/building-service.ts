@@ -1,5 +1,5 @@
 import { buildingService } from '@/core/application/buildingService'
-import { buildingRepository } from '@/core/infrastructure/repositories/buildingRepository'
+import { buildingApiRepository } from '@/core/infrastructure/repositories/buildingApiRepository'
 import { Injectable } from '@angular/core'
 
 @Injectable({
@@ -7,10 +7,10 @@ import { Injectable } from '@angular/core'
 })
 export class BuildingService {
   constructor() {
-    buildingService.init(buildingRepository)
+    buildingService.init(buildingApiRepository)
   }
 
-  getAllBuildings() {
-    return buildingService.getAllBuildings()
+  getAll() {
+    return buildingService.getAll()
   }
 }
