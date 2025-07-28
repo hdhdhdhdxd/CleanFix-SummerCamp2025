@@ -19,7 +19,8 @@
               {
                 "glob": "**/*",
                 "input": "public"
-              }
+              },
+              "src/assets"
             ],
             "styles": ["src/styles/global.css"]
           },
@@ -85,9 +86,7 @@
     }
   },
   "cli": {
-    "schematicCollections": [
-      "angular-eslint"
-    ],
+    "schematicCollections": ["angular-eslint"],
     "analytics": "e90790e6-26a7-4374-975f-c9e15cd44b55"
   }
 }
