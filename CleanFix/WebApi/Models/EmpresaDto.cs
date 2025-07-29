@@ -9,6 +9,6 @@ public class EmpresaDto
     public string Email { get; set; }
     public string Tipo { get; set; } // Ejemplo: "Electricidad", "Fontanería", etc.
     public decimal Coste { get; set; }
-    public TimeSpan TiempoTrabajo { get; set; }
+    public int TiempoTrabajo { get; set; }
 
 }
