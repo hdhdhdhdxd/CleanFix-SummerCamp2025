@@ -1,4 +1,4 @@
-﻿namespace WebApi.Models;
+﻿namespace WebApi.Entidades;
 
 public class Empresa
 {
@@ -10,5 +10,4 @@ public class Empresa
     public string Tipo { get; set; } // Ejemplo: "Electricidad", "Fontanería", etc.
     public decimal Coste { get; set; }
     public TimeSpan TiempoTrabajo { get; set; }
-
 }
