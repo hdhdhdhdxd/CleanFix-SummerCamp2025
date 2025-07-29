@@ -1,5 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WebApi.BaseDatos;
+using WebApi.Entidades;
 using WebApi.Models;
 
 namespace WebApi.Controllers;
@@ -7,14 +11,17 @@ namespace WebApi.Controllers;
 [ApiController]
 public class EmpresaController : ControllerBase
 {
-    [HttpGet]
-    public IActionResult Get()
+    private readonly ContextoBasedatos _context;
+
+    public EmpresaController(ContextoBasedatos context)
     {
-        var list = new List<EmpresaDto>
-        {
-            new EmpresaDto{Id = 1, Nombre = "fontaneriaPaco", Direccion = "CalleDeLosTubos", Telefono= "568394732", Email = "fontaneriaPaco@gmail.com", Tipo ="fontaneria", TiempoTrabajo = new TimeSpan(2, 30, 0), Coste = 50.00M},
-            new EmpresaDto{Id = 2, Nombre = "electricidadAntonio", Direccion = "CalleDeLosCables", Telefono= "937849572", Email = "electricidadAntonio@gmail.com", Tipo ="electricidad", TiempoTrabajo = new TimeSpan(3, 0, 0), Coste = 30.00M}
-        };
-        return Ok(list);
+        _context = context;
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Company>>> GetEmpresas()
+    {
+        var empresas = await _context.Companies.ToListAsync();
+        return Ok(empresas);
     }
 }
