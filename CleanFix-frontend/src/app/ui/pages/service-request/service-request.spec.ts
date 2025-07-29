@@ -10,7 +10,7 @@ describe('ServiceRequest', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ServiceRequest],
-      providers: [provideZonelessChangeDetection()]
+      providers: [provideZonelessChangeDetection()],
     }).compileComponents()
 
     fixture = TestBed.createComponent(ServiceRequest)
