@@ -1,19 +1,10 @@
-import { Building } from '@/core/domain/models/Building'
-import { BuildingService } from '@/ui/services/building/building-service'
-import { Component, OnInit, inject, signal } from '@angular/core'
+import { Component } from '@angular/core'
+import { CardInfo } from './components/card-info/card-info'
+import { Hero } from './components/hero/hero'
 
 @Component({
   selector: 'app-home',
-  imports: [],
+  imports: [Hero, CardInfo],
   templateUrl: './home.html',
-  styleUrl: './home.css',
 })
-export class Home implements OnInit {
-  private buildingService = inject(BuildingService)
-
-  buildings = signal<Building[]>([])
-
-  async ngOnInit() {
-    this.buildings.set(await this.buildingService.getAll())
-  }
-}
+export class Home {}
