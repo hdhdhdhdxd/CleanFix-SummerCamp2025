@@ -1,6 +1,11 @@
 <app-hero />
-<section>
-  <app-card-info title="Empresas Colaboradoras" [value]="50" svgPath="/svg/users.svg" />
-  <app-card-info title="Proyectos Completados" [value]="1000" svgPath="/svg/award.svg" />
-  <app-card-info title="Años de Experiencia" [value]="15" svgPath="/svg/map-pin.svg" />
+
+<app-brands />
+
+<section class="w-full flex justify-center *:-translate-y-1/2 bg-[url(/images/building.webp)] bg-cover bg-bottom h-72">
+  <div class="flex space-x-44">
+    <app-card-info title="Empresas Colaboradoras" [value]="50" svgPath="/svg/users.svg" />
+    <app-card-info title="Proyectos Completados" [value]="1000" svgPath="/svg/award.svg" />
+    <app-card-info title="Años de Experiencia" [value]="15" svgPath="/svg/map-pin.svg" />
+  </div>
 </section>
