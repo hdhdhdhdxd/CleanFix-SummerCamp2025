@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
+import { provideZonelessChangeDetection } from '@angular/core'
 import { ServiceRequest } from './service-request'
 
 describe('ServiceRequest', () => {
@@ -9,6 +10,7 @@ describe('ServiceRequest', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [ServiceRequest],
+      providers: [provideZonelessChangeDetection()],
     }).compileComponents()
 
     fixture = TestBed.createComponent(ServiceRequest)
