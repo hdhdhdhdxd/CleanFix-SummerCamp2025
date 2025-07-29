@@ -1,6 +1,6 @@
 ﻿namespace WebApi.Models;
 
-public class Empresas
+public class Empresa
 {
     public int Id { get; set; } // Identificador único de la empresa
     public string Nombre { get; set; }
