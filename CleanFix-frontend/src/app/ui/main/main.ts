@@ -7,6 +7,5 @@ import { Header } from '../shared/header/header'
   selector: 'app-root',
   imports: [RouterOutlet, Footer, Header],
   templateUrl: './main.html',
-  styleUrl: './main.css',
 })
 export class Main {}
