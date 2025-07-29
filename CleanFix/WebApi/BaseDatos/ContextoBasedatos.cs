@@ -10,5 +10,9 @@ public class ContextoBasedatos: DbContext
 
     }
 
-    public DbSet<Empresa> Empresas { get; set; }
+    public DbSet<Company> Companies { get; set; }
+    public DbSet<Material> Materials { get; set; }
+    public DbSet<Apartment> Apartments { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Application> Applications { get; set; }
 }

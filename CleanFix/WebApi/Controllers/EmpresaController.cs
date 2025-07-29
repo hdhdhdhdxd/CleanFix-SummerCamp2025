@@ -19,9 +19,9 @@ public class EmpresaController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Empresa>>> GetEmpresas()
+    public async Task<ActionResult<IEnumerable<Company>>> GetEmpresas()
     {
-        var empresas = await _context.Empresas.ToListAsync();
+        var empresas = await _context.Companies.ToListAsync();
         return Ok(empresas);
     }
 }

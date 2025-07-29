@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApi.BaseDatos;
 
@@ -11,9 +12,11 @@ using WebApi.BaseDatos;
 namespace WebApi.Migrations
 {
     [DbContext(typeof(ContextoBasedatos))]
-    partial class ContextoBasedatosModelSnapshot : ModelSnapshot
+    [Migration("20250729115828_apartment-material-issuetype")]
+    partial class apartmentmaterialissuetype
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,42 +52,6 @@ namespace WebApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Apartments");
-                });
-
-            modelBuilder.Entity("WebApi.Entidades.Application", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("Duration")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Applications");
                 });
 
             modelBuilder.Entity("WebApi.Entidades.Company", b =>
@@ -145,54 +112,6 @@ namespace WebApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Materials");
-                });
-
-            modelBuilder.Entity("WebApi.Entidades.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("ApartmentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApartmentId");
-
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("WebApi.Entidades.Application", b =>
-                {
-                    b.HasOne("WebApi.Entidades.Company", "Company")
-                        .WithMany()
-                        .HasForeignKey("CompanyId");
-
-                    b.HasOne("WebApi.Entidades.User", null)
-                        .WithMany("Applications")
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("Company");
-                });
-
-            modelBuilder.Entity("WebApi.Entidades.User", b =>
-                {
-                    b.HasOne("WebApi.Entidades.Apartment", "Apartment")
-                        .WithMany()
-                        .HasForeignKey("ApartmentId");
-
-                    b.Navigation("Apartment");
-                });
-
-            modelBuilder.Entity("WebApi.Entidades.User", b =>
-                {
-                    b.Navigation("Applications");
                 });
 #pragma warning restore 612, 618
         }
