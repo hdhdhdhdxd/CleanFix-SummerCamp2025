@@ -3,9 +3,9 @@
 <app-brands />
 
 <section
-  class="flex h-72 w-full justify-center bg-[url(/images/building.webp)] bg-cover bg-bottom *:-translate-y-1/2"
+  class="flex w-screen justify-center bg-[url(/images/building.webp)] bg-cover bg-bottom *:-translate-y-1/5 md:h-72 md:*:-translate-y-1/2"
 >
-  <div class="flex space-x-44">
+  <div class="flex flex-col space-y-10 md:flex-row md:space-y-0 md:space-x-44">
     <app-card-info title="Empresas Colaboradoras" [value]="50" svgPath="/svg/users.svg" />
     <app-card-info title="Proyectos Completados" [value]="1000" svgPath="/svg/award.svg" />
     <app-card-info title="Años de Experiencia" [value]="15" svgPath="/svg/map-pin.svg" />
@@ -15,5 +15,3 @@
 <app-service-section />
 
 <app-why-us-section />
-
-
