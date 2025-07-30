@@ -1,6 +1,6 @@
 ﻿namespace WebApi.Entidades;
 
-public class Application
+public class Solicitation
 {
     public int Id { get; set; } // Identificador único de la aplicación
     public Company? Company { get; set; } // Empresa asociada a la aplicación

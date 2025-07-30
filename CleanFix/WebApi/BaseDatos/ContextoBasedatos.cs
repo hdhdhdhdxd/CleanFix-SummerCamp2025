@@ -14,5 +14,5 @@ public class ContextoBasedatos: DbContext
     public DbSet<Material> Materials { get; set; }
     public DbSet<Apartment> Apartments { get; set; }
     public DbSet<User> Users { get; set; }
-    public DbSet<Application> Applications { get; set; }
+    public DbSet<Solicitation> Applications { get; set; }
 }
