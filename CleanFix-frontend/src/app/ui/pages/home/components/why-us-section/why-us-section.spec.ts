@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { WhyUsSection } from './why-us-section'
+import { provideZonelessChangeDetection } from '@angular/core'
 
 describe('WhyUsSection', () => {
   let component: WhyUsSection
@@ -9,6 +10,7 @@ describe('WhyUsSection', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [WhyUsSection],
+      providers: [provideZonelessChangeDetection()],
     }).compileComponents()
 
     fixture = TestBed.createComponent(WhyUsSection)
