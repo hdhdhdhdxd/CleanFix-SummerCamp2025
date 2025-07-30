@@ -1,1 +1,1 @@
-cd CleanFix-frontend && ng lint
+cd CleanFix-frontend && npm run lint-staged
