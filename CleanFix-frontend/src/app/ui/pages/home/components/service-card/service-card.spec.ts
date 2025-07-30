@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { provideZonelessChangeDetection } from '@angular/core'
-import { Footer } from './footer'
+import { ServiceCard } from './service-card'
 
-describe('Footer', () => {
-  let component: Footer
-  let fixture: ComponentFixture<Footer>
+describe('ServiceCard', () => {
+  let component: ServiceCard
+  let fixture: ComponentFixture<ServiceCard>
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Footer],
+      imports: [ServiceCard],
       providers: [provideZonelessChangeDetection()],
     }).compileComponents()
 
-    fixture = TestBed.createComponent(Footer)
+    fixture = TestBed.createComponent(ServiceCard)
     component = fixture.componentInstance
     fixture.detectChanges()
   })

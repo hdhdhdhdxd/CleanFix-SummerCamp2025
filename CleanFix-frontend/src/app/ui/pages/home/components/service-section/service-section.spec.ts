@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { provideZonelessChangeDetection } from '@angular/core'
-import { Footer } from './footer'
+import { ServiceSection } from './service-section'
 
-describe('Footer', () => {
-  let component: Footer
-  let fixture: ComponentFixture<Footer>
+describe('ServiceSection', () => {
+  let component: ServiceSection
+  let fixture: ComponentFixture<ServiceSection>
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Footer],
+      imports: [ServiceSection],
       providers: [provideZonelessChangeDetection()],
     }).compileComponents()
 
-    fixture = TestBed.createComponent(Footer)
+    fixture = TestBed.createComponent(ServiceSection)
     component = fixture.componentInstance
     fixture.detectChanges()
   })

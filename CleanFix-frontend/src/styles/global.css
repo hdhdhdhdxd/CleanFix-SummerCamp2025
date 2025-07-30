@@ -63,7 +63,7 @@
       transform: translateX(0);
     }
     100% {
-      transform: translateX(-50%);
+      transform: translateX(-100%);
     }
   }
 }
@@ -81,6 +81,13 @@
   font-family: 'PlusJakartaSans';
   src: url('/fonts/plusjakartasans-regular.woff2') format('woff2');
   font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PlusJakartaSans';
+  src: url('/fonts/plusjakartasans-medium.woff2') format('woff2');
+  font-weight: 500;
   font-display: swap;
 }
 

@@ -1,10 +1,8 @@
-import { Component } from '@angular/core';
+import { Component } from '@angular/core'
 
 @Component({
   selector: 'app-hero',
   imports: [],
-  templateUrl: './hero.html'
+  templateUrl: './hero.html',
 })
-export class Hero {
-
-}
+export class Hero {}
