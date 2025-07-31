@@ -1,6 +1,8 @@
-<article class="image-card">
-  <img src="path/to/image.jpg" alt="Image Description" />
-  <header>
-    <h1>Pais</h1>
+<article
+  class="image-card flex h-[28rem] min-h-[200px] w-[17rem] items-end bg-cover bg-center"
+  [ngStyle]="{ 'background-image': 'url(' + imageUrl() + ')' }"
+>
+  <header class="w-full bg-black/40 p-4">
+    <h1 class="m-0 text-white">{{ title() }}</h1>
   </header>
 </article>
