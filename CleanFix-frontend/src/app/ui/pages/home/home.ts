@@ -4,10 +4,11 @@ import { Hero } from './components/hero/hero'
 import { Brands } from './components/brands/brands'
 import { ServiceSection } from './components/service-section/service-section'
 import { WhyUsSection } from './components/why-us-section/why-us-section'
+import { LocationsSection } from './components/locations-section/locations-section'
 
 @Component({
   selector: 'app-home',
-  imports: [Hero, CardInfo, Brands, ServiceSection, WhyUsSection],
+  imports: [Hero, CardInfo, Brands, ServiceSection, WhyUsSection, LocationsSection],
   templateUrl: './home.html',
 })
 export class Home {}
