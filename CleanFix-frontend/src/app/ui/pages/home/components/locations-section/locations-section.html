@@ -1,12 +1,44 @@
-<section>
-  <header>
-    <h1>Titulo</h1>
-    <h2>Descripcion</h2>
+<section class="mx-auto flex w-full max-w-6xl flex-col gap-15 pl-5 lg:pl-0">
+  <header class="flex flex-col gap-2 pr-5 lg:pr-0">
+    <h1 class="text-3xl font-bold text-brand-0">Localizaciones</h1>
+    <h2 class="w-full text-base text-brand-100 md:w-xl">
+      Ofrecemos nuestros servicios en distintas zonas, adaptándonos a las necesidades de cada
+      cliente.
+    </h2>
   </header>
-  <div class="flex flex-wrap justify-center gap-4">
-    <app-image-card title="Pais 1" imageUrl="/images/country1.webp"></app-image-card>
-    <app-image-card title="Pais 2" imageUrl="/images/country2.webp"></app-image-card>
-    <app-image-card title="Pais 3" imageUrl="/images/country3.webp"></app-image-card>
-    <app-image-card title="Pais 4" imageUrl="/images/country4.webp"></app-image-card>
+
+  <div class="relative w-full">
+    <div
+      #carousel
+      class="grid auto-cols-max grid-flow-col gap-4 overflow-x-auto overflow-y-hidden scroll-smooth pr-5 lg:overflow-x-hidden lg:pr-0"
+    >
+      <app-image-card title="Pais 1" imageUrl="/images/country1.webp"></app-image-card>
+      <app-image-card title="Pais 2" imageUrl="/images/country2.webp"></app-image-card>
+      <app-image-card title="Pais 3" imageUrl="/images/country3.webp"></app-image-card>
+      <app-image-card title="Pais 5" imageUrl="/images/country5.webp"></app-image-card>
+      <app-image-card title="Pais 6" imageUrl="/images/country1.webp"></app-image-card>
+      <app-image-card title="Pais 7" imageUrl="/images/country2.webp"></app-image-card>
+      <app-image-card title="Pais 8" imageUrl="/images/country3.webp"></app-image-card>
+      <app-image-card title="Pais 9" imageUrl="/images/country5.webp"></app-image-card>
+    </div>
+
+    <div
+      class="absolute top-2/3 -left-0 hidden -translate-x-1/2 -translate-y-1/2 gap-2 lg:flex lg:flex-col"
+    >
+      <button
+        (click)="scrollCarousel('left')"
+        class="transition-scale flex h-16 w-16 items-center justify-center rounded-full bg-primary-500 shadow-lg duration-300 hover:scale-105"
+        aria-label="Anterior"
+      >
+        <img src="/svg/arrow.svg" alt="Anterior" class="rotate-180" />
+      </button>
+      <button
+        (click)="scrollCarousel('right')"
+        class="transition-scale flex h-16 w-16 items-center justify-center rounded-full bg-primary-500 shadow-lg duration-300 hover:scale-105"
+        aria-label="Siguiente"
+      >
+        <img src="/svg/arrow.svg" alt="Siguiente" />
+      </button>
+    </div>
   </div>
 </section>
