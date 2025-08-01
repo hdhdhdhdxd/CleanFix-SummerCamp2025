@@ -1,23 +1,23 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using WebApi.Interfaces;
+﻿using Microsoft.AspNetCore.Mvc;
+using WebApi.Entidades;
 
 namespace WebApi.Controllers;
-[Route("api/user")]
-[ApiController]
 
-public class UserController : ControllersBase
+[ApiController]
+[Route("api/user")]
+public class UserController : ControllerBase
 {
     [HttpPost]
-    public IActionResult CrearUsuario([FromBody] Usuario usuario)
-    {         if (usuario == null)
+    public IActionResult CrearUsuario([FromBody] User user)
+    {
+        if(user == null || string.IsNullOrEmpty(user.Name))
         {
-            return BadRequest("El usuario no puede ser nulo.");
+            return BadRequest("El nombre del usuario es obligatorio.");
         }
-
-        // Aquí podrías agregar lógica para guardar el usuario en la base de datos
-        // Por ejemplo, usando un DbContext para interactuar con la base de datos
-
-        return Ok(new { mensaje = "Usuario creado correctamente", usuario });
+        // Aquí podrías agregar lógica para crear un usuario
+        // Por ahora, simplemente devolvemos el nombre recibido
+        return Ok(new { mensaje = "Usuario creado correctamente", user });
     }
+
+
 }
