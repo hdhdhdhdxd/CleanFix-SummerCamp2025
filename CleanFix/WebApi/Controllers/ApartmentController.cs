@@ -1,23 +1,23 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Application.Apartments.Queries.GetAparmets;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Interfaces;
 
 namespace WebApi.Controllers;
 [Route("api/apartamento")]
 [ApiController]
 public class ApartmentController : ControllerBase
 {
-    private IApartment _apartment;
+    private readonly IGetApartmentsQuery _getApartmentsQuery;
 
-    public ApartmentController(IApartment apartment)
+    public ApartmentController(IGetApartmentsQuery getApartmentsQuery)
     {
-        _apartment = apartment;
+        _getApartmentsQuery = getApartmentsQuery;
     }
 
     [HttpGet]
-    public IActionResult Get()
+    public async Task<IActionResult> Get()
     {
-        // Devuelve un saludo simple
-        return Ok(_apartment.GetAll());
+        var result = await _getApartmentsQuery.ExecuteAsync();
+
+        return Ok(result);
     }
 }

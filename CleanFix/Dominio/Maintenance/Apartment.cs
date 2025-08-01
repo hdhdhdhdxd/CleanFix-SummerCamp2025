@@ -1,10 +1,12 @@
-﻿namespace Dominio.Maintenance
+﻿using Dominio.Common.Interfaces;
+
+namespace Dominio.Maintenance
 {
-    public class Apartment
+    public class Apartment : IEntity
     {
-        int id { get; }
-        string address { get; set; }
-        string surface { get; set; }
+        public int Id { get; set; }
+        public string Address { get; set; }
+        string Surface { get; set; }
         IssueType Type { get; set; }
     }
 }
