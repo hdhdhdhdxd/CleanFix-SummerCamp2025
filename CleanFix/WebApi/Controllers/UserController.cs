@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using WebApi.Interfaces;
 
 namespace WebApi.Controllers;
-[Route("api/usuario")]
+[Route("api/user")]
 [ApiController]
 
-public class UsuarioController : ControllerBase
+public class UserController : ControllersBase
 {
     [HttpPost]
     public IActionResult CrearUsuario([FromBody] Usuario usuario)
