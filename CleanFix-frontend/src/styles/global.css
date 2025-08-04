@@ -8,6 +8,7 @@
   --font-primary: 'PlusJakartaSans';
 
   --color-primary-500: oklch(0.2712 0.0493 251.09);
+  --color-primary-300: oklch(0.3333 0.0572 251.09);
   --color-accent-500: oklch(0.8263 0.1634 90.12);
 
   --color-brand-0: oklch(1 0 0);
