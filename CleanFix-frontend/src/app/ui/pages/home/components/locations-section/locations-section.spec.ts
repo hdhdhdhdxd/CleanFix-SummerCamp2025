@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { LocationsSection } from './locations-section'
+import { provideZonelessChangeDetection } from '@angular/core'
 
 describe('LocationsSection', () => {
   let component: LocationsSection
@@ -9,6 +10,7 @@ describe('LocationsSection', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [LocationsSection],
+      providers: [provideZonelessChangeDetection()],
     }).compileComponents()
 
     fixture = TestBed.createComponent(LocationsSection)
