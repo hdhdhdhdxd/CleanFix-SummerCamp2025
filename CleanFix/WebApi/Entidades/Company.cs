@@ -2,7 +2,7 @@
 
 public class Company
 {
-    public int Id { get; set; } // Identificador único de la empresa
+    public Guid Id { get; set; } // Identificador único de la empresa
     public string? Name { get; set; }
     public string? Address { get; set; }
     public string? Number { get; set; }

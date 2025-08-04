@@ -1,6 +1,9 @@
-﻿namespace WebApi.Entidades;
+﻿
+using WebApi.Entidades;
 
-public class Material
+namespace WebApi.Models;
+
+public class MaterialDto
 {
     public Guid Id { get; set; } // Identificador único del material
     public string Name { get; set; }

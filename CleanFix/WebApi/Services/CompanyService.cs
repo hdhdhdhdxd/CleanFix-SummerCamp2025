@@ -1,8 +1,7 @@
 ﻿using WebApi.BaseDatos;
 using WebApi.Entidades;
 using WebApi.Interfaces;
-
-namespace WebApi.Repositories;
+namespace WebApi.Services;
 
 public class CompanyService : ICompany
 {

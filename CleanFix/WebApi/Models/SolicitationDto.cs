@@ -1,6 +1,7 @@
-﻿namespace WebApi.Entidades;
+﻿using WebApi.Entidades;
+namespace WebApi.Models;
 
-public class Solicitation
+public class SolicitationDto
 {
     public Guid Id { get; set; } // Identificador único de la aplicación
     public Apartment? Apartment { get; set; } // Apartamento asociado a la aplicación

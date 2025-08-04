@@ -12,8 +12,8 @@ using WebApi.BaseDatos;
 namespace WebApi.Migrations
 {
     [DbContext(typeof(ContextoBasedatos))]
-    [Migration("20250729120727_user-application")]
-    partial class userapplication
+    [Migration("20250804120012_inicial")]
+    partial class inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,11 +27,9 @@ namespace WebApi.Migrations
 
             modelBuilder.Entity("WebApi.Entidades.Apartment", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -54,49 +52,11 @@ namespace WebApi.Migrations
                     b.ToTable("Apartments");
                 });
 
-            modelBuilder.Entity("WebApi.Entidades.Application", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<double>("Duration")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Applications");
-                });
-
             modelBuilder.Entity("WebApi.Entidades.Company", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Address")
                         .HasColumnType("nvarchar(max)");
@@ -126,11 +86,9 @@ namespace WebApi.Migrations
 
             modelBuilder.Entity("WebApi.Entidades.Material", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("Available")
                         .HasColumnType("bit");
@@ -145,21 +103,66 @@ namespace WebApi.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("SolicitationId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("SolicitationId");
 
                     b.ToTable("Materials");
                 });
 
+            modelBuilder.Entity("WebApi.Entidades.Solicitation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ApartmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("Duration")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Price")
+                        .HasColumnType("float");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApartmentId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Solicitations");
+                });
+
             modelBuilder.Entity("WebApi.Entidades.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("ApartmentId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("ApartmentId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -171,8 +174,19 @@ namespace WebApi.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("WebApi.Entidades.Application", b =>
+            modelBuilder.Entity("WebApi.Entidades.Material", b =>
                 {
+                    b.HasOne("WebApi.Entidades.Solicitation", null)
+                        .WithMany("Materials")
+                        .HasForeignKey("SolicitationId");
+                });
+
+            modelBuilder.Entity("WebApi.Entidades.Solicitation", b =>
+                {
+                    b.HasOne("WebApi.Entidades.Apartment", "Apartment")
+                        .WithMany()
+                        .HasForeignKey("ApartmentId");
+
                     b.HasOne("WebApi.Entidades.Company", "Company")
                         .WithMany()
                         .HasForeignKey("CompanyId");
@@ -180,6 +194,8 @@ namespace WebApi.Migrations
                     b.HasOne("WebApi.Entidades.User", null)
                         .WithMany("Applications")
                         .HasForeignKey("UserId");
+
+                    b.Navigation("Apartment");
 
                     b.Navigation("Company");
                 });
@@ -191,6 +207,11 @@ namespace WebApi.Migrations
                         .HasForeignKey("ApartmentId");
 
                     b.Navigation("Apartment");
+                });
+
+            modelBuilder.Entity("WebApi.Entidades.Solicitation", b =>
+                {
+                    b.Navigation("Materials");
                 });
 
             modelBuilder.Entity("WebApi.Entidades.User", b =>

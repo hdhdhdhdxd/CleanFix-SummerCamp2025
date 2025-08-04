@@ -3,7 +3,7 @@ using WebApi.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using WebApi.BaseDatos;
 using WebApi.Entidades;
-namespace WebApi.Repositories;
+namespace WebApi.Services;
 
 public class ApartmentService : IApartment
 {

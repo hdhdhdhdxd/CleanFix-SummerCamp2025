@@ -1,6 +1,6 @@
-﻿namespace WebApi.Entidades;
+﻿namespace WebApi.Models;
 
-public class Apartment
+public class ApartmentDto
 {
     public Guid Id { get; set; }
     public int FloorNumber { get; set; } // Piso del apartamento

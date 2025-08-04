@@ -1,8 +1,7 @@
 ﻿using WebApi.BaseDatos;
 using WebApi.Entidades;
 using WebApi.Interfaces;
-
-namespace WebApi.Repositories;
+namespace WebApi.Services;
 
 public class SolicitationService : ISolicitation
 {
@@ -15,27 +14,27 @@ public class SolicitationService : ISolicitation
 
     public List<Solicitation> GetAll()
     {
-        return _context.Applications.ToList(); // DbSet<Solicitation> se llama Applications
+        return _context.Solicitations.ToList(); // DbSet<Solicitation> se llama Applications
     }
 
     public void Add(Solicitation solicitation)
     {
-        _context.Applications.Add(solicitation);
+        _context.Solicitations.Add(solicitation);
         _context.SaveChanges();
     }
 
     public void Update(Solicitation solicitation)
     {
-        _context.Applications.Update(solicitation);
+        _context.Solicitations.Update(solicitation);
         _context.SaveChanges();
     }
 
     public void Delete(int id)
     {
-        var solicitud = _context.Applications.Find(id);
+        var solicitud = _context.Solicitations.Find(id);
         if (solicitud != null)
         {
-            _context.Applications.Remove(solicitud);
+            _context.Solicitations.Remove(solicitud);
             _context.SaveChanges();
         }
     }
