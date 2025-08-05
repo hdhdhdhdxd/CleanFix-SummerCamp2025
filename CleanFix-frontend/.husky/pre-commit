@@ -1,1 +1,1 @@
-npm test
+cd CleanFix-frontend && npm run lint-staged

@@ -1,0 +1,13 @@
+<article class="flex w-52 flex-col items-center justify-center space-y-3 text-center text-pretty">
+  <div class="flex h-9 w-9 items-center justify-center rounded-3xl bg-primary-500">
+    <img [src]="svgSource()" alt="{{ title() }}" />
+  </div>
+  <div class="flex flex-col space-y-2">
+    <header>
+      <h1 class="font-semibold">{{ title() }}</h1>
+    </header>
+    <div>
+      <p class="text-brand-600">{{ description() }}</p>
+    </div>
+  </div>
+</article>
