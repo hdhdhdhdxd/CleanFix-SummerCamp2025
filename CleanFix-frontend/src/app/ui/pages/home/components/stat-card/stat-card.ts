@@ -1,11 +1,11 @@
 import { Component, input } from '@angular/core'
 
 @Component({
-  selector: 'app-card-info',
+  selector: 'app-stat-card',
   imports: [],
-  templateUrl: './card-info.html',
+  templateUrl: './stat-card.html',
 })
-export class CardInfo {
+export class StatCard {
   svgPath = input<string>('')
   title = input<string>('')
   value = input<number>(0)

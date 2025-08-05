@@ -6,6 +6,7 @@ body {
   display: flex;
   flex-direction: column;
   scrollbar-gutter: stable;
+  scroll-behavior: smooth;
 }
 
 ul,
