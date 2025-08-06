@@ -3,6 +3,7 @@ using WebApi.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using WebApi.BaseDatos;
 using WebApi.Entidades;
+
 namespace WebApi.Services;
 
 public class ApartmentService : IApartment
@@ -39,5 +40,10 @@ public class ApartmentService : IApartment
             _context.Apartments.Remove(apartment);
             _context.SaveChanges();
         }
+    }
+
+    Task<List<Apartment>> IApartment.GetAll()
+    {
+        throw new NotImplementedException();
     }
 }
