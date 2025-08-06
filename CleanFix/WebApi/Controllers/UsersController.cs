@@ -26,14 +26,37 @@ namespace WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
         {
+            List<UserDto> listaUsers = new List<UserDto>();
+
             var users = await _context.Users
-                            // Where(userdto => userdto.Id != Guid.Empty).
-                            .OrderBy(userdto => userdto.Name)
-                            // .Take(10) // Limitar a 10 resultados
+                            // Where(user => user.Id != Guid.Empty).
+                            .OrderBy(user => user.Name)
+                            .Take(10) // Limitar a 10 resultados
                             .ToListAsync();
+           
+                // Reemplaza la asignación directa de Apartment por una conversión explícita a ApartmentDto
+                foreach (var user in users)
+                {
+                    listaUsers.Add(new UserDto
+                    {
+                        Id = user.Id,
+                        Name = user.Name,
+                        Applications = user.Applications,
+                        Apartment = user.Apartment == null ? null : new ApartmentDto
+                        {
+                            Id = user.Apartment.Id,
+                            FloorNumber = user.Apartment.FloorNumber,
+                            Address = user.Apartment.Address,
+                            Surface = user.Apartment.Surface,
+                            RoomNumber = user.Apartment.RoomNumber,
+                            BathroomNumber = user.Apartment.BathroomNumber
+                        }
+                    });
+                }
+                 
+            
 
-
-            return Ok (users);
+            return Ok (listaUsers);
         }
 
         // GET: api/Users/5

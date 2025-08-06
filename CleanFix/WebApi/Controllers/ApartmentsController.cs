@@ -27,21 +27,17 @@ namespace WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ApartmentDto>>> GetApartments()
         {
-            //List<ApartmentDto> listaApartments = new List<ApartmentDto>();
+            List<ApartmentDto> listaApartments = new List<ApartmentDto>();
 
             // 1-Traer todos los distritos de la base de datos
             var apartments = await _context.Apartments
-                            // Where(apartmentdto => apartmentdto.Id != Guid.Empty).
-                            .OrderBy(apartmentdto => apartmentdto.FloorNumber)
-                           // .Take(10) // Limitar a 10 resultados
+                            // Where(apartment => apartment.Id != Guid.Empty).
+                            .OrderBy(apartment => apartment.FloorNumber)
+                            .Take(10) // Limitar a 10 resultados
                             .ToListAsync();
-
-            // Sacar solo 10 datos
-
-
-
+             
             // 2-Devolver la lista de distritos en formato dto
-            /* foreach (var apartment in apartments)
+             foreach (var apartment in apartments)
              {
                  listaApartments.Add(new ApartmentDto
                  {
@@ -52,9 +48,9 @@ namespace WebApi.Controllers
                      RoomNumber = apartment.RoomNumber,
                      BathroomNumber = apartment.BathroomNumber,
                  });
-             }*/
+             }
 
-            return Ok (apartments);
+            return Ok (listaApartments);
         }
 
         // GET: api/Apartments/5

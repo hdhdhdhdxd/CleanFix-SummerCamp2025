@@ -26,17 +26,17 @@ namespace WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CompanyDto>>> GetCompanies()
         {
-           // List<CompanyDto> listaCompanies = new List<CompanyDto>();
+            List<CompanyDto> listaCompanies = new List<CompanyDto>();
 
             // 1-Traer todos los distritos de la base de datos
             var companies = await _context.Companies
-                            // Where(companydto => companydto.Id != Guid.Empty).
-                            .OrderBy(companydto => companydto.Name)
+                            // Where(company => company.Id != Guid.Empty).
+                            .OrderBy(company => company.Name)
                             // .Take(10) // Limitar a 10 resultados
                             .ToListAsync();
 
             // 2-Devolver la lista de distritos en formato dto
-            /* foreach (var company in companies)
+             foreach (var company in companies)
              {
                  listaCompanies.Add(new CompanyDto
                  {
@@ -49,9 +49,9 @@ namespace WebApi.Controllers
                      Price = company.Price,
                      WorkTime = company.WorkTime
                  });
-             }*/
+             }
 
-            return Ok (companies);
+            return Ok (listaCompanies);
         }
 
         // GET: api/Companies/5

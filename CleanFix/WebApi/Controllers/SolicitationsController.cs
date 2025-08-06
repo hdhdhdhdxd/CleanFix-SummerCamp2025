@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.BaseDatos;
 using WebApi.Entidades;
+using WebApi.Interfaces;
 using WebApi.Models;
 
 namespace WebApi.Controllers
@@ -26,17 +27,17 @@ namespace WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SolicitationDto>>> GetSolicitations()
         {
-            //List<SolicitationDto> listaSolicitations = new List<SolicitationDto>();
+            List<SolicitationDto> listaSolicitations = new List<SolicitationDto>();
 
             // 1-Traer todos los distritos de la base de datos
             var solicitations = await _context.Solicitations
-                            // Where(solicitationdto => solicitationdto.Id != Guid.Empty).
-                            .OrderBy(solicitationdto => solicitationdto.Date)
-                            // .Take(10) // Limitar a 10 resultados
+                            // Where(solicitation => solicitation.Id != Guid.Empty).
+                            .OrderBy(solicitation => solicitation.Date)
+                            .Take(10) // Limitar a 10 resultados
                             .ToListAsync();
 
             // 2-Devolver la lista de distritos en formato dto
-            /* foreach (var solicitation in solicitations)
+             foreach (var solicitation in solicitations)
              {
                  listaSolicitations.Add(new SolicitationDto
                  {
@@ -50,9 +51,9 @@ namespace WebApi.Controllers
                      Type = solicitation.Type,
                      Materials = solicitation.Materials,
                  });
-             }*/
+             }
 
-            return Ok (solicitations);
+            return Ok (listaSolicitations);
         }
 
         // GET: api/Solicitations/5
