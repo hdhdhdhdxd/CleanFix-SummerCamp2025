@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.SemanticKernel;
 using System.Data.SqlClient;
 using System.ComponentModel;
-
+/*
 public class DBPlugin
 {
     [KernelFunction, Description("Listado de empresas disponibles para reformas y mantenimiento")]
@@ -69,3 +69,4 @@ public class Material
 }
 
 
+*/
