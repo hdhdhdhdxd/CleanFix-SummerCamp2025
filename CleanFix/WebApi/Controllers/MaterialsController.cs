@@ -26,13 +26,17 @@ namespace WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MaterialDto>>> GetMaterials()
         {
-            List<MaterialDto> listaMaterials = new List<MaterialDto>();
+           // List<MaterialDto> listaMaterials = new List<MaterialDto>();
 
             // 1-Traer todos los distritos de la base de datos
-            var materials = await _context.Materials.ToListAsync();
+            var materials = await _context.Materials
+                            // Where(materialdto => materialdto.Id != Guid.Empty).
+                            .OrderBy(materialdto => materialdto.Name)
+                            // .Take(10) // Limitar a 10 resultados
+                            .ToListAsync();
 
             // 2-Devolver la lista de distritos en formato dto
-            foreach (var material in materials)
+            /*foreach (var material in materials)
             {
                 listaMaterials.Add(new MaterialDto
                 {
@@ -42,9 +46,9 @@ namespace WebApi.Controllers
                     Available = material.Available,
                     Issue = material.Issue
                 });
-            }
+            }*/
 
-            return listaMaterials;
+            return Ok (materials);
         }
 
         // GET: api/Materials/5

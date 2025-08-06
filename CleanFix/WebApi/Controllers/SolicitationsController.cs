@@ -26,29 +26,33 @@ namespace WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SolicitationDto>>> GetSolicitations()
         {
-            List<SolicitationDto> listaSolicitations = new List<SolicitationDto>();
+            //List<SolicitationDto> listaSolicitations = new List<SolicitationDto>();
 
             // 1-Traer todos los distritos de la base de datos
-            var solicitations = await _context.Solicitations.ToListAsync();
+            var solicitations = await _context.Solicitations
+                            // Where(solicitationdto => solicitationdto.Id != Guid.Empty).
+                            .OrderBy(solicitationdto => solicitationdto.Date)
+                            // .Take(10) // Limitar a 10 resultados
+                            .ToListAsync();
 
             // 2-Devolver la lista de distritos en formato dto
-            foreach (var solicitation in solicitations)
-            {
-                listaSolicitations.Add(new SolicitationDto
-                {
-                    Id = solicitation.Id,
-                    Apartment = solicitation.Apartment,
-                    Company = solicitation.Company,
-                    Date = solicitation.Date,
-                    Price = solicitation.Price,
-                    Duration = solicitation.Duration,
-                    Address = solicitation.Address,
-                    Type = solicitation.Type,
-                    Materials = solicitation.Materials,
-                });
-            }
+            /* foreach (var solicitation in solicitations)
+             {
+                 listaSolicitations.Add(new SolicitationDto
+                 {
+                     Id = solicitation.Id,
+                     Apartment = solicitation.Apartment,
+                     Company = solicitation.Company,
+                     Date = solicitation.Date,
+                     Price = solicitation.Price,
+                     Duration = solicitation.Duration,
+                     Address = solicitation.Address,
+                     Type = solicitation.Type,
+                     Materials = solicitation.Materials,
+                 });
+             }*/
 
-            return listaSolicitations;
+            return Ok (solicitations);
         }
 
         // GET: api/Solicitations/5
