@@ -32,7 +32,7 @@ namespace WebApi.Controllers
             var companies = await _context.Companies
                             // Where(company => company.Id != Guid.Empty).
                             .OrderBy(company => company.Name)
-                            // .Take(10) // Limitar a 10 resultados
+                            .Take(10) // Limitar a 10 resultados
                             .ToListAsync();
 
             // 2-Devolver la lista de distritos en formato dto
