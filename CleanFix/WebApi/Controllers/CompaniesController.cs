@@ -26,28 +26,32 @@ namespace WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CompanyDto>>> GetCompanies()
         {
-            List<CompanyDto> listaCompanies = new List<CompanyDto>();
+           // List<CompanyDto> listaCompanies = new List<CompanyDto>();
 
             // 1-Traer todos los distritos de la base de datos
-            var companies = await _context.Companies.ToListAsync();
+            var companies = await _context.Companies
+                            // Where(companydto => companydto.Id != Guid.Empty).
+                            .OrderBy(companydto => companydto.Name)
+                            // .Take(10) // Limitar a 10 resultados
+                            .ToListAsync();
 
             // 2-Devolver la lista de distritos en formato dto
-            foreach (var company in companies)
-            {
-                listaCompanies.Add(new CompanyDto
-                {
-                    Id = company.Id,
-                    Name = company.Name,
-                    Address = company.Address,
-                    Number = company.Number,
-                    Email = company.Email,
-                    Type = company.Type,
-                    Price = company.Price,
-                    WorkTime = company.WorkTime
-                });
-            }
+            /* foreach (var company in companies)
+             {
+                 listaCompanies.Add(new CompanyDto
+                 {
+                     Id = company.Id,
+                     Name = company.Name,
+                     Address = company.Address,
+                     Number = company.Number,
+                     Email = company.Email,
+                     Type = company.Type,
+                     Price = company.Price,
+                     WorkTime = company.WorkTime
+                 });
+             }*/
 
-            return listaCompanies;
+            return Ok (companies);
         }
 
         // GET: api/Companies/5

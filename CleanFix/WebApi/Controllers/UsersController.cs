@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.BaseDatos;
 using WebApi.Entidades;
+using WebApi.Models;
 
 namespace WebApi.Controllers
 {
@@ -23,9 +24,16 @@ namespace WebApi.Controllers
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            var users = await _context.Users
+                            // Where(userdto => userdto.Id != Guid.Empty).
+                            .OrderBy(userdto => userdto.Name)
+                            // .Take(10) // Limitar a 10 resultados
+                            .ToListAsync();
+
+
+            return Ok (users);
         }
 
         // GET: api/Users/5
