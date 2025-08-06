@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApi.BaseDatos;
 using WebApi.Entidades;
+using WebApi.Interfaces;
 using WebApi.Models;
 
 namespace WebApi.Controllers
