@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using WebApi.Interfaces;
 
-namespace Application.Apartments.Commands.DeleteAparment;
+namespace Application.Apartments.Commands.DeleteApartment;
 
 public record DeleteApartmentsCommand : IRequest<bool>
 {

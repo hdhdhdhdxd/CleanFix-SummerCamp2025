@@ -1,5 +1,5 @@
 ﻿using Application.Apartments.Commands.CreateApartment;
-using Application.Apartments.Commands.DeleteAparment;
+using Application.Apartments.Commands.DeleteApartment;
 using Application.Apartments.Commands.UpdateApartment;
 using Application.Apartments.Queries.GetApartment;
 using Application.Apartments.Queries.GetApartments;
