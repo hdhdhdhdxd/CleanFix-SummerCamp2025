@@ -13,4 +13,5 @@ public class Solicitation : IEntity
     public string Address { get; set; } // Dirección de la aplicación
     public IssueType Type { get; set; } // Tipo de problema asociado a la aplicación
     public List<Material> Materials { get; set; }
+    public bool IsRequest { get; set; } // Indica si es una solicitud de servicio o una oferta de trabajo
 }
