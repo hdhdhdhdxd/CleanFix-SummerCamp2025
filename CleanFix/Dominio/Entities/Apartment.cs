@@ -1,10 +1,5 @@
-<<<<<<< HEAD:CleanFix/Dominio/Entities/Apartment.cs
-﻿using Dominio.Common.Interfaces;
-=======
+using Dominio.Common.Interfaces;
 ﻿using System.ComponentModel.DataAnnotations;
-
-namespace WebApi.Entidades;
->>>>>>> 3860d99b48ff67cce57bb6505b0d7bf413574b20:CleanFix/WebApi/Entidades/Apartment.cs
 
 namespace WebApi.Entidades;
 
