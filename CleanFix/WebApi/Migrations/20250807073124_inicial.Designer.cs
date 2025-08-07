@@ -12,7 +12,7 @@ using WebApi.BaseDatos;
 namespace WebApi.Migrations
 {
     [DbContext(typeof(ContextoBasedatos))]
-    [Migration("20250804120012_inicial")]
+    [Migration("20250807073124_inicial")]
     partial class inicial
     {
         /// <inheritdoc />
@@ -33,7 +33,8 @@ namespace WebApi.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("BathroomNumber")
                         .HasColumnType("int");
@@ -134,6 +135,9 @@ namespace WebApi.Migrations
 
                     b.Property<double>("Duration")
                         .HasColumnType("float");
+
+                    b.Property<bool>("IsRequest")
+                        .HasColumnType("bit");
 
                     b.Property<double>("Price")
                         .HasColumnType("float");

@@ -17,7 +17,7 @@ namespace WebApi.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FloorNumber = table.Column<int>(type: "int", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Surface = table.Column<double>(type: "float", nullable: false),
                     RoomNumber = table.Column<int>(type: "int", nullable: false),
                     BathroomNumber = table.Column<int>(type: "int", nullable: false)
@@ -75,6 +75,7 @@ namespace WebApi.Migrations
                     Duration = table.Column<double>(type: "float", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
+                    IsRequest = table.Column<bool>(type: "bit", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
