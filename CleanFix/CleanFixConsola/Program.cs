@@ -1,5 +1,8 @@
-﻿// See https://aka.ms/new-console-template for more information
-using Dominio.Maintenance;
+﻿using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Agents;
+using Microsoft.SemanticKernel.ChatCompletion;
+
+/*using Dominio.Maintenance;
 
 string titulo = "CleanFix";
 int anchoConsola = Console.WindowWidth;
@@ -51,7 +54,7 @@ var company = new Company();
  */
 
 // crear empresas
-
+/*
 Empresa Empresa1 = new Empresa()
 {
     Id = 1,
@@ -290,7 +293,40 @@ static void MostrarRespuesta(string mensaje, ConsoleColor color)
     Console.WriteLine("\n");
 }
 
+*/
 
 
+//Datos de conexion con el ChatBot
 
 
+var builder = Kernel.CreateBuilder();
+builder.AddAzureOpenAIChatCompletion(
+    deploymentName: "gpt-4.1",
+    endpoint: "https://hdhdh-mdx2smel-eastus2.cognitiveservices.azure.com/",
+    apiKey: "9ZMpVj9cCWRyv73s8vyxd0RL93ELHrtmNwN68ZPxRlDgBDjEgxR0JQQJ99BHACHYHv6XJ3w3AAAAACOGEv9e"
+    );
+
+
+//Plugins/Scripts creados para la IA
+var kernel = builder.Build();
+kernel.Plugins.Add(KernelPluginFactory.CreateFromType<FacturaPluginTest>());
+kernel.Plugins.Add(KernelPluginFactory.CreateFromType<DBPluginTest>());
+
+
+//Descripcion del agente    
+var agent = new ChatCompletionAgent
+{
+    Name = "CleanFixBot",
+    Instructions = "Eres un agente de IA especializado en responder preguntas sobre los servicios de CleanFix. Proporciona respuestas claras y concisas basadas en la información que tienes.",
+    Kernel = kernel
+};
+
+//Entrada al usuario
+Console.WriteLine("Escribe tu petición para CleanFixBot:");
+string userInput = Console.ReadLine();
+
+var userMessage = new ChatMessageContent(AuthorRole.User, userInput);
+await foreach (var response in agent.InvokeAsync(userMessage))
+{
+    Console.WriteLine(response.Message.Content);
+}
