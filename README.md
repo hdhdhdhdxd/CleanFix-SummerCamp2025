@@ -5,5 +5,5 @@ dotnet ef migrations add "InitialCreate" --project Infrastructure --startup-proj
 ```
 
 ```
-dotnet ef database update --project Infrastructure --startup-project Web
+dotnet ef database update --project Infrastructure --startup-project WebApi
 ```
