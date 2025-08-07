@@ -4,68 +4,90 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.SemanticKernel;
-using System.Data.SqlClient;
 using System.ComponentModel;
+using Microsoft.Data.SqlClient;
 
 public class DBPluginTest
 {
-    [KernelFunction, Description("Listado de empresas disponibles para reformas y mantenimiento")]
-    public List<Empresa> GetAllEmpresas()
+    [KernelFunction, Description("Obtienes las empresas de la tabla companies y puedes devolver la lista de empresas con los datos que sean necesarios en base a la peticion")]
+    public List<Companies> GetAllEmpresas()
     {
-        var empresas = new List<Empresa>();
-        using (var connection = new SqlConnection("string-de-conexion"))
+        var companies = new List<Companies>();
+        using (var connection = new SqlConnection("Server=(localdb)\\mssqllocaldb;Database=CleanFixDB;Trusted_Connection=True;MultipleActiveResultSets=true")) 
         {
             connection.Open();
-            var command = new SqlCommand("SELECT Id, Nombre, Direccion FROM Empresas", connection);
+            Console.WriteLine("Conexión a la base de datos establecida.");
+            // Asegúrate de que la tabla Companies existe y tiene las columnas correctas
+            Console.WriteLine("Ejecutando consulta para obtener empresas...");
+            var command = new SqlCommand("SELECT Id, Name, Address, Number, type, Price, WorkTime FROM Companies", connection);
             var reader = command.ExecuteReader();
             while (reader.Read())
             {
-                empresas.Add(new Empresa
+                companies.Add(new Companies
                 {
+                    Id = reader.GetGuid(0), // Asumiendo que Id es de tipo Guid
+                    Name = reader.GetString(1),
+                    Address = reader.GetString(2),
+                    Number = reader.GetString(3),
+                    Type = reader.GetInt32(4), // Asumiendo que Type es de tipo
+                    Price = reader.GetDecimal(5), // Asumiendo que Price es de tipo decimal
+                    WorkTime = reader.GetInt32(6)
 
-                    Id = reader.GetInt32(0),
-                    Nombre = reader.GetString(1),
-                    Direccion = reader.GetString(2)
                 });
             }
         }
-        return empresas;
+        return companies;
     }
 
-    [KernelFunction, Description("Devuelve todos los materiales de la base de datos")]
-    public List<Material> GetAllMateriales()
+    /*[KernelFunction, Description("Devuelve todos los materiales de la base de datos")]
+    public List<Materials> GetAllMateriales()
     {
-        var materiales = new List<Material>();
-        using (var connection = new SqlConnection("string-de-conexion"))
+        var materials = new List<Materials>();
+        using (var connection = new SqlConnection("Server=(localdb)\\\\mssqllocaldb;Database=CleanFixDB;Trusted_Connection=True;MultipleActiveResultSets=true\"\n  }"))
         {
             connection.Open();
-            var command = new SqlCommand("SELECT Id, Nombre, Tipo FROM Materiales", connection);
+            var command = new SqlCommand("SELECT * FROM Materials", connection);
             var reader = command.ExecuteReader();
             while (reader.Read())
             {
-                materiales.Add(new Material
+                materials.Add(new Materials
                 {
 
                     Id = reader.GetInt32(0),
-                    Nombre = reader.GetString(1),
-                    Tipo = reader.GetString(2)
+                    Name = reader.GetString(1),
+                    Cost = reader.GetFloat(2),
+                    Available = reader.GetBoolean(3),
+                    Issue = reader.GetInt32(4)
                 });
             }
         }
-        return materiales;
-    }
+        return materials;
+    }*/
 }
-public class Empresa
+public class Companies
+{
+
+    public Guid Id { get; set; } // Identificador único de la empresa
+    public string Name { get; set; }
+
+    public string Address { get; set; }
+
+    public string Number { get; set; }
+
+    public int Type { get; set; }
+
+    public decimal Price { get; set; }
+
+    public int WorkTime { get; set; }
+}
+    public class Materials
 {
     public int Id { get; set; }
-    public string Nombre { get; set; }
-    public string Direccion { get; set; }
-}
-public class Material
-{
-    public int Id { get; set; }
-    public string Nombre { get; set; }
-    public string Tipo { get; set; }
+
+    public string Name { get; set; }
+    public float Cost { get; set; }
+    public bool Available { get; set; }
+    public int Issue { get; set; }
 }
 
 
