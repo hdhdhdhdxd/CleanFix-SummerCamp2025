@@ -19,14 +19,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-
-builder.Services.AddScoped<IApartmentRepository, ApartmentService>();
-builder.Services.AddScoped<ISolicitationRepository, SolicitationService>();
-builder.Services.AddScoped<ICompanyRepository, CompanyService>();
-builder.Services.AddScoped<IMaterialRepository, MaterialService>();
-
-
-
 var app = builder.Build();
 
 

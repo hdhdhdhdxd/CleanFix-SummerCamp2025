@@ -1,5 +1,4 @@
-﻿using System.Security.Principal;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Dominio.Common.Interfaces;
 using Infrastructure.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -17,24 +16,35 @@ public class Repository<T>
         _database = database;
     }
 
-    public IQueryable<T> GetAll()
+    public async Task<List<T>> GetAllAsync(CancellationToken cancellationToken)
     {
-        return _database.Set<T>();
+        return await _database.Set<T>().ToListAsync(cancellationToken);
     }
 
-    public T Get(Guid id)
+    public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
-        return _database.Set<T>()
-            .Single(p => p.Id == id);
+        return await _database.Set<T>().SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
-    public void Add(T entity)
+    public async Task<Guid> AddAsync(T entity, CancellationToken cancellationToken)
     {
         _database.Set<T>().Add(entity);
+
+        await _database.SaveChangesAsync(cancellationToken);
+
+        return entity.Id;
     }
 
-    public async Task Remove(T entity)
+    public async Task UpdateAsync(T entity, CancellationToken cancellationToken)
+    {
+        _database.Set<T>().Update(entity);
+        await _database.SaveChangesAsync(cancellationToken);
+    }
+
+    public async Task RemoveAsync(T entity, CancellationToken cancellationToken)
     {
         await _database.Set<T>().Where(e => e.Id == entity.Id).ExecuteDeleteAsync();
+
+        await _database.SaveChangesAsync(cancellationToken);
     }
 }

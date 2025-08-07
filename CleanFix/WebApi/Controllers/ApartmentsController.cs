@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Application.Apartments.Commands.CreateApartment;
 using Application.Apartments.Commands.DeleteAparment;
-using Application.Apartments.Commands.PostApartments;
-using Application.Apartments.Commands.PutApartments;
+using Application.Apartments.Commands.UpdateApartment;
+using Application.Apartments.Queries.GetApartment;
 using Application.Apartments.Queries.GetApartments;
 using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebApi.BaseDatos;
-using WebApi.Entidades;
-using WebApi.Interfaces;
-using WebApi.Models;
 
 namespace WebApi.Controllers
 {
@@ -22,12 +13,10 @@ namespace WebApi.Controllers
     public class ApartmentsController : ControllerBase
     {
         private readonly IMediator _mediator;
-        private readonly DatabaseContext _context;
 
-        public ApartmentsController(IMediator mediator, DatabaseContext context)
+        public ApartmentsController(IMediator mediator)
         {
             _mediator = mediator;
-            _context = context;
         }
 
         // GET: api/Apartments
@@ -41,24 +30,32 @@ namespace WebApi.Controllers
 
         // GET: api/Apartments/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Apartment>> GetApartment(Guid id)
+        public async Task<ActionResult<GetApartmentDto>> GetApartment(Guid id)
         {
-            var apartment = await _context.Apartments.FindAsync(id);
+            var result = await _mediator.Send(new GetApartmentQuery { Id = id });
 
-            if (apartment == null)
-            {
+            if (result == null)
                 return NotFound();
-            }
 
-            return apartment;
+            return Ok(result);
         }
 
         // PUT: api/Apartments/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutApartment(Guid id, Apartment apartment)
+        public async Task<IActionResult> PutApartment(Guid id, [FromBody] UpdateApartmentDto apartmentDto)
         {
-            await _mediator.Send(new PutApartmentQuery());
+            if (apartmentDto.Id != Guid.Empty && apartmentDto.Id != id)
+                return BadRequest("El id de la ruta y el del cuerpo no coinciden.");
+
+            apartmentDto.Id = id;
+
+            var command = new UpdateApartmentCommand
+            {
+                Apartment = apartmentDto
+            };
+
+            await _mediator.Send(command);
 
             return NoContent();
         }
@@ -66,25 +63,37 @@ namespace WebApi.Controllers
         // POST: api/Apartments
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Apartment>> PostApartment(Apartment apartment)
+        public async Task<ActionResult<GetApartmentsDto>> PostApartment([FromBody] CreateApartmentDto apartmentDto)
         {
-            await _mediator.Send(new PostApartmentsQuery());
+            var command = new CreateApartmentCommand
+            {
+                Apartment = apartmentDto
+            };
 
-            return CreatedAtAction("GetApartment", new { id = apartment.Id }, apartment);
+            var newApartmentId = await _mediator.Send(command);
+
+            return CreatedAtAction(
+                nameof(GetApartment),
+                new { id = newApartmentId },
+                null
+            );
         }
 
         // DELETE: api/Apartments/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteApartment(Guid id)
         {
-            await _mediator.Send(new DeleteApartmentsQuery());
+            var command = new DeleteApartmentsCommand
+            {
+                Id = id
+            };
+
+            var result = await _mediator.Send(command);
+
+            if (!result)
+                return NotFound();
 
             return NoContent();
-        }
-
-        private bool ApartmentExists(Guid id)
-        {
-            return _context.Apartments.Any(e => e.Id == id);
         }
     }
 }

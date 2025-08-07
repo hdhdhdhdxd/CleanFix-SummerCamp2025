@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using WebApi.Entidades;
 
-namespace Application.Apartments.Commands.PostApartments;
-public class PostApartmentDto
+namespace Application.Apartments.Commands.CreateApartment;
+public class CreateApartmentDto
 {
     public int FloorNumber { get; set; } // Piso del apartamento
     public string Address { get; set; } // Dirección del apartamento
@@ -13,7 +13,7 @@ public class PostApartmentDto
     {
         public Mapping()
         {
-            CreateMap<Apartment, PostApartmentDto>();
+            CreateMap<CreateApartmentDto, Apartment>();
         }
     }
 }

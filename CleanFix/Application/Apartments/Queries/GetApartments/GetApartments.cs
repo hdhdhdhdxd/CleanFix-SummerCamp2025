@@ -19,10 +19,10 @@ public class GetApartmentsQueryHandler : IRequestHandler<GetApartmentsQuery, Lis
 
     public async Task<List<GetApartmentsDto>> Handle(GetApartmentsQuery request, CancellationToken cancellationToken)
     {
-        var apartments = _apartmentRepository.GetAll().ToList();
+        var apartments = await _apartmentRepository.GetAllAsync(cancellationToken);
 
         var result = _mapper.Map<List<GetApartmentsDto>>(apartments);
 
-        return await Task.FromResult(result);
+        return result;
     }
 }

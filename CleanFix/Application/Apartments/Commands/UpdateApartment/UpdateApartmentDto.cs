@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Apartments.Commands.PostApartments;
-using AutoMapper;
+﻿using AutoMapper;
 using WebApi.Entidades;
 
-namespace Application.Apartments.Commands.PutApartments;
-public class PutApartmentDto
+namespace Application.Apartments.Commands.UpdateApartment;
+public class UpdateApartmentDto
 {
+    public Guid Id { get; set; }
     public int FloorNumber { get; set; } // Piso del apartamento
     public string Address { get; set; } // Dirección del apartamento
     public double Surface { get; set; } // Superficie del apartamento
@@ -19,7 +14,7 @@ public class PutApartmentDto
     {
         public Mapping()
         {
-            CreateMap<Apartment, PutApartmentDto>();
+            CreateMap<UpdateApartmentDto, Apartment>();
         }
     }
 }

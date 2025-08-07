@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Security.Principal;
-using Dominio.Common.Interfaces;
+﻿using Dominio.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Entidades;
 
@@ -14,4 +12,5 @@ public interface IDatabaseContext
     DbSet<Material> Materials { get; set; }
 
     DbSet<T> Set<T>() where T : class, IEntity;
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }
