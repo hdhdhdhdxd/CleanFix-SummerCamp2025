@@ -309,6 +309,8 @@ builder.AddAzureOpenAIChatCompletion(
 
 //Plugins/Scripts creados para la IA
 var kernel = builder.Build();
+kernel.ImportPluginFromObject(new DBPluginTest(), "DBPlugin");
+var result = await kernel.InvokeAsync("DBPlugin", "GetAllEmpresas");
 kernel.Plugins.Add(KernelPluginFactory.CreateFromType<FacturaPluginTest>());
 kernel.Plugins.Add(KernelPluginFactory.CreateFromType<DBPluginTest>());
 
