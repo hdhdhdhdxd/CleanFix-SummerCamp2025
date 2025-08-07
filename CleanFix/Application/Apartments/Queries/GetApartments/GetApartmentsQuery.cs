@@ -4,9 +4,9 @@ using AutoMapper;
 
 namespace Application.Apartments.Queries.GetApartments;
 
-public record GetApartmentsQuery : IRequest<List<GetApartmentDto>>;
+public record GetApartmentsQuery : IRequest<List<GetApartmentsDto>>;
 
-public class GetApartmentsQueryHandler : IRequestHandler<GetApartmentsQuery, List<GetApartmentDto>>
+public class GetApartmentsQueryHandler : IRequestHandler<GetApartmentsQuery, List<GetApartmentsDto>>
 {
     private readonly IApartmentRepository _apartmentRepository;
     private readonly IMapper _mapper;
@@ -17,11 +17,11 @@ public class GetApartmentsQueryHandler : IRequestHandler<GetApartmentsQuery, Lis
         _mapper = mapper;
     }
 
-    public async Task<List<GetApartmentDto>> Handle(GetApartmentsQuery request, CancellationToken cancellationToken)
+    public async Task<List<GetApartmentsDto>> Handle(GetApartmentsQuery request, CancellationToken cancellationToken)
     {
         var apartments = _apartmentRepository.GetAll().ToList();
 
-        var result = _mapper.Map<List<GetApartmentDto>>(apartments);
+        var result = _mapper.Map<List<GetApartmentsDto>>(apartments);
 
         return await Task.FromResult(result);
     }

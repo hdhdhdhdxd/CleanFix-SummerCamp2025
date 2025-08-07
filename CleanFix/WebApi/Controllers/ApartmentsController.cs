@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Apartments.Commands.DeleteAparment;
+using Application.Apartments.Commands.PostApartments;
+using Application.Apartments.Commands.PutApartments;
 using Application.Apartments.Queries.GetApartments;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -29,7 +32,7 @@ namespace WebApi.Controllers
 
         // GET: api/Apartments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetApartmentDto>>> GetApartments()
+        public async Task<ActionResult<IEnumerable<GetApartmentsDto>>> GetApartments()
         {
             var result = await _mediator.Send(new GetApartmentsQuery());
 
@@ -55,28 +58,7 @@ namespace WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutApartment(Guid id, Apartment apartment)
         {
-            if (id != apartment.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(apartment).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ApartmentExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _mediator.Send(new PutApartmentQuery());
 
             return NoContent();
         }
@@ -86,8 +68,7 @@ namespace WebApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Apartment>> PostApartment(Apartment apartment)
         {
-            _context.Apartments.Add(apartment);
-            await _context.SaveChangesAsync();
+            await _mediator.Send(new PostApartmentsQuery());
 
             return CreatedAtAction("GetApartment", new { id = apartment.Id }, apartment);
         }
@@ -96,14 +77,7 @@ namespace WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteApartment(Guid id)
         {
-            var apartment = await _context.Apartments.FindAsync(id);
-            if (apartment == null)
-            {
-                return NotFound();
-            }
-
-            _context.Apartments.Remove(apartment);
-            await _context.SaveChangesAsync();
+            await _mediator.Send(new DeleteApartmentsQuery());
 
             return NoContent();
         }
