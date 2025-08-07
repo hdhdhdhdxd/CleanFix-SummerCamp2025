@@ -16,9 +16,9 @@ namespace WebApi.Controllers
     [ApiController]
     public class SolicitationsController : ControllerBase
     {
-        private readonly ContextoBasedatos _context;
+        private readonly DatabaseContext _context;
 
-        public SolicitationsController(ContextoBasedatos context)
+        public SolicitationsController(DatabaseContext context)
         {
             _context = context;
         }

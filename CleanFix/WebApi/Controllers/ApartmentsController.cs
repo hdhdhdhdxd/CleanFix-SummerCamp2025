@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Apartments.Queries.GetApartments;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,41 +18,22 @@ namespace WebApi.Controllers
     [ApiController]
     public class ApartmentsController : ControllerBase
     {
-        private readonly ContextoBasedatos _context;
+        private readonly IMediator _mediator;
+        private readonly DatabaseContext _context;
 
-        public ApartmentsController(ContextoBasedatos context)
+        public ApartmentsController(IMediator mediator, DatabaseContext context)
         {
+            _mediator = mediator;
             _context = context;
         }
 
         // GET: api/Apartments
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ApartmentDto>>> GetApartments()
+        public async Task<ActionResult<IEnumerable<GetApartmentDto>>> GetApartments()
         {
-            List<ApartmentDto> listaApartments = new List<ApartmentDto>();
+            var result = await _mediator.Send(new GetApartmentsQuery());
 
-            // 1-Traer todos los distritos de la base de datos
-            var apartments = await _context.Apartments
-                            // Where(apartment => apartment.Id != Guid.Empty).
-                            .OrderBy(apartment => apartment.FloorNumber)
-                            .Take(10) // Limitar a 10 resultados
-                            .ToListAsync();
-             
-            // 2-Devolver la lista de distritos en formato dto
-             foreach (var apartment in apartments)
-             {
-                 listaApartments.Add(new ApartmentDto
-                 {
-                     Id = apartment.Id,
-                     FloorNumber = apartment.FloorNumber,
-                     Address = apartment.Address,
-                     Surface = apartment.Surface,
-                     RoomNumber = apartment.RoomNumber,
-                     BathroomNumber = apartment.BathroomNumber,
-                 });
-             }
-
-            return Ok (listaApartments);
+            return Ok(result);
         }
 
         // GET: api/Apartments/5

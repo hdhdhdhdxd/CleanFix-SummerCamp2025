@@ -15,9 +15,9 @@ namespace WebApi.Controllers
     [ApiController]
     public class CompaniesController : ControllerBase
     {
-        private readonly ContextoBasedatos _context;
+        private readonly DatabaseContext _context;
 
-        public CompaniesController(ContextoBasedatos context)
+        public CompaniesController(DatabaseContext context)
         {
             _context = context;
         }

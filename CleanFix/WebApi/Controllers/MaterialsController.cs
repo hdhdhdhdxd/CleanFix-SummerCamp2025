@@ -15,9 +15,9 @@ namespace WebApi.Controllers
     [ApiController]
     public class MaterialsController : ControllerBase
     {
-        private readonly ContextoBasedatos _context;
+        private readonly DatabaseContext _context;
 
-        public MaterialsController(ContextoBasedatos context)
+        public MaterialsController(DatabaseContext context)
         {
             _context = context;
         }

@@ -1,0 +1,25 @@
+﻿using Dominio.Common.Interfaces;
+using Infrastructure.Common.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using WebApi.Entidades;
+
+namespace WebApi.BaseDatos;
+
+public class DatabaseContext: DbContext, IDatabaseContext
+{
+    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
+    {
+
+    }
+
+    public new DbSet<T> Set<T>() where T : class, IEntity
+    {
+        return base.Set<T>();
+    }
+
+    public DbSet<Company> Companies { get; set; }
+    public DbSet<Material> Materials { get; set; }
+    public DbSet<Apartment> Apartments { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Solicitation> Solicitations { get; set; }
+}

@@ -4,8 +4,12 @@ using WebApi.BaseDatos;
 using WebApi.Services;
 using Bogus;
 using WebApi.Entidades;
+using Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.AddInfrastructureServices();
+builder.AddApplicationServices();
 
 // Add services to the container.
 
@@ -14,12 +18,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<ContextoBasedatos>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped<IApartment, ApartmentService>();
-builder.Services.AddScoped<ISolicitation, SolicitationService>();
-builder.Services.AddScoped<ICompany, CompanyService>();
-builder.Services.AddScoped<IMaterial, MaterialService>();
+
+
+builder.Services.AddScoped<IApartmentRepository, ApartmentService>();
+builder.Services.AddScoped<ISolicitationRepository, SolicitationService>();
+builder.Services.AddScoped<ICompanyRepository, CompanyService>();
+builder.Services.AddScoped<IMaterialRepository, MaterialService>();
 
 
 
@@ -29,7 +33,7 @@ var app = builder.Build();
 // Seeding de datos de Apartamento, Edificio y Distrito, y migración automática solo en desarrollo
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ContextoBasedatos>();
+    var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
     db.Database.Migrate();
     if (!db.Apartments.Any() && !db.Companies.Any() && !db.Materials.Any() && !db.Solicitations.Any())
     {

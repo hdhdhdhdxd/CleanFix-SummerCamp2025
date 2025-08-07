@@ -15,9 +15,9 @@ namespace WebApi.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly ContextoBasedatos _context;
+        private readonly DatabaseContext _context;
 
-        public UsersController(ContextoBasedatos context)
+        public UsersController(DatabaseContext context)
         {
             _context = context;
         }
