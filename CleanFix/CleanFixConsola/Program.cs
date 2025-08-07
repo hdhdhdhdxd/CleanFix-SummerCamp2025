@@ -1,7 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
-using Dominio.Maintenance;
+﻿using Dominio.Maintenance;
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.Agents;
+using Microsoft.SemanticKernel.ChatCompletion;
 
-string titulo = "CleanFix";
+/*string titulo = "CleanFix";
 int anchoConsola = Console.WindowWidth;
 int posicionX1 = (anchoConsola - titulo.Length) / 2;
 
@@ -21,7 +23,7 @@ Console.ResetColor();
 Console.WriteLine("\n");
 
 var company = new Company();
-
+*/
 /*
  
 - Nombre de la aplicación: Dificultad I()
@@ -49,7 +51,7 @@ var company = new Company();
           - Debe haber constructores acordes a cada una de las empresas
           - Debe ser posible introducir un tipo de problema y mostrar una lista de empresas que pueden solucionar ese problema
  */
-
+/*
 // crear empresas
 
 Empresa Empresa1 = new Empresa()
@@ -290,7 +292,40 @@ static void MostrarRespuesta(string mensaje, ConsoleColor color)
     Console.WriteLine("\n");
 }
 
+*/
 
 
 
+//Datos de conexion con el ChatBot
 
+var builder = Kernel.CreateBuilder();
+builder.AddAzureOpenAIChatCompletion(
+    deploymentName: "gpt-4.1",
+    endpoint: "https://hdhdh-mdx2smel-eastus2.cognitiveservices.azure.com/",
+    apiKey: "9ZMpVj9cCWRyv73s8vyxd0RL93ELHrtmNwN68ZPxRlDgBDjEgxR0JQQJ99BHACHYHv6XJ3w3AAAAACOGEv9e"
+    );
+
+
+//Plugins/Scripts creados para la IA
+var kernel = builder.Build();
+kernel.Plugins.Add(KernelPluginFactory.CreateFromType<FacturasPluginTest>());
+kernel.Plugins.Add(KernelPluginFactory.CreateFromType<DBPluginTest>());
+
+
+//Descripcion del agente    
+var agent = new ChatCompletionAgent
+{
+    Name = "CleanFixBot",
+    Instructions = "Eres un agente de IA especializado en responder preguntas sobre los servicios de CleanFix. Proporciona respuestas claras y concisas basadas en la información que tienes.",
+    Kernel = kernel
+};
+
+//Entrada al usuario
+Console.WriteLine("Escribe tu petición para CleanFixBot:");
+string userInput = Console.ReadLine();
+
+var userMessage = new ChatMessageContent(AuthorRole.User, userInput);
+await foreach (var response in agent.InvokeAsync(userMessage))
+{
+    Console.WriteLine(response.Message.Content);
+}
