@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using Application.Materials.Commands.CreateMaterial;
+using Application.Materials.Commands.DeleteMaterial;
+using Application.Materials.Commands.UpdateMaterial;
+using Application.Materials.Queries.GetMaterial;
+using Application.Materials.Queries.GetMaterials;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebApi.BaseDatos;
-using WebApi.Entidades;
-using WebApi.Models;
 
 namespace WebApi.Controllers
 {
@@ -15,117 +15,72 @@ namespace WebApi.Controllers
     [ApiController]
     public class MaterialsController : ControllerBase
     {
-        private readonly DatabaseContext _context;
+        private readonly IMediator _mediator;
 
-        public MaterialsController(DatabaseContext context)
+        public MaterialsController(IMediator mediator)
         {
-            _context = context;
+            _mediator = mediator;
         }
 
         // GET: api/Materials
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MaterialDto>>> GetMaterials()
+        public async Task<ActionResult<IEnumerable<GetMaterialsDto>>> GetMaterials()
         {
-            List<MaterialDto> listaMaterials = new List<MaterialDto>();
-
-            // 1-Traer todos los distritos de la base de datos
-            var materials = await _context.Materials
-                            // Where(material => material.Id != Guid.Empty).
-                            .OrderBy(material => material.Cost)
-                            .Take(10) // Limitar a 10 resultados
-                            .ToListAsync();
-
-            // 2-Devolver la lista de distritos en formato dto
-            foreach (var material in materials)
-            {
-                listaMaterials.Add(new MaterialDto
-                {
-                    Id = material.Id,
-                    Name = material.Name,
-                    Cost = material.Cost,
-                    Available = material.Available,
-                    Issue = material.Issue
-                });
-            }
-
-            return Ok (listaMaterials);
+            var result = await _mediator.Send(new GetMaterialsQuery());
+            return Ok(result);
         }
 
         // GET: api/Materials/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Material>> GetMaterial(Guid id)
+        public async Task<ActionResult<GetMaterialDto>> GetMaterial(Guid id)
         {
-            var material = await _context.Materials.FindAsync(id);
-
-            if (material == null)
-            {
+            var result = await _mediator.Send(new GetMaterialQuery(id));
+            if (result == null)
                 return NotFound();
-            }
-
-            return material;
+            return Ok(result);
         }
 
         // PUT: api/Materials/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMaterial(Guid id, Material material)
+        public async Task<IActionResult> PutMaterial(Guid id, [FromBody] UpdateMaterialDto materialDto)
         {
-            if (id != material.Id)
+            if (materialDto.Id != Guid.Empty && materialDto.Id != id)
+                return BadRequest("El id de la ruta y el del cuerpo no coinciden.");
+            materialDto.Id = id;
+            var command = new UpdateMaterialCommand
             {
-                return BadRequest();
-            }
-
-            _context.Entry(material).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MaterialExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+                Material = materialDto
+            };
+            await _mediator.Send(command);
             return NoContent();
         }
 
         // POST: api/Materials
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Material>> PostMaterial(Material material)
+        public async Task<ActionResult<GetMaterialsDto>> PostMaterial([FromBody] CreateMaterialDto materialDto)
         {
-            _context.Materials.Add(material);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetMaterial", new { id = material.Id }, material);
+            var command = new CreateMaterialCommand
+            {
+                Material = materialDto
+            };
+            var newMaterialId = await _mediator.Send(command);
+            var createdMaterial = await _mediator.Send(new GetMaterialQuery(newMaterialId));
+            return CreatedAtAction(
+                nameof(GetMaterial),
+                new { id = newMaterialId },
+                createdMaterial
+            );
         }
 
         // DELETE: api/Materials/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMaterial(Guid id)
         {
-            var material = await _context.Materials.FindAsync(id);
-            if (material == null)
-            {
+            var command = new DeleteMaterialCommand(id);
+            var result = await _mediator.Send(command);
+            if (!result)
                 return NotFound();
-            }
-
-            _context.Materials.Remove(material);
-            await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        private bool MaterialExists(Guid id)
-        {
-            return _context.Materials.Any(e => e.Id == id);
         }
     }
 }
