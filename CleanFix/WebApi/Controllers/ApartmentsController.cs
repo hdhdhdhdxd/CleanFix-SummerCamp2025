@@ -32,7 +32,7 @@ namespace WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<GetApartmentDto>> GetApartment(Guid id)
         {
-            var result = await _mediator.Send(new GetApartmentQuery { Id = id });
+            var result = await _mediator.Send(new GetApartmentQuery(id));
 
             if (result == null)
                 return NotFound();
