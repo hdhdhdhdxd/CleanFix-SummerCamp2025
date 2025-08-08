@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Application.Companies.Commands.CreateCompany;
+using Application.Companies.Commands.DeleteCompany;
+using Application.Companies.Commands.UpdateCompany;
+using Application.Companies.Queries.GetCompany;
+using Application.Companies.Queries.GetCompanies;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebApi.BaseDatos;
-using WebApi.Entidades;
-using WebApi.Models;
 
 namespace WebApi.Controllers
 {
@@ -15,120 +12,72 @@ namespace WebApi.Controllers
     [ApiController]
     public class CompaniesController : ControllerBase
     {
-        private readonly DatabaseContext _context;
+        private readonly IMediator _mediator;
 
-        public CompaniesController(DatabaseContext context)
+        public CompaniesController(IMediator mediator)
         {
-            _context = context;
+            _mediator = mediator;
         }
 
         // GET: api/Companies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CompanyDto>>> GetCompanies()
+        public async Task<ActionResult<IEnumerable<GetCompaniesDto>>> GetCompanies()
         {
-            List<CompanyDto> listaCompanies = new List<CompanyDto>();
-
-            // 1-Traer todos los distritos de la base de datos
-            var companies = await _context.Companies
-                            // Where(company => company.Id != Guid.Empty).
-                            .OrderBy(company => company.Name)
-                            .Take(10) // Limitar a 10 resultados
-                            .ToListAsync();
-
-            // 2-Devolver la lista de distritos en formato dto
-             foreach (var company in companies)
-             {
-                 listaCompanies.Add(new CompanyDto
-                 {
-                     Id = company.Id,
-                     Name = company.Name,
-                     Address = company.Address,
-                     Number = company.Number,
-                     Email = company.Email,
-                     Type = company.Type,
-                     Price = company.Price,
-                     WorkTime = company.WorkTime
-                 });
-             }
-
-            return Ok (listaCompanies);
+            var result = await _mediator.Send(new GetCompaniesQuery());
+            return Ok(result);
         }
 
         // GET: api/Companies/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Company>> GetCompany(Guid id)
+        public async Task<ActionResult<GetCompanyDto>> GetCompany(Guid id)
         {
-            var company = await _context.Companies.FindAsync(id);
-
-            if (company == null)
-            {
+            var result = await _mediator.Send(new GetCompanyQuery(id));
+            if (result == null)
                 return NotFound();
-            }
-
-            return company;
+            return Ok(result);
         }
 
         // PUT: api/Companies/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCompany(Guid id, Company company)
+        public async Task<IActionResult> PutCompany(Guid id, [FromBody] UpdateCompanyDto companyDto)
         {
-            if (id != company.Id)
+            if (companyDto.Id != Guid.Empty && companyDto.Id != id)
+                return BadRequest("El id de la ruta y el del cuerpo no coinciden.");
+            companyDto.Id = id;
+            var command = new UpdateCompanyCommand
             {
-                return BadRequest();
-            }
-
-            _context.Entry(company).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CompanyExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+                Company = companyDto
+            };
+            await _mediator.Send(command);
             return NoContent();
         }
 
         // POST: api/Companies
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Company>> PostCompany(Company company)
+        public async Task<ActionResult<GetCompaniesDto>> PostCompany([FromBody] CreateCompanyDto companyDto)
         {
-            _context.Companies.Add(company);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCompany", new { id = company.Id }, company);
+            var command = new CreateCompanyCommand
+            {
+                Company = companyDto
+            };
+            var newCompanyId = await _mediator.Send(command);
+            var createdCompany = await _mediator.Send(new GetCompanyQuery(newCompanyId));
+            return CreatedAtAction(
+                nameof(GetCompany),
+                new { id = newCompanyId },
+                createdCompany
+            );
         }
 
         // DELETE: api/Companies/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCompany(Guid id)
         {
-            var company = await _context.Companies.FindAsync(id);
-            if (company == null)
-            {
+            var command = new DeleteCompanyCommand(id);
+            var result = await _mediator.Send(command);
+            if (!result)
                 return NotFound();
-            }
-
-            _context.Companies.Remove(company);
-            await _context.SaveChangesAsync();
-
             return NoContent();
-        }
-
-        private bool CompanyExists(Guid id)
-        {
-            return _context.Companies.Any(e => e.Id == id);
         }
     }
 }
