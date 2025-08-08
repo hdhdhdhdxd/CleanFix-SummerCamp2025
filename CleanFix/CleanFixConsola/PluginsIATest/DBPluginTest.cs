@@ -13,7 +13,7 @@ public class DBPluginTest
     public List<Companies> GetAllEmpresas()
     {
         var companies = new List<Companies>();
-        using (var connection = new SqlConnection("Server=(localdb)\\mssqllocaldb;Database=CleanFixDB;Trusted_Connection=True;MultipleActiveResultSets=true")) 
+        using (var connection = new SqlConnection("")) 
         {
             connection.Open();
             Console.WriteLine("Conexión a la base de datos establecida.");
