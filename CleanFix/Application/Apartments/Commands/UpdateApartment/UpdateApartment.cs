@@ -7,7 +7,7 @@ namespace Application.Apartments.Commands.UpdateApartment;
 
 public record UpdateApartmentCommand : IRequest
 {
-    public UpdateApartmentDto Apartment { get; init; } = new UpdateApartmentDto();
+    public UpdateApartmentDto Apartment { get; init; }
 }
 
 public class UpdateApartmentCommandHandler : IRequestHandler<UpdateApartmentCommand>

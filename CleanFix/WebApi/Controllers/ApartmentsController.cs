@@ -72,10 +72,12 @@ namespace WebApi.Controllers
 
             var newApartmentId = await _mediator.Send(command);
 
+            var createdApartment = await _mediator.Send(new GetApartmentQuery(newApartmentId));
+
             return CreatedAtAction(
                 nameof(GetApartment),
                 new { id = newApartmentId },
-                null
+                createdApartment
             );
         }
 

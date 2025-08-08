@@ -3,10 +3,7 @@ using MediatR;
 using WebApi.Interfaces;
 
 namespace Application.Apartments.Queries.GetApartment;
-public record GetApartmentQuery : IRequest<GetApartmentDto>
-{
-    public Guid Id { get; init; }
-}
+public record GetApartmentQuery(Guid Id) : IRequest<GetApartmentDto>;
 
 public class GetApartmentQueryHandler : IRequestHandler<GetApartmentQuery, GetApartmentDto>
 {
