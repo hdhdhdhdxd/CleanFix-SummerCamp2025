@@ -83,10 +83,7 @@ namespace WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteApartment(Guid id)
         {
-            var command = new DeleteApartmentsCommand
-            {
-                Id = id
-            };
+            var command = new DeleteApartmentCommand(id);
 
             var result = await _mediator.Send(command);
 

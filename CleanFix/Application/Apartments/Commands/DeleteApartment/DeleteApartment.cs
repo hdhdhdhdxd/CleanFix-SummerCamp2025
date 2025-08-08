@@ -3,21 +3,18 @@ using WebApi.Interfaces;
 
 namespace Application.Apartments.Commands.DeleteApartment;
 
-public record DeleteApartmentsCommand : IRequest<bool>
-{
-    public Guid Id { get; init; }
-}
+public record DeleteApartmentCommand(Guid Id) : IRequest<bool>;
 
-public class DeleteApartmentsCommandHandler
+public class DeleteApartmentCommandHandler : IRequestHandler<DeleteApartmentCommand, bool>
 {
     private readonly IApartmentRepository _apartmentRepository;
 
-    public DeleteApartmentsCommandHandler(IApartmentRepository apartmentRepository)
+    public DeleteApartmentCommandHandler(IApartmentRepository apartmentRepository)
     {
         _apartmentRepository = apartmentRepository;
     }
 
-    public async Task<bool> Handle(DeleteApartmentsCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteApartmentCommand request, CancellationToken cancellationToken)
     {
         var apartment = await _apartmentRepository.GetByIdAsync(request.Id, cancellationToken);
 

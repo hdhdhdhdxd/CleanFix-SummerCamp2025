@@ -10,7 +10,7 @@ public record UpdateApartmentCommand : IRequest
     public UpdateApartmentDto Apartment { get; init; } = new UpdateApartmentDto();
 }
 
-public class UpdateApartmentCommandHandler
+public class UpdateApartmentCommandHandler : IRequestHandler<UpdateApartmentCommand>
 {
     private readonly IApartmentRepository _apartmentRepository;
     private readonly IMapper _mapper;

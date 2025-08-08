@@ -1,10 +1,7 @@
-using WebApi.Interfaces;
+using Bogus;
 using Microsoft.EntityFrameworkCore;
 using WebApi.BaseDatos;
-using WebApi.Services;
-using Bogus;
 using WebApi.Entidades;
-using Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,7 +31,7 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.Id, f => Guid.NewGuid())
             .RuleFor(e => e.Name, f => $"Empresa {f.UniqueIndex + 1}")
             .RuleFor(e => e.Address, f => $"{f.Address}")
-            .RuleFor(e => e.Number, f => f.Random.Int(100000000,999999999).ToString())
+            .RuleFor(e => e.Number, f => f.Random.Int(100000000, 999999999).ToString())
             .RuleFor(e => e.Email, f => $"empresa{f.UniqueIndex + 1}@test.com")
             .RuleFor(e => e.Type, f => (IssueType)f.Random.Int(0, 6))
             .RuleFor(e => e.Price, f => f.Random.Int(20, 500))
@@ -46,7 +43,7 @@ using (var scope = app.Services.CreateScope())
         // Crear 100 apartamentos
         var apartmentFaker = new Faker<Apartment>()
             .RuleFor(e => e.Id, f => Guid.NewGuid())
-            .RuleFor(e => e.FloorNumber, f => f.Random.Int(1,9))
+            .RuleFor(e => e.FloorNumber, f => f.Random.Int(1, 9))
             .RuleFor(e => e.Address, f => $"{f.Address}")
             .RuleFor(e => e.Surface, f => f.Random.Int(50, 200))
             .RuleFor(e => e.RoomNumber, f => f.Random.Int(3, 7))
@@ -56,7 +53,7 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
 
         // Crear 100 materiales
-        var materialFaker = new Faker<Material>() 
+        var materialFaker = new Faker<Material>()
             .RuleFor(e => e.Id, f => Guid.NewGuid())
             .RuleFor(e => e.Name, f => $"Material {f.UniqueIndex + 1}")
             .RuleFor(e => e.Cost, f => f.Random.Float(10, 1000))
