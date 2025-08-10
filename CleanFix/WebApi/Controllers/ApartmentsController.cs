@@ -12,18 +12,18 @@ namespace WebApi.Controllers
     [ApiController]
     public class ApartmentsController : ControllerBase
     {
-        private readonly IMediator _mediator;
+        private readonly ISender _sender;
 
-        public ApartmentsController(IMediator mediator)
+        public ApartmentsController(ISender mediator)
         {
-            _mediator = mediator;
+            _sender = mediator;
         }
 
         // GET: api/Apartments
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetApartmentsDto>>> GetApartments()
         {
-            var result = await _mediator.Send(new GetApartmentsQuery());
+            var result = await _sender.Send(new GetApartmentsQuery());
 
             return Ok(result);
         }
@@ -32,7 +32,7 @@ namespace WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<GetApartmentDto>> GetApartment(Guid id)
         {
-            var result = await _mediator.Send(new GetApartmentQuery(id));
+            var result = await _sender.Send(new GetApartmentQuery(id));
 
             if (result == null)
                 return NotFound();
@@ -55,7 +55,7 @@ namespace WebApi.Controllers
                 Apartment = apartmentDto
             };
 
-            await _mediator.Send(command);
+            await _sender.Send(command);
 
             return NoContent();
         }
@@ -70,9 +70,9 @@ namespace WebApi.Controllers
                 Apartment = apartmentDto
             };
 
-            var newApartmentId = await _mediator.Send(command);
+            var newApartmentId = await _sender.Send(command);
 
-            var createdApartment = await _mediator.Send(new GetApartmentQuery(newApartmentId));
+            var createdApartment = await _sender.Send(new GetApartmentQuery(newApartmentId));
 
             return CreatedAtAction(
                 nameof(GetApartment),
@@ -87,7 +87,7 @@ namespace WebApi.Controllers
         {
             var command = new DeleteApartmentCommand(id);
 
-            var result = await _mediator.Send(command);
+            var result = await _sender.Send(command);
 
             if (!result)
                 return NotFound();

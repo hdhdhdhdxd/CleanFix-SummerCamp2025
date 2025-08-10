@@ -15,18 +15,18 @@ namespace WebApi.Controllers
     [ApiController]
     public class MaterialsController : ControllerBase
     {
-        private readonly IMediator _mediator;
+        private readonly ISender _sender;
 
         public MaterialsController(IMediator mediator)
         {
-            _mediator = mediator;
+            _sender = mediator;
         }
 
         // GET: api/Materials
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetMaterialsDto>>> GetMaterials()
         {
-            var result = await _mediator.Send(new GetMaterialsQuery());
+            var result = await _sender.Send(new GetMaterialsQuery());
             return Ok(result);
         }
 
@@ -34,7 +34,7 @@ namespace WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<GetMaterialDto>> GetMaterial(Guid id)
         {
-            var result = await _mediator.Send(new GetMaterialQuery(id));
+            var result = await _sender.Send(new GetMaterialQuery(id));
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -51,7 +51,7 @@ namespace WebApi.Controllers
             {
                 Material = materialDto
             };
-            await _mediator.Send(command);
+            await _sender.Send(command);
             return NoContent();
         }
 
@@ -63,8 +63,8 @@ namespace WebApi.Controllers
             {
                 Material = materialDto
             };
-            var newMaterialId = await _mediator.Send(command);
-            var createdMaterial = await _mediator.Send(new GetMaterialQuery(newMaterialId));
+            var newMaterialId = await _sender.Send(command);
+            var createdMaterial = await _sender.Send(new GetMaterialQuery(newMaterialId));
             return CreatedAtAction(
                 nameof(GetMaterial),
                 new { id = newMaterialId },
@@ -77,7 +77,7 @@ namespace WebApi.Controllers
         public async Task<IActionResult> DeleteMaterial(Guid id)
         {
             var command = new DeleteMaterialCommand(id);
-            var result = await _mediator.Send(command);
+            var result = await _sender.Send(command);
             if (!result)
                 return NotFound();
             return NoContent();

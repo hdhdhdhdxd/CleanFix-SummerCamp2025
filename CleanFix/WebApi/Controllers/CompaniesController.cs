@@ -12,18 +12,18 @@ namespace WebApi.Controllers
     [ApiController]
     public class CompaniesController : ControllerBase
     {
-        private readonly IMediator _mediator;
+        private readonly ISender _sender;
 
         public CompaniesController(IMediator mediator)
         {
-            _mediator = mediator;
+            _sender = mediator;
         }
 
         // GET: api/Companies
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetCompaniesDto>>> GetCompanies()
         {
-            var result = await _mediator.Send(new GetCompaniesQuery());
+            var result = await _sender.Send(new GetCompaniesQuery());
             return Ok(result);
         }
 
@@ -31,7 +31,7 @@ namespace WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<GetCompanyDto>> GetCompany(Guid id)
         {
-            var result = await _mediator.Send(new GetCompanyQuery(id));
+            var result = await _sender.Send(new GetCompanyQuery(id));
             if (result == null)
                 return NotFound();
             return Ok(result);
@@ -48,7 +48,7 @@ namespace WebApi.Controllers
             {
                 Company = companyDto
             };
-            await _mediator.Send(command);
+            await _sender.Send(command);
             return NoContent();
         }
 
@@ -60,8 +60,8 @@ namespace WebApi.Controllers
             {
                 Company = companyDto
             };
-            var newCompanyId = await _mediator.Send(command);
-            var createdCompany = await _mediator.Send(new GetCompanyQuery(newCompanyId));
+            var newCompanyId = await _sender.Send(command);
+            var createdCompany = await _sender.Send(new GetCompanyQuery(newCompanyId));
             return CreatedAtAction(
                 nameof(GetCompany),
                 new { id = newCompanyId },
@@ -74,7 +74,7 @@ namespace WebApi.Controllers
         public async Task<IActionResult> DeleteCompany(Guid id)
         {
             var command = new DeleteCompanyCommand(id);
-            var result = await _mediator.Send(command);
+            var result = await _sender.Send(command);
             if (!result)
                 return NotFound();
             return NoContent();
