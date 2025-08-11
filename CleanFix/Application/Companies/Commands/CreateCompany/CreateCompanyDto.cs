@@ -1,5 +1,5 @@
 using AutoMapper;
-using WebApi.Entidades;
+using Domain.Entities;
 
 namespace Application.Companies.Commands.CreateCompany;
 public class CreateCompanyDto

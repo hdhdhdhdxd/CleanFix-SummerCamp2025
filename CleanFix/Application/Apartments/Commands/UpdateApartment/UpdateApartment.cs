@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Domain.Entities;
 using MediatR;
-using WebApi.Entidades;
 using WebApi.Interfaces;
 
 namespace Application.Apartments.Commands.UpdateApartment;

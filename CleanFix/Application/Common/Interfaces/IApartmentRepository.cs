@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interfaces;
-using WebApi.Entidades;
+using Domain.Entities;
 
 namespace WebApi.Interfaces;
 

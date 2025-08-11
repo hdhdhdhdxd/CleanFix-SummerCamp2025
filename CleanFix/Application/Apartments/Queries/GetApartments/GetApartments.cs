@@ -1,6 +1,6 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using WebApi.Interfaces;
-using AutoMapper;
 
 namespace Application.Apartments.Queries.GetApartments;
 

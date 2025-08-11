@@ -1,7 +1,6 @@
 using AutoMapper;
 using MediatR;
 using WebApi.Interfaces;
-using Application.Companies.Queries.GetCompany;
 
 namespace Application.Companies.Queries.GetCompany;
 public record GetCompanyQuery(Guid Id) : IRequest<GetCompanyDto>;

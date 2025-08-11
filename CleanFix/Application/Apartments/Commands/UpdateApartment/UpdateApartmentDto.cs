@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using WebApi.Entidades;
+using Domain.Entities;
 
 namespace Application.Apartments.Commands.UpdateApartment;
 public class UpdateApartmentDto

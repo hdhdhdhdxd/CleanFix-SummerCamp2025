@@ -1,7 +1,7 @@
 using Bogus;
 using Microsoft.EntityFrameworkCore;
 using WebApi.BaseDatos;
-using WebApi.Entidades;
+using Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 

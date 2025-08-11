@@ -1,6 +1,6 @@
-﻿using Dominio.Common.Interfaces;
+﻿using Domain.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using WebApi.Entidades;
 
 namespace Infrastructure.Common.Interfaces;
 public interface IDatabaseContext

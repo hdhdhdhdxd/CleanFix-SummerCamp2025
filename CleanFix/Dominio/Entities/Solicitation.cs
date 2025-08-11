@@ -1,6 +1,6 @@
-﻿using Dominio.Common.Interfaces;
+﻿using Domain.Common.Interfaces;
 
-namespace WebApi.Entidades;
+namespace Domain.Entities;
 
 public class Solicitation : IEntity
 {

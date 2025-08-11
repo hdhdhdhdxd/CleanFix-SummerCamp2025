@@ -1,11 +1,11 @@
-﻿using Dominio.Common.Interfaces;
+﻿using Domain.Common.Interfaces;
+using Domain.Entities;
 using Infrastructure.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using WebApi.Entidades;
 
 namespace WebApi.BaseDatos;
 
-public class DatabaseContext: DbContext, IDatabaseContext
+public class DatabaseContext : DbContext, IDatabaseContext
 {
     public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
     {

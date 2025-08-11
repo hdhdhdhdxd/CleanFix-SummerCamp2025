@@ -1,7 +1,6 @@
-﻿using Infrastructure.Common.Interfaces;
+﻿using Domain.Entities;
+using Infrastructure.Common.Interfaces;
 using Infrastructure.Repositories;
-using WebApi.BaseDatos;
-using WebApi.Entidades;
 using WebApi.Interfaces;
 namespace WebApi.Services;
 

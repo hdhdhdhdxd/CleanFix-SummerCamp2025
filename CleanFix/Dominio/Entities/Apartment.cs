@@ -1,7 +1,7 @@
-using Dominio.Common.Interfaces;
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using Domain.Common.Interfaces;
 
-namespace WebApi.Entidades;
+namespace Domain.Entities;
 
 public class Apartment : IEntity
 {

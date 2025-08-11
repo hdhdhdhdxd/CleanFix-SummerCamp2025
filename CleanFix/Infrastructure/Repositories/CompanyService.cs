@@ -1,5 +1,5 @@
-﻿using Infrastructure.Common.Interfaces;
-using WebApi.Entidades;
+﻿using Domain.Entities;
+using Infrastructure.Common.Interfaces;
 using WebApi.Interfaces;
 namespace Infrastructure.Repositories;
 
