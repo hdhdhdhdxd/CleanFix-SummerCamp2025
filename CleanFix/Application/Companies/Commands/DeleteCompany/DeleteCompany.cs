@@ -1,5 +1,5 @@
+using Application.Common.Interfaces;
 using MediatR;
-using WebApi.Interfaces;
 
 namespace Application.Companies.Commands.DeleteCompany;
 

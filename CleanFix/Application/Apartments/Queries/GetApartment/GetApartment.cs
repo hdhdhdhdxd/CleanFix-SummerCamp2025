@@ -1,6 +1,6 @@
-﻿using AutoMapper;
+﻿using Application.Common.Interfaces;
+using AutoMapper;
 using MediatR;
-using WebApi.Interfaces;
 
 namespace Application.Apartments.Queries.GetApartment;
 public record GetApartmentQuery(Guid Id) : IRequest<GetApartmentDto>;

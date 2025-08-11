@@ -1,5 +1,5 @@
-﻿using MediatR;
-using WebApi.Interfaces;
+﻿using Application.Common.Interfaces;
+using MediatR;
 
 namespace Application.Apartments.Commands.DeleteApartment;
 

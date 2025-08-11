@@ -1,6 +1,6 @@
 using MediatR;
-using WebApi.Interfaces;
 using AutoMapper;
+using Application.Common.Interfaces;
 
 namespace Application.Companies.Queries.GetCompanies;
 

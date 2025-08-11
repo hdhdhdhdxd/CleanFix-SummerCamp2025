@@ -1,7 +1,6 @@
-﻿using Application.Common.Interfaces;
-using Domain.Entities;
+﻿using Domain.Entities;
 
-namespace WebApi.Interfaces;
+namespace Application.Common.Interfaces;
 public interface ICompanyRepository : IRepository<Company>
 {
 }

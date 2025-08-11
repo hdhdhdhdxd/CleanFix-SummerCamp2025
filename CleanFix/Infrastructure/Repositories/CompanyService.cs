@@ -1,6 +1,6 @@
-﻿using Domain.Entities;
+﻿using Application.Common.Interfaces;
+using Domain.Entities;
 using Infrastructure.Common.Interfaces;
-using WebApi.Interfaces;
 namespace Infrastructure.Repositories;
 
 public class CompanyService : Repository<Company>, ICompanyRepository

@@ -1,7 +1,7 @@
+using Application.Common.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
-using WebApi.Interfaces;
 
 namespace Application.Solicitations.Commands.UpdateSolicitation;
 

@@ -1,6 +1,6 @@
+using Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
-using WebApi.Interfaces;
 
 namespace Application.Materials.Queries.GetMaterial;
 
