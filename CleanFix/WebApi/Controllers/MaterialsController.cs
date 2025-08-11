@@ -17,9 +17,9 @@ namespace WebApi.Controllers
     {
         private readonly ISender _sender;
 
-        public MaterialsController(IMediator mediator)
+        public MaterialsController(IMediator sender)
         {
-            _sender = mediator;
+            _sender = sender;
         }
 
         // GET: api/Materials

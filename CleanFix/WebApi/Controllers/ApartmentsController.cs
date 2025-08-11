@@ -14,9 +14,9 @@ namespace WebApi.Controllers
     {
         private readonly ISender _sender;
 
-        public ApartmentsController(ISender mediator)
+        public ApartmentsController(ISender sender)
         {
-            _sender = mediator;
+            _sender = sender;
         }
 
         // GET: api/Apartments

@@ -14,9 +14,9 @@ namespace WebApi.Controllers
     {
         private readonly ISender _sender;
 
-        public CompaniesController(IMediator mediator)
+        public CompaniesController(IMediator sender)
         {
-            _sender = mediator;
+            _sender = sender;
         }
 
         // GET: api/Companies
