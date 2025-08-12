@@ -1,86 +1,95 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using Microsoft.SemanticKernel;
-using System.ComponentModel;
+using Domain.Entities;
 using Microsoft.Data.SqlClient;
+using Microsoft.SemanticKernel;
 
 public class DBPluginTest
 {
-    [KernelFunction, Description("Obtienes las empresas de la tabla companies y puedes devolver la lista de empresas con los datos que sean necesarios en base a la peticion")]
-    public List<Companies> GetAllEmpresas()
-    {
-        var companies = new List<Companies>();
-        using (var connection = new SqlConnection("")) 
-        {
-            connection.Open();
-            Console.WriteLine("Conexión a la base de datos establecida.");
-            // Asegúrate de que la tabla Companies existe y tiene las columnas correctas
-            Console.WriteLine("Ejecutando consulta para obtener empresas...");
-            var command = new SqlCommand("SELECT Id, Name, Address, Number, type, Price, WorkTime FROM Companies", connection);
-            var reader = command.ExecuteReader();
-            while (reader.Read())
-            {
-                companies.Add(new Companies
-                {
-                    Id = reader.GetGuid(0), // Asumiendo que Id es de tipo Guid
-                    Name = reader.GetString(1),
-                    Address = reader.GetString(2),
-                    Number = reader.GetString(3),
-                    Type = reader.GetInt32(4), // Asumiendo que Type es de tipo
-                    Price = reader.GetDecimal(5), // Asumiendo que Price es de tipo decimal
-                    WorkTime = reader.GetInt32(6)
+    private readonly string _connectionString;
 
-                });
-            }
-        }
-        return companies;
+    public DBPluginTest(string connectionString)
+    {
+        _connectionString = connectionString;
     }
 
-    /*[KernelFunction, Description("Devuelve todos los materiales de la base de datos")]
-    public List<Materials> GetAllMateriales()
+    [KernelFunction, Description("Obtiene todas las empresas desde la base de datos")]
+    public string GetAllEmpresas()
     {
-        var materials = new List<Materials>();
-        using (var connection = new SqlConnection("Server=(localdb)\\\\mssqllocaldb;Database=CleanFixDB;Trusted_Connection=True;MultipleActiveResultSets=true\"\n  }"))
+        var companies = new List<Company>();
+
+        try
         {
+            using var connection = new SqlConnection(_connectionString);
             connection.Open();
-            var command = new SqlCommand("SELECT * FROM Materials", connection);
-            var reader = command.ExecuteReader();
+
+            var command = new SqlCommand("SELECT Id, Name, Address, Number, [type], Price, WorkTime FROM dbo.Companies", connection);
+            using var reader = command.ExecuteReader();
+
             while (reader.Read())
             {
-                materials.Add(new Materials
+                companies.Add(new Company
                 {
-
-                    Id = reader.GetInt32(0),
-                    Name = reader.GetString(1),
-                    Cost = reader.GetFloat(2),
-                    Available = reader.GetBoolean(3),
-                    Issue = reader.GetInt32(4)
+                    Id = reader.GetGuid(0),
+                    Name = reader.IsDBNull(1) ? null : reader.GetString(1),
+                    Address = reader.IsDBNull(2) ? null : reader.GetString(2),
+                    Number = reader.IsDBNull(3) ? null : reader.GetString(3),
+                    Type = reader.IsDBNull(4) ? 0 : reader.GetInt32(4),
+                    Price = reader.IsDBNull(5) ? 0 : reader.GetDecimal(5),
+                    WorkTime = reader.IsDBNull(6) ? 0 : reader.GetInt32(6)
                 });
             }
         }
-        return materials;
-    }*/
+        catch (Exception ex)
+        {
+            return JsonSerializer.Serialize(new { success = false, error = ex.Message });
+        }
+
+        return JsonSerializer.Serialize(new { success = true, data = companies }, new JsonSerializerOptions { WriteIndented = true });
+    }
 }
-public class Companies
+
+/*[KernelFunction, Description("Devuelve todos los materiales de la base de datos")]
+public List<Materials> GetAllMateriales()
 {
+    var materials = new List<Materials>();
+    using (var connection = new SqlConnection("Server=(localdb)\\\\mssqllocaldb;Database=CleanFixDB;Trusted_Connection=True;MultipleActiveResultSets=true\"\n  }"))
+    {
+        connection.Open();
+        var command = new SqlCommand("SELECT * FROM Materials", connection);
+        var reader = command.ExecuteReader();
+        while (reader.Read())
+        {
+            materials.Add(new Materials
+            {
 
-    public Guid Id { get; set; } // Identificador único de la empresa
+                Id = reader.GetInt32(0),
+                Name = reader.GetString(1),
+                Cost = reader.GetFloat(2),
+                Available = reader.GetBoolean(3),
+                Issue = reader.GetInt32(4)
+            });
+        }
+    }
+    return materials;
+}
+}*/
+public class Company
+{
+    public Guid Id { get; set; }
     public string Name { get; set; }
-
     public string Address { get; set; }
-
     public string Number { get; set; }
-
     public int Type { get; set; }
-
     public decimal Price { get; set; }
-
     public int WorkTime { get; set; }
 }
-    public class Materials
+public class Materials
 {
     public int Id { get; set; }
 

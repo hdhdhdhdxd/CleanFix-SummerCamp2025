@@ -1,6 +1,13 @@
-﻿using Microsoft.SemanticKernel;
+﻿using System.Data.SqlClient;
+using System.Text.Json;
+using System.Threading.Tasks;
+using HandlebarsDotNet;
+using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.ChatCompletion;
+using Microsoft.SemanticKernel.Connectors.OpenAI;
+using Microsoft.SemanticKernel.Functions;
+using Microsoft.SemanticKernel.PromptTemplates;
 
 /*using Dominio.Maintenance;
 
@@ -296,39 +303,71 @@ static void MostrarRespuesta(string mensaje, ConsoleColor color)
 */
 
 
-//Datos de conexion con el ChatBot
-
-
-var builder = Kernel.CreateBuilder();
-builder.AddAzureOpenAIChatCompletion(
-    deploymentName: "gpt-4.1",
-    endpoint: "https://hdhdh-mdx2smel-eastus2.cognitiveservices.azure.com/",
-    apiKey: "9ZMpVj9cCWRyv73s8vyxd0RL93ELHrtmNwN68ZPxRlDgBDjEgxR0JQQJ99BHACHYHv6XJ3w3AAAAACOGEv9e"
-    );
-
-
-//Plugins/Scripts creados para la IA
-var kernel = builder.Build();
-kernel.ImportPluginFromObject(new DBPluginTest(), "DBPlugin");
-var result = await kernel.InvokeAsync("DBPlugin", "GetAllEmpresas");
-kernel.Plugins.Add(KernelPluginFactory.CreateFromType<FacturaPluginTest>());
-kernel.Plugins.Add(KernelPluginFactory.CreateFromType<DBPluginTest>());
-
-
-//Descripcion del agente    
-var agent = new ChatCompletionAgent
+class Program
 {
-    Name = "CleanFixBot",
-    Instructions = "Eres un agente de IA especializado en responder preguntas sobre los servicios de CleanFix. Proporciona respuestas claras y concisas basadas en la información que tienes.",
-    Kernel = kernel
-};
+    static async Task Main(string[] args)
+    {
+        // 1. Crear el builder y configurar Azure OpenAI
+        var builder = Kernel.CreateBuilder();
+        builder.AddAzureOpenAIChatCompletion(
+            deploymentName: "gpt-4.1",
+            endpoint: "https://hdhdh-mdx2smel-eastus2.cognitiveservices.azure.com/",
+            apiKey: "9ZMpVj9cCWRyv73s8vyxd0RL93ELHrtmNwN68ZPxRlDgBDjEgxR0JQQJ99BHACHYHv6XJ3w3AAAAACOGEv9e"
+        );
 
-//Entrada al usuario
-Console.WriteLine("Escribe tu petición para CleanFixBot:");
-string userInput = Console.ReadLine();
+        // 2. Agregar el plugin
+        string connectionString = "Server=tcp:devdemoserverbbdd.database.windows.net,1433;Initial Catalog=devdemobbdd;Persist Security Info=False;User ID=admsql;Password=P@ssw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+        var dbPlugin = new DBPluginTest(connectionString);
+        builder.Plugins.AddFromObject(dbPlugin, "DBPlugin");
 
-var userMessage = new ChatMessageContent(AuthorRole.User, userInput);
+        // 3. Construir el kernel
+        var kernel = builder.Build();
+
+        // 4. Obtener JSON de empresas una sola vez
+        var result = await kernel.InvokeAsync("DBPlugin", "GetAllEmpresas");
+        var empresasJson = result.GetValue<string>();
+
+        // 5. Definir el prompt con placeholders
+        var promptTemplate = @"
+        Tienes la siguiente información de empresas en JSON:
+        {{$empresas}}
+
+        Usa esta información para responder la pregunta del usuario:
+        {{$pregunta}}
+
+        Si no tiene relación, responde que no puedes ayudar.
+        ";
+
+        var promptFunction = kernel.CreateFunctionFromPrompt(promptTemplate);
+
+        Console.WriteLine("Escribe tu petición (o 'salir' para terminar):");
+
+        while (true)
+        {
+            Console.Write("> ");
+            string userInput = Console.ReadLine()?.Trim();
+            if (string.IsNullOrEmpty(userInput)) continue;
+            if (userInput.Equals("salir", StringComparison.OrdinalIgnoreCase)) break;
+
+            // 6. Construir KernelArguments con variables
+            var kernelArgs = new KernelArguments();
+            kernelArgs["empresas"] = empresasJson;
+            kernelArgs["pregunta"] = userInput;
+
+            // 7. Invocar la función
+            var response = await promptFunction.InvokeAsync(kernel, kernelArgs);
+
+            // 8. Mostrar respuesta
+            Console.WriteLine($"\n🧠 CleanFixBot: {response.GetValue<string>()}\n");
+        }
+    }
+}
+
+
+/*var userMessage = new ChatMessageContent(AuthorRole.User, userInput);
 await foreach (var response in agent.InvokeAsync(userMessage))
 {
     Console.WriteLine(response.Message.Content);
-}
+}*/
+
+
