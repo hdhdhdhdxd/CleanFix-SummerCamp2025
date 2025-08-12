@@ -55,14 +55,14 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
 
         // Crear 100 materiales
-        Random random = new Random();
-        var type = random.Next(0, 7);
+        Random random2 = new Random();
+        var type2 = random2.Next(0, 7);
         var materialFaker = new Faker<Material>()
             .RuleFor(e => e.Id, f => Guid.NewGuid())
-            .RuleFor(e => e.Name, f => $"Material {f.UniqueIndex + 1} _ {type}")
+            .RuleFor(e => e.Name, f => $"Material {f.UniqueIndex + 1} _ {type2}")
             .RuleFor(e => e.Cost, f => f.Random.Float(10, 1000))
             .RuleFor(e => e.Available, f => true)
-            .RuleFor(e => e.Issue, f => (IssueType)type);
+            .RuleFor(e => e.Issue, f => (IssueType)type2);
         var materials = materialFaker.Generate(10);
         db.Materials.AddRange(materials);
         db.SaveChanges(); 
