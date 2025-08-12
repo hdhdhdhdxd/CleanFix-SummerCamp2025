@@ -18,7 +18,7 @@ public class DBPluginTest
         _connectionString = connectionString;
     }
 
-    [KernelFunction, Description("Obtiene todas las empresas desde la base de datos")]
+    [KernelFunction, Description("Obtiene todas las empresas desde la base de datos, las convierte a JSON")]
     public string GetAllEmpresas()
     {
         var companies = new List<Company>();

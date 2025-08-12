@@ -340,7 +340,7 @@ class Program
 
         var promptFunction = kernel.CreateFunctionFromPrompt(promptTemplate);
 
-        Console.WriteLine("Escribe tu petición (o 'salir' para terminar):");
+        Console.WriteLine("¡Hola! Soy CleanFixBot y estoy aquí para ayudarte. ¿Necesitas información sobre reformas, empresas o materiales? ¡Estaré encantado de ayudarte!):");
 
         while (true)
         {
