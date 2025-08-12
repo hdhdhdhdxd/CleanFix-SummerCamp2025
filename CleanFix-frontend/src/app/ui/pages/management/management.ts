@@ -21,7 +21,7 @@ export class Management implements OnInit {
     {
       label: 'Incidencias',
       icon: 'alert',
-      route: '/management/incidencias',
+      route: '/management/incidences',
     },
     {
       label: 'Trabajos en Proceso',

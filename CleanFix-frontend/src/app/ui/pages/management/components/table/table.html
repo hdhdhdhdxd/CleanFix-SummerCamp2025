@@ -1,48 +1,171 @@
-<table class="min-w-full divide-y divide-brand-200">
-  <thead class="bg-brand-50">
-    <tr>
-      <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-brand-500 uppercase">
-        ID
-      </th>
-      <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-brand-500 uppercase">
-        Dirección
-      </th>
-      <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-brand-500 uppercase">
-        Descripción
-      </th>
-      <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-brand-500 uppercase">
-        Tipo
-      </th>
-      <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-brand-500 uppercase">
-        Coste
-      </th>
-      <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-brand-500 uppercase">
-        Fecha
-      </th>
-      <th class="px-4 py-3 text-left text-xs font-medium tracking-wider text-brand-500 uppercase">
-        Estado
-      </th>
-    </tr>
-  </thead>
-  <tbody class="divide-y divide-brand-200 bg-white">
-    @for (solicitation of solicitations(); track $index) {
-      <tr>
-        <td class="px-4 py-3 whitespace-nowrap">{{ solicitation.id }}</td>
-        <td class="px-4 py-3 whitespace-nowrap">{{ solicitation.address }}</td>
-        <td class="px-4 py-3 whitespace-nowrap">{{ solicitation.description }}</td>
-        <td class="px-4 py-3 whitespace-nowrap">{{ solicitation.type }}</td>
-        <td class="px-4 py-3 whitespace-nowrap">
-          {{ solicitation.cost | currency: 'EUR' : 'symbol' : '1.2-2' }}
-        </td>
-        <td class="px-4 py-3 whitespace-nowrap">{{ solicitation.date | date: 'shortDate' }}</td>
-        <td class="px-4 py-3 whitespace-nowrap">{{ solicitation.status }}</td>
-      </tr>
-    }
+<!-- Contenedor principal que ocupa todo el espacio disponible -->
+<div class="flex h-full flex-col">
+  <!-- Tabla con scroll interno -->
+  <div class="flex-1 overflow-hidden rounded-lg border border-brand-200">
+    <div class="h-full overflow-auto">
+      <table class="w-full divide-y divide-brand-200">
+        <thead class="sticky top-0 bg-brand-50">
+          <tr>
+            <th
+              class="px-4 py-3 text-left text-xs font-medium tracking-wider text-brand-500 uppercase"
+            >
+              ID
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-medium tracking-wider text-brand-500 uppercase"
+            >
+              Dirección
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-medium tracking-wider text-brand-500 uppercase"
+            >
+              Descripción
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-medium tracking-wider text-brand-500 uppercase"
+            >
+              Tipo
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-medium tracking-wider text-brand-500 uppercase"
+            >
+              Coste
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-medium tracking-wider text-brand-500 uppercase"
+            >
+              Fecha
+            </th>
+            <th
+              class="px-4 py-3 text-left text-xs font-medium tracking-wider text-brand-500 uppercase"
+            >
+              Estado
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-brand-200 bg-white">
+          @for (solicitation of paginatedSolicitations(); track $index) {
+            <tr class="hover:bg-brand-50">
+              <td class="px-4 py-3 whitespace-nowrap">{{ solicitation.id }}</td>
+              <td class="px-4 py-3 whitespace-nowrap">{{ solicitation.address }}</td>
+              <td class="px-4 py-3 whitespace-nowrap">{{ solicitation.description }}</td>
+              <td class="px-4 py-3 whitespace-nowrap">{{ solicitation.type }}</td>
+              <td class="px-4 py-3 whitespace-nowrap">
+                {{ solicitation.cost | currency: 'EUR' : 'symbol' : '1.2-2' }}
+              </td>
+              <td class="px-4 py-3 whitespace-nowrap">
+                {{ solicitation.date | date: 'shortDate' }}
+              </td>
+              <td class="px-4 py-3 whitespace-nowrap">
+                <span
+                  class="inline-flex rounded-full px-2 py-1 text-xs font-semibold"
+                  [ngClass]="getStatusClass(solicitation.status)"
+                >
+                  {{ solicitation.status }}
+                </span>
+              </td>
+            </tr>
+          }
 
-    @if (solicitations().length === 0) {
-      <tr>
-        <td colspan="7" class="px-4 py-4 text-center text-brand-400">No hay solicitudes</td>
-      </tr>
-    }
-  </tbody>
-</table>
+          @if (paginatedSolicitations().length === 0) {
+            <tr>
+              <td colspan="8" class="px-4 py-8 text-center text-brand-400">
+                <div class="flex flex-col items-center">
+                  <svg
+                    class="mb-4 h-12 w-12 text-brand-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    ></path>
+                  </svg>
+                  <p class="text-lg font-medium text-brand-500">No hay solicitudes</p>
+                  <p class="text-sm text-brand-400">
+                    Las solicitudes aparecerán aquí cuando las crees
+                  </p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Paginado y acciones -->
+  <div
+    class="mt-4 flex items-center justify-between border-t border-brand-200 bg-white px-4 py-3 sm:px-6"
+  >
+    <!-- Información de resultados -->
+    <div class="flex items-center text-sm text-brand-500">
+      <span>
+        Mostrando
+        <span class="font-medium">1</span>
+        a
+        <span class="font-medium">10</span>
+        de
+        <span class="font-medium">{{ totalItems() }}</span>
+        resultados
+      </span>
+    </div>
+
+    <!-- Controles de paginación -->
+    <div class="flex items-center space-x-2">
+      <!-- Botón anterior -->
+      <button
+        class="relative inline-flex items-center rounded-md border border-brand-300 bg-white px-4 py-2 text-sm font-medium text-brand-500 hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-50"
+        [disabled]="currentPage() === 1"
+        (click)="previousPage()"
+      >
+        <svg class="mr-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          ></path>
+        </svg>
+        Anterior
+      </button>
+
+      <!-- Números de página -->
+      <div class="flex space-x-1">
+        @for (page of getPageNumbers(); track page) {
+          <button
+            class="relative inline-flex items-center rounded-md px-4 py-2 text-sm font-medium"
+            [class]="
+              page === currentPage()
+                ? 'border border-primary-500 bg-primary-500 text-white'
+                : 'border border-brand-300 bg-white text-brand-500 hover:bg-brand-50'
+            "
+            (click)="goToPage(page)"
+          >
+            {{ page }}
+          </button>
+        }
+      </div>
+
+      <!-- Botón siguiente -->
+      <button
+        class="relative inline-flex items-center rounded-md border border-brand-300 bg-white px-4 py-2 text-sm font-medium text-brand-500 hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-50"
+        [disabled]="currentPage() === totalPages()"
+        (click)="nextPage()"
+      >
+        Siguiente
+        <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5l7 7-7 7"
+          ></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

@@ -17,7 +17,7 @@ export const MANAGEMENT_ROUTES: Routes = [
         loadComponent: () => import('./components/requests/requests').then((m) => m.Requests),
       },
       {
-        path: 'incidencias',
+        path: 'incidences',
         loadComponent: () => import('./components/incidences/incidences').then((m) => m.Incidences),
       },
     ],
