@@ -52,33 +52,41 @@ public class DBPluginTest
 
         return JsonSerializer.Serialize(new { success = true, data = companies }, new JsonSerializerOptions { WriteIndented = true });
     }
-}
 
-/*[KernelFunction, Description("Devuelve todos los materiales de la base de datos")]
-public List<Materials> GetAllMateriales()
-{
-    var materials = new List<Materials>();
-    using (var connection = new SqlConnection("Server=(localdb)\\\\mssqllocaldb;Database=CleanFixDB;Trusted_Connection=True;MultipleActiveResultSets=true\"\n  }"))
+    [KernelFunction, Description("Obtiene todos los materiales desde la base de datos, las convierte a JSON")]
+    public string GetAllMaterials()
     {
-        connection.Open();
-        var command = new SqlCommand("SELECT * FROM Materials", connection);
-        var reader = command.ExecuteReader();
-        while (reader.Read())
-        {
-            materials.Add(new Materials
-            {
+        var materiales = new List<Material>();
 
-                Id = reader.GetInt32(0),
-                Name = reader.GetString(1),
-                Cost = reader.GetFloat(2),
-                Available = reader.GetBoolean(3),
-                Issue = reader.GetInt32(4)
-            });
+        try
+        {
+            using var connection = new SqlConnection(_connectionString);
+            connection.Open();
+
+            var command = new SqlCommand("SELECT Id, Name, Cost, Issue FROM dbo.Materials", connection);
+            using var reader = command.ExecuteReader();
+
+            while (reader.Read())
+            {
+                materiales.Add(new Material
+                {
+                    Id = reader.GetInt32(0),
+                    Name = reader.IsDBNull(1) ? null : reader.GetString(1),
+                    Cost = reader.IsDBNull(2) ? 0 : reader.GetDouble(2),
+                    Issue = reader.IsDBNull(3) ? 0 : reader.GetInt32(3)
+                });
+            }
         }
+        catch (Exception ex)
+        {
+            return JsonSerializer.Serialize(new { success = false, error = ex.Message });
+        }
+
+        return JsonSerializer.Serialize(new { success = true, data = materiales }, new JsonSerializerOptions { WriteIndented = true });
     }
-    return materials;
 }
-}*/
+
+
 public class Company
 {
     public Guid Id { get; set; }
@@ -89,13 +97,12 @@ public class Company
     public decimal Price { get; set; }
     public int WorkTime { get; set; }
 }
-public class Materials
+public class Material
 {
     public int Id { get; set; }
 
     public string Name { get; set; }
-    public float Cost { get; set; }
-    public bool Available { get; set; }
+    public double Cost { get; set; }
     public int Issue { get; set; }
 }
 

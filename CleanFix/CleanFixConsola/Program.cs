@@ -316,29 +316,40 @@ class Program
         );
 
         // 2. Agregar el plugin
-        string connectionString = "Server=tcp:devdemoserverbbdd.database.windows.net,1433;Initial Catalog=devdemobbdd;Persist Security Info=False;User ID=admsql;Password=P@ssw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
-        var dbPlugin = new DBPluginTest(connectionString);
-        builder.Plugins.AddFromObject(dbPlugin, "DBPlugin");
+        string connectionString = "Server=tcp:devdemoserverbbdd.database.windows.net,1433;Initial Catalog=devdemobbdd2;Persist Security Info=False;User ID=admsql;Password=P@ssw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
+        var dbPluginEmpresas = new DBPluginTest(connectionString);
+        builder.Plugins.AddFromObject(dbPluginEmpresas, "DBPluginEmpresas");
+
+        var dbPluginMateriales = new DBPluginTest(connectionString);
+        builder.Plugins.AddFromObject(dbPluginMateriales, "DBPluginMateriales");
 
         // 3. Construir el kernel
         var kernel = builder.Build();
 
-        // 4. Obtener JSON de empresas una sola vez
-        var result = await kernel.InvokeAsync("DBPlugin", "GetAllEmpresas");
-        var empresasJson = result.GetValue<string>();
+        // 4.1 Obtener JSON de empresas una sola vez
+        var empresasIA = await kernel.InvokeAsync("DBPluginEmpresas", "GetAllEmpresas");
+        var empresasJson = empresasIA.GetValue<string>();
 
-        // 5. Definir el prompt con placeholders
+        // 4.2 Obtener JSON de materiales una sola vez
+        var materialesIA = await kernel.InvokeAsync("DBPluginMateriales", "GetAllMaterials");
+        var materialesJson = materialesIA.GetValue<string>();
+
+        // 5.1 Definir el prompt con placeholders
         var promptTemplate = @"
-        Tienes la siguiente información de empresas en JSON:
-        {{$empresas}}
+Tienes la siguiente información de empresas en JSON:
+{{$empresas}}
 
-        Usa esta información para responder la pregunta del usuario:
-        {{$pregunta}}
+Y también la siguiente información de materiales en JSON:
+{{$materiales}}
 
-        Si no tiene relación, responde que no puedes ayudar.
-        ";
+Usa esta información para responder la pregunta del usuario:
+{{$pregunta}}
+
+Si no tiene relación, responde que no puedes ayudar.
+";
 
         var promptFunction = kernel.CreateFunctionFromPrompt(promptTemplate);
+
 
         Console.WriteLine("¡Hola! Soy CleanFixBot y estoy aquí para ayudarte. ¿Necesitas información sobre reformas, empresas o materiales? ¡Estaré encantado de ayudarte!):");
 
@@ -352,13 +363,15 @@ class Program
             // 6. Construir KernelArguments con variables
             var kernelArgs = new KernelArguments();
             kernelArgs["empresas"] = empresasJson;
+            kernelArgs["materiales"] = materialesJson;
             kernelArgs["pregunta"] = userInput;
 
+
             // 7. Invocar la función
-            var response = await promptFunction.InvokeAsync(kernel, kernelArgs);
+            var responseData = await promptFunction.InvokeAsync(kernel, kernelArgs);
 
             // 8. Mostrar respuesta
-            Console.WriteLine($"\n🧠 CleanFixBot: {response.GetValue<string>()}\n");
+            Console.WriteLine($"\n🧠 CleanFixBot: {responseData.GetValue<string>()}\n");
         }
     }
 }
