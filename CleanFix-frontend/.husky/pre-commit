@@ -10,6 +10,5 @@ elif [ -d "../CleanFix-frontend" ]; then
   # Estamos en CleanFix (backend) - subir un nivel y entrar al frontend
   cd ../CleanFix-frontend && npm run lint-staged
 else
-  echo "⚠️  No se encontró el proyecto Angular. Verificar estructura de directorios."
   exit 1
 fi  
