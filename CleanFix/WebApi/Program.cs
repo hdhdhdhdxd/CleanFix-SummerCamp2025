@@ -24,7 +24,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
     db.Database.Migrate();
-    if (!db.Apartments.Any() && !db.Companies.Any() && !db.Materials.Any() && !db.Solicitations.Any())
+    if (!db.Apartments.Any() && !db.Companies.Any() && !db.Materials.Any() && !db.Solicitations.Any())  
     {
         // Crear 100 empresas
         var companyFaker = new Faker<Company>()
@@ -36,11 +36,11 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.Type, f => (IssueType)f.Random.Int(0, 6))
             .RuleFor(e => e.Price, f => f.Random.Int(20, 500))
             .RuleFor(e => e.WorkTime, f => f.Random.Int(20, 500));
-        var companies = companyFaker.Generate(100);
+        var companies = companyFaker.Generate(10);
         db.Companies.AddRange(companies);
-        db.SaveChanges();
+        db.SaveChanges(); 
 
-        // Crear 100 apartamentos
+       /* // Crear 100 apartamentos
         var apartmentFaker = new Faker<Apartment>()
             .RuleFor(e => e.Id, f => Guid.NewGuid())
             .RuleFor(e => e.FloorNumber, f => f.Random.Int(1, 9))
@@ -48,7 +48,7 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.Surface, f => f.Random.Int(50, 200))
             .RuleFor(e => e.RoomNumber, f => f.Random.Int(3, 7))
             .RuleFor(e => e.BathroomNumber, f => f.Random.Int(1, 3));
-        var apartments = apartmentFaker.Generate(100);
+        var apartments = apartmentFaker.Generate(10);
         db.Apartments.AddRange(apartments);
         db.SaveChanges();
 
@@ -59,9 +59,9 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.Cost, f => f.Random.Float(10, 1000))
             .RuleFor(e => e.Available, f => true)
             .RuleFor(e => e.Issue, f => (IssueType)f.Random.Int(0, 6));
-        var materials = materialFaker.Generate(100);
+        var materials = materialFaker.Generate(10);
         db.Materials.AddRange(materials);
-        db.SaveChanges();
+        db.SaveChanges(); 
 
         // Crea 100 solicitudes
         var solicitationFaker = new Faker<Solicitation>()
@@ -74,9 +74,9 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.Address, f => $"{f.Address}")
             .RuleFor(e => e.Type, f => (IssueType)f.Random.Int(0, 6))
             .RuleFor(e => e.Materials, f => materials.OrderBy(x => f.Random.Int()).Take(f.Random.Int(1, 5)).ToList());
-        var solicitations = solicitationFaker.Generate(100);
+        var solicitations = solicitationFaker.Generate(10);
         db.Solicitations.AddRange(solicitations);
-        db.SaveChanges();
+        db.SaveChanges();*/
     }
 }
 
