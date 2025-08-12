@@ -12,8 +12,8 @@ using WebApi.BaseDatos;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250812110031_initial")]
-    partial class initial
+    [Migration("20250812112334_initial1234")]
+    partial class initial1234
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
