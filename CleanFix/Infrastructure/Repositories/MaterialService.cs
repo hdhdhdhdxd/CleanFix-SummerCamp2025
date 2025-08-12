@@ -1,7 +1,7 @@
-﻿using Domain.Entities;
+﻿using Application.Common.Interfaces;
+using Domain.Entities;
 using Infrastructure.Common.Interfaces;
 using Infrastructure.Repositories;
-using WebApi.Interfaces;
 namespace WebApi.Services;
 
 public class MaterialService : Repository<Material>, IMaterialRepository

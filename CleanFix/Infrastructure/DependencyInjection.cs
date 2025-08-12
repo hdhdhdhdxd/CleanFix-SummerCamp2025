@@ -1,11 +1,11 @@
-﻿using Infrastructure.Common.Interfaces;
+﻿using Application.Common.Interfaces;
+using Infrastructure.Common.Interfaces;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebApi.BaseDatos;
-using WebApi.Interfaces;
 using WebApi.Services;
 
 namespace Microsoft.Extensions.DependencyInjection;
