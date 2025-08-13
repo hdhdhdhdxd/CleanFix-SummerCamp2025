@@ -21,12 +21,12 @@ public class Repository<T>
         return await _database.Set<T>().ToListAsync(cancellationToken);
     }
 
-    public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
         return await _database.Set<T>().SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
-    public async Task<Guid> AddAsync(T entity, CancellationToken cancellationToken)
+    public async Task<int> AddAsync(T entity, CancellationToken cancellationToken)
     {
         _database.Set<T>().Add(entity);
 

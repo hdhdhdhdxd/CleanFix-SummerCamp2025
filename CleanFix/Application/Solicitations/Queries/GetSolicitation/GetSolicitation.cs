@@ -3,7 +3,7 @@ using AutoMapper;
 using MediatR;
 
 namespace Application.Solicitations.Queries.GetSolicitation;
-public record GetSolicitationQuery(Guid Id) : IRequest<GetSolicitationDto>;
+public record GetSolicitationQuery(int Id) : IRequest<GetSolicitationDto>;
 
 public class GetSolicitationQueryHandler : IRequestHandler<GetSolicitationQuery, GetSolicitationDto>
 {

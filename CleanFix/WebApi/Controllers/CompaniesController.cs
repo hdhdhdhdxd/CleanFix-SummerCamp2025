@@ -29,7 +29,7 @@ namespace WebApi.Controllers
 
         // GET: api/Companies/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<GetCompanyDto>> GetCompany(Guid id)
+        public async Task<ActionResult<GetCompanyDto>> GetCompany(int id)
         {
             var result = await _sender.Send(new GetCompanyQuery(id));
             if (result == null)
@@ -39,9 +39,9 @@ namespace WebApi.Controllers
 
         // PUT: api/Companies/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCompany(Guid id, [FromBody] UpdateCompanyDto companyDto)
+        public async Task<IActionResult> PutCompany(int id, [FromBody] UpdateCompanyDto companyDto)
         {
-            if (companyDto.Id != Guid.Empty && companyDto.Id != id)
+            if (companyDto.Id != 0 && companyDto.Id != id)
                 return BadRequest("El id de la ruta y el del cuerpo no coinciden.");
             companyDto.Id = id;
             var command = new UpdateCompanyCommand
@@ -71,7 +71,7 @@ namespace WebApi.Controllers
 
         // DELETE: api/Companies/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCompany(Guid id)
+        public async Task<IActionResult> DeleteCompany(int id)
         {
             var command = new DeleteCompanyCommand(id);
             var result = await _sender.Send(command);

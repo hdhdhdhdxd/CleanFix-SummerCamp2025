@@ -12,8 +12,8 @@ using WebApi.BaseDatos;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250812112334_initial1234")]
-    partial class initial1234
+    [Migration("20250812122239_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,9 +27,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Apartment", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
                         .IsRequired()
@@ -55,29 +57,35 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Company", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Number")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("Price")
+                    b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("Type")
+                    b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<int?>("WorkTime")
+                    b.Property<int>("WorkTime")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -87,9 +95,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Material", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Available")
                         .HasColumnType("bit");
@@ -104,8 +114,8 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("SolicitationId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int?>("SolicitationId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -116,19 +126,21 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Solicitation", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("ApartmentId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("ApartmentId")
+                        .HasColumnType("int");
 
-                    b.Property<Guid?>("CompanyId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
@@ -145,8 +157,8 @@ namespace Infrastructure.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -161,12 +173,14 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
 
-                    b.Property<Guid?>("ApartmentId")
-                        .HasColumnType("uniqueidentifier");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ApartmentId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -189,19 +203,27 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.Apartment", "Apartment")
                         .WithMany()
-                        .HasForeignKey("ApartmentId");
+                        .HasForeignKey("ApartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.Company", "Company")
                         .WithMany()
-                        .HasForeignKey("CompanyId");
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("Domain.Entities.User", null)
+                    b.HasOne("Domain.Entities.User", "User")
                         .WithMany("Applications")
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Apartment");
 
                     b.Navigation("Company");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>

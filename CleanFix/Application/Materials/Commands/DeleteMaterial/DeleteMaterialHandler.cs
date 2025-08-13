@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Application.Materials.Commands.DeleteMaterial;
 
-public record DeleteMaterialCommand(Guid Id) : IRequest<bool>;
+public record DeleteMaterialCommand(int Id) : IRequest<bool>;
 
 public class DeleteMaterialCommandHandler : IRequestHandler<DeleteMaterialCommand, bool>
 {

@@ -3,7 +3,7 @@ using AutoMapper;
 using MediatR;
 
 namespace Application.Incidences.Queries.GetIncidence;
-public record GetIncidenceQuery(Guid Id) : IRequest<GetIncidenceDto>;
+public record GetIncidenceQuery(int Id) : IRequest<GetIncidenceDto>;
 
 public class GetIncidenceQueryHandler : IRequestHandler<GetIncidenceQuery, GetIncidenceDto>
 {

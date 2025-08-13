@@ -4,7 +4,7 @@ namespace Domain.Entities;
 
 public class Incidence : IEntity
 {
-    public Guid Id { get; set; } // Identificador único de la incidencia
+    public int Id { get; set; } // Identificador único de la incidencia
     public IssueType Type { get; set; } // Tipo de incidencia (e.g., "Electricidad", "Fontanería", etc.)
     public DateTime Date { get; set; } // Fecha de la incidencia
     public string Status { get; set; } // Estado de la incidencia (e.g., "Pendiente", "En Progreso", "Resuelta")

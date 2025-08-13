@@ -18,19 +18,18 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-
 // Seeding de datos de Apartamento, Edificio y Distrito, y migración automática solo en desarrollo
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-    db.Database.Migrate();
+    
     if (!db.Apartments.Any() && !db.Companies.Any() && !db.Materials.Any() && !db.Solicitations.Any())  
     {
-        // Crear 100 empresas
+        db.Database.Migrate();
+        // Crear 10 empresas
         Random random = new Random();
         var type = random.Next(0, 7);
         var companyFaker = new Faker<Company>()
-            .RuleFor(e => e.Id, f => Guid.NewGuid())
             .RuleFor(e => e.Name, f => $"Empresa {f.UniqueIndex + 1}_{type}")
             .RuleFor(e => e.Address, f => $"{f.Address}")
             .RuleFor(e => e.Number, f => f.Random.Int(100000000, 999999999).ToString())
@@ -42,9 +41,8 @@ using (var scope = app.Services.CreateScope())
         db.Companies.AddRange(companies);
         db.SaveChanges(); 
 
-       // Crear 100 apartamentos
+       // Crear 10 apartamentos
         var apartmentFaker = new Faker<Apartment>()
-            .RuleFor(e => e.Id, f => Guid.NewGuid())
             .RuleFor(e => e.FloorNumber, f => f.Random.Int(1, 9))
             .RuleFor(e => e.Address, f => $"{f.Address}")
             .RuleFor(e => e.Surface, f => f.Random.Int(50, 200))
@@ -54,11 +52,10 @@ using (var scope = app.Services.CreateScope())
         db.Apartments.AddRange(apartments);
         db.SaveChanges();
 
-        // Crear 100 materiales
+        // Crear 10 materiales
         Random random2 = new Random();
         var type2 = random2.Next(0, 7);
         var materialFaker = new Faker<Material>()
-            .RuleFor(e => e.Id, f => Guid.NewGuid())
             .RuleFor(e => e.Name, f => $"Material {f.UniqueIndex + 1} _ {type2}")
             .RuleFor(e => e.Cost, f => f.Random.Float(10, 1000))
             .RuleFor(e => e.Available, f => true)
@@ -67,9 +64,8 @@ using (var scope = app.Services.CreateScope())
         db.Materials.AddRange(materials);
         db.SaveChanges(); 
 
-        // Crea 100 solicitudes
+        // Crear 10 solicitudes
         var solicitationFaker = new Faker<Solicitation>()
-            .RuleFor(e => e.Id, f => Guid.NewGuid())
             .RuleFor(e => e.Apartment, f => apartments[f.Random.Int(0, apartments.Count - 1)])
             .RuleFor(e => e.Company, f => companies[f.Random.Int(0, companies.Count - 1)])
             .RuleFor(e => e.Date, f => f.Date.Recent())

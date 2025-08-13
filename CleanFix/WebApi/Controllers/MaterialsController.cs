@@ -32,7 +32,7 @@ namespace WebApi.Controllers
 
         // GET: api/Materials/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<GetMaterialDto>> GetMaterial(Guid id)
+        public async Task<ActionResult<GetMaterialDto>> GetMaterial(int id)
         {
             var result = await _sender.Send(new GetMaterialQuery(id));
             if (result == null)
@@ -42,9 +42,9 @@ namespace WebApi.Controllers
 
         // PUT: api/Materials/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMaterial(Guid id, [FromBody] UpdateMaterialDto materialDto)
+        public async Task<IActionResult> PutMaterial(int id, [FromBody] UpdateMaterialDto materialDto)
         {
-            if (materialDto.Id != Guid.Empty && materialDto.Id != id)
+            if (materialDto.Id != 0 && materialDto.Id != id)
                 return BadRequest("El id de la ruta y el del cuerpo no coinciden.");
             materialDto.Id = id;
             var command = new UpdateMaterialCommand
@@ -74,7 +74,7 @@ namespace WebApi.Controllers
 
         // DELETE: api/Materials/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMaterial(Guid id)
+        public async Task<IActionResult> DeleteMaterial(int id)
         {
             var command = new DeleteMaterialCommand(id);
             var result = await _sender.Send(command);

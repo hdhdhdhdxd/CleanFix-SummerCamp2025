@@ -5,12 +5,12 @@ using MediatR;
 
 namespace Application.Materials.Commands.CreateMaterial;
 
-public record CreateMaterialCommand : IRequest<Guid>
+public record CreateMaterialCommand : IRequest<int>
 {
     public CreateMaterialDto Material { get; init; }
 }
 
-public class CreateMaterialCommandHandler : IRequestHandler<CreateMaterialCommand, Guid>
+public class CreateMaterialCommandHandler : IRequestHandler<CreateMaterialCommand, int>
 {
     private readonly IMaterialRepository _materialRepository;
     private readonly IMapper _mapper;
@@ -21,15 +21,12 @@ public class CreateMaterialCommandHandler : IRequestHandler<CreateMaterialComman
         _mapper = mapper;
     }
 
-    public async Task<Guid> Handle(CreateMaterialCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateMaterialCommand request, CancellationToken cancellationToken)
     {
         var material = _mapper.Map<Material>(request.Material);
-
-        if (material.Id == Guid.Empty)
-            material.Id = Guid.NewGuid();
-
+        if (material.Id == 0)
+            material.Id = 0; // El Id será autoincremental en la base de datos
         var result = await _materialRepository.AddAsync(material, cancellationToken);
-
         return result;
     }
 }

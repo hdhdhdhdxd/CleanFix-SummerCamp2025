@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Application.Companies.Commands.DeleteCompany;
 
-public record DeleteCompanyCommand(Guid Id) : IRequest<bool>;
+public record DeleteCompanyCommand(int Id) : IRequest<bool>;
 
 public class DeleteCompanyCommandHandler : IRequestHandler<DeleteCompanyCommand, bool>
 {
