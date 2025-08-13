@@ -1,6 +1,8 @@
 using Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Solicitations.Queries.GetSolicitations;
 public record GetSolicitationsQuery : IRequest<List<GetSolicitationsDto>>;
@@ -18,7 +20,7 @@ public class GetSolicitationsQueryHandler : IRequestHandler<GetSolicitationsQuer
 
     public async Task<List<GetSolicitationsDto>> Handle(GetSolicitationsQuery request, CancellationToken cancellationToken)
     {
-        var solicitations = await _solicitationRepository.GetAllAsync(cancellationToken);
+        var solicitations = await _solicitationRepository.GetAll().ToListAsync(cancellationToken);
         var result = _mapper.Map<List<GetSolicitationsDto>>(solicitations);
         return result;
     }

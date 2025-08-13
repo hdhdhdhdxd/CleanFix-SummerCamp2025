@@ -1,6 +1,8 @@
+using System.Linq;
 using MediatR;
 using Application.Common.Interfaces;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Companies.Queries.GetCompanies;
 
@@ -19,7 +21,7 @@ public class GetCompaniesQueryHandler : IRequestHandler<GetCompaniesQuery, List<
 
     public async Task<List<GetCompaniesDto>> Handle(GetCompaniesQuery request, CancellationToken cancellationToken)
     {
-        var companies = await _companyRepository.GetAllAsync(cancellationToken);
+        var companies = await _companyRepository.GetAll().ToListAsync(cancellationToken);
         var result = _mapper.Map<List<GetCompaniesDto>>(companies);
         return result;
     }

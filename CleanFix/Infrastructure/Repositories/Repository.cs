@@ -16,9 +16,9 @@ public class Repository<T>
         _database = database;
     }
 
-    public async Task<List<T>> GetAllAsync(CancellationToken cancellationToken)
+    public IQueryable<T> GetAll()
     {
-        return await _database.Set<T>().ToListAsync(cancellationToken);
+        return _database.Set<T>();
     }
 
     public async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken)
