@@ -4,7 +4,7 @@ namespace Domain.Entities;
 
 public class Request : IEntity
 {
-    public Guid Id { get; set; } // Identificador único de la solicitud
+    public int Id { get; set; } // Identificador único de la solicitud
     public string? Description { get; set; } // Descripción de la solicitud
     public DateTime Date { get; set; } // Fecha de la solicitud
     public string Address { get; set; } // Dirección donde se solicita el servicio

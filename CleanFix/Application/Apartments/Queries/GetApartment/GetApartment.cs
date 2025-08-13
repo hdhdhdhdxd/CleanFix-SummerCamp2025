@@ -3,7 +3,7 @@ using AutoMapper;
 using MediatR;
 
 namespace Application.Apartments.Queries.GetApartment;
-public record GetApartmentQuery(Guid Id) : IRequest<GetApartmentDto>;
+public record GetApartmentQuery(int Id) : IRequest<GetApartmentDto>;
 
 public class GetApartmentQueryHandler : IRequestHandler<GetApartmentQuery, GetApartmentDto>
 {

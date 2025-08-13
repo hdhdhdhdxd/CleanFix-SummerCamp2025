@@ -30,7 +30,7 @@ namespace WebApi.Controllers
 
         // GET: api/Apartments/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<GetApartmentDto>> GetApartment(Guid id)
+        public async Task<ActionResult<GetApartmentDto>> GetApartment(int id)
         {
             var result = await _sender.Send(new GetApartmentQuery(id));
 
@@ -43,9 +43,9 @@ namespace WebApi.Controllers
         // PUT: api/Apartments/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutApartment(Guid id, [FromBody] UpdateApartmentDto apartmentDto)
+        public async Task<IActionResult> PutApartment(int id, [FromBody] UpdateApartmentDto apartmentDto)
         {
-            if (apartmentDto.Id != Guid.Empty && apartmentDto.Id != id)
+            if (apartmentDto.Id != 0 && apartmentDto.Id != id)
                 return BadRequest("El id de la ruta y el del cuerpo no coinciden.");
 
             apartmentDto.Id = id;
@@ -83,7 +83,7 @@ namespace WebApi.Controllers
 
         // DELETE: api/Apartments/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteApartment(Guid id)
+        public async Task<IActionResult> DeleteApartment(int id)
         {
             var command = new DeleteApartmentCommand(id);
 

@@ -1,5 +1,5 @@
 export interface Solicitation {
-  id: string
+  id: number
   address: string
   description: string
   type: string

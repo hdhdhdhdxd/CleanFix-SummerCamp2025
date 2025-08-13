@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Application.Requests.Commands.DeleteRequest;
 
-public record DeleteRequestCommand(Guid Id) : IRequest<bool>;
+public record DeleteRequestCommand(int Id) : IRequest<bool>;
 
 public class DeleteRequestCommandHandler : IRequestHandler<DeleteRequestCommand, bool>
 {

@@ -5,12 +5,11 @@ using MediatR;
 
 namespace Application.Companies.Commands.UpdateCompany;
 
-public record UpdateCompanyCommand : IRequest
+public record UpdateCompanyCommand : IRequest<int>
 {
     public UpdateCompanyDto Company { get; init; }
 }
-
-public class UpdateCompanyCommandHandler : IRequestHandler<UpdateCompanyCommand>
+public class UpdateCompanyCommandHandler : IRequestHandler<UpdateCompanyCommand, int>
 {
     private readonly ICompanyRepository _companyRepository;
     private readonly IMapper _mapper;
@@ -21,9 +20,10 @@ public class UpdateCompanyCommandHandler : IRequestHandler<UpdateCompanyCommand>
         _mapper = mapper;
     }
 
-    public async Task Handle(UpdateCompanyCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(UpdateCompanyCommand request, CancellationToken cancellationToken)
     {
         var company = _mapper.Map<Company>(request.Company);
         await _companyRepository.UpdateAsync(company, cancellationToken);
+        return company.Id;
     }
 }

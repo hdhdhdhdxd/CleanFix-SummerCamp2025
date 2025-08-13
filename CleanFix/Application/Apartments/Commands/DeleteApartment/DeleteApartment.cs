@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Application.Apartments.Commands.DeleteApartment;
 
-public record DeleteApartmentCommand(Guid Id) : IRequest<bool>;
+public record DeleteApartmentCommand(int Id) : IRequest<bool>;
 
 public class DeleteApartmentCommandHandler : IRequestHandler<DeleteApartmentCommand, bool>
 {

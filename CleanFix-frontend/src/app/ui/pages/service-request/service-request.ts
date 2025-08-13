@@ -1,8 +1,13 @@
-import { Component } from '@angular/core'
+import { CompanyService } from '@/ui/services/company/company-service'
+import { AsyncPipe } from '@angular/common'
+import { Component, inject } from '@angular/core'
 
 @Component({
   selector: 'app-service-request',
-  imports: [],
+  imports: [AsyncPipe],
   templateUrl: './service-request.html',
 })
-export class ServiceRequest {}
+export class ServiceRequest {
+  companyService = inject(CompanyService)
+  companies = this.companyService.getAll()
+}

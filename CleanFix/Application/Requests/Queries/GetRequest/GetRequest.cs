@@ -3,7 +3,7 @@ using AutoMapper;
 using MediatR;
 
 namespace Application.Requests.Queries.GetRequest;
-public record GetRequestQuery(Guid Id) : IRequest<GetRequestDto>;
+public record GetRequestQuery(int Id) : IRequest<GetRequestDto>;
 
 public class GetRequestQueryHandler : IRequestHandler<GetRequestQuery, GetRequestDto>
 {

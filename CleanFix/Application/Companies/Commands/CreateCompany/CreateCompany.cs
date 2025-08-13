@@ -5,11 +5,11 @@ using MediatR;
 
 namespace Application.Companies.Commands.CreateCompany;
 
-public record CreateCompanyCommand : IRequest<Guid>
+public record CreateCompanyCommand : IRequest<int>
 {
     public CreateCompanyDto Company { get; init; }
 }
-public class CreateCompanyCommandHandler : IRequestHandler<CreateCompanyCommand, Guid>
+public class CreateCompanyCommandHandler : IRequestHandler<CreateCompanyCommand, int>
 {
     private readonly ICompanyRepository _companyRepository;
     private readonly IMapper _mapper;
@@ -20,15 +20,12 @@ public class CreateCompanyCommandHandler : IRequestHandler<CreateCompanyCommand,
         _mapper = mapper;
     }
 
-    public async Task<Guid> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
     {
         var company = _mapper.Map<Company>(request.Company);
-
-        if (company.Id == Guid.Empty)
-            company.Id = Guid.NewGuid();
-
+        if (company.Id == 0)
+            company.Id = 0; // El Id será autoincremental en la base de datos
         var result = await _companyRepository.AddAsync(company, cancellationToken);
-
         return result;
     }
 }

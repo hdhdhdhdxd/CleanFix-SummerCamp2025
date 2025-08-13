@@ -3,7 +3,7 @@ using AutoMapper;
 using MediatR;
 
 namespace Application.Companies.Queries.GetCompany;
-public record GetCompanyQuery(Guid Id) : IRequest<GetCompanyDto>;
+public record GetCompanyQuery(int Id) : IRequest<GetCompanyDto>;
 
 public class GetCompanyQueryHandler : IRequestHandler<GetCompanyQuery, GetCompanyDto>
 {
@@ -19,6 +19,8 @@ public class GetCompanyQueryHandler : IRequestHandler<GetCompanyQuery, GetCompan
     public async Task<GetCompanyDto> Handle(GetCompanyQuery request, CancellationToken cancellationToken)
     {
         var company = await _companyRepository.GetByIdAsync(request.Id, cancellationToken);
+        if (company == null)
+            return null;
         var result = _mapper.Map<GetCompanyDto>(company);
         return result;
     }

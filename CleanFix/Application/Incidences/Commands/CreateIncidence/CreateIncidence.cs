@@ -5,11 +5,11 @@ using MediatR;
 
 namespace Application.Incidences.Commands.CreateIncidence;
 
-public record CreateIncidenceCommand : IRequest<Guid>
+public record CreateIncidenceCommand : IRequest<int>
 {
     public CreateIncidenceDto Incidence { get; init; }
 }
-public class CreateIncidenceCommandHandler : IRequestHandler<CreateIncidenceCommand, Guid>
+public class CreateIncidenceCommandHandler : IRequestHandler<CreateIncidenceCommand, int>
 {
     private readonly IIncidenceRepository _incidenceRepository;
     private readonly IMapper _mapper;
@@ -20,11 +20,11 @@ public class CreateIncidenceCommandHandler : IRequestHandler<CreateIncidenceComm
         _mapper = mapper;
     }
 
-    public async Task<Guid> Handle(CreateIncidenceCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateIncidenceCommand request, CancellationToken cancellationToken)
     {
         var entity = _mapper.Map<Incidence>(request.Incidence);
-        if (entity.Id == Guid.Empty)
-            entity.Id = Guid.NewGuid();
+        if (entity.Id == 0)
+            entity.Id = 0;
         var result = await _incidenceRepository.AddAsync(entity, cancellationToken);
         return result;
     }

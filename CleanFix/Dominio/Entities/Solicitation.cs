@@ -4,14 +4,15 @@ namespace Domain.Entities;
 
 public class Solicitation : IEntity
 {
-    public Guid Id { get; set; } // Identificador único de la aplicación
-    public Apartment? Apartment { get; set; } // Apartamento asociado a la aplicación
-    public Company? Company { get; set; } // Empresa asociada a la aplicación
-    public DateTime Date { get; set; } // Fecha de la aplicación
-    public double Price { get; set; } // Precio de la aplicación    
-    public double Duration { get; set; } // Duración de la aplicación en horas
-    public string Address { get; set; } // Dirección de la aplicación
-    public IssueType Type { get; set; } // Tipo de problema asociado a la aplicación
+    public int Id { get; set; } // Identificador único de la solicitud
+    public string Address { get; set; }
+    public Apartment Apartment { get; set; }
+    public Company Company { get; set; }
+    public DateTime Date { get; set; }
+    public double Price { get; set; }
+    public double Duration { get; set; }
+    public IssueType Type { get; set; }
     public List<Material> Materials { get; set; }
-    public bool IsRequest { get; set; } // Indica si es una solicitud de servicio o una oferta de trabajo
+    public bool IsRequest { get; set; }
+    public User User { get; set; }
 }

@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Application.Incidences.Commands.DeleteIncidence;
 
-public record DeleteIncidenceCommand(Guid Id) : IRequest<bool>;
+public record DeleteIncidenceCommand(int Id) : IRequest<bool>;
 
 public class DeleteIncidenceCommandHandler : IRequestHandler<DeleteIncidenceCommand, bool>
 {

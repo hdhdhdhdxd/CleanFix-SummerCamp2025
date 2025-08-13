@@ -6,7 +6,7 @@ namespace Domain.Entities;
 public class Apartment : IEntity
 {
     [Key]
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     public int FloorNumber { get; set; } // Piso del apartamento
 
     [Required(ErrorMessage = "La dirección es obligatoria."), MaxLength(100, ErrorMessage = "La direccion no puede pasar de 100 caracteres")]
