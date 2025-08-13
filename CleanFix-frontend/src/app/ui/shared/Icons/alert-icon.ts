@@ -17,7 +17,7 @@ import { Component, input } from '@angular/core'
       stroke-linecap="round"
       stroke-linejoin="round"
     />
-  </svg> `,
+  </svg>`,
   standalone: true,
 })
 export class AlertIcon {

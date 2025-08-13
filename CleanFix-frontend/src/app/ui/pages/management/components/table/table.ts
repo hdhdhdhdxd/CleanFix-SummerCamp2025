@@ -1,75 +1,49 @@
-import { Solicitation } from '@/core/domain/models/Solicitation'
-import { SolicitationService } from '@/ui/services/solicitation/solicitation-service'
-import { CurrencyPipe, DatePipe, NgClass } from '@angular/common'
-import { Component, inject, OnInit, signal, computed } from '@angular/core'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { CurrencyPipe, DatePipe, NgClass, AsyncPipe } from '@angular/common'
+import { Component, input } from '@angular/core'
+import { Observable } from 'rxjs'
+
+export interface TableColumn<T> {
+  key: keyof T
+  label: string
+  type: 'text' | 'currency' | 'date' | 'number' | 'status'
+}
 
 @Component({
   selector: 'app-table',
-  imports: [CurrencyPipe, DatePipe, NgClass],
+  imports: [CurrencyPipe, DatePipe, NgClass, AsyncPipe],
   templateUrl: './table.html',
 })
-export class Table implements OnInit {
-  solicitations = signal<Solicitation[]>([])
-  currentPage = signal(1)
-  itemsPerPage = signal(5)
+export class Table<T extends Record<string, any> = Record<string, any>> {
+  data$ = input.required<Observable<T[]>>()
+  tableColumns = input.required<TableColumn<T>[]>()
 
-  solicitationService: SolicitationService = inject(SolicitationService)
-
-  // Computed properties para el paginado
-  totalItems = computed(() => this.solicitations().length)
-  totalPages = computed(() => Math.ceil(this.totalItems() / this.itemsPerPage()))
-
-  paginatedSolicitations = computed(() => {
-    const start = (this.currentPage() - 1) * this.itemsPerPage()
-    const end = start + this.itemsPerPage()
-    return this.solicitations().slice(start, end)
-  })
-
-  ngOnInit() {
-    this.loadSolicitations()
+  get observableData() {
+    return this.data$()
   }
 
-  private async loadSolicitations() {
-    const solicitations = await this.solicitationService.getAll()
-    this.solicitations.set(solicitations)
-  }
+  getColumns(): { key: string; label: string; type: string }[] {
+    const customColumns = this.tableColumns()
 
-  // Métodos de paginación
-  previousPage() {
-    if (this.currentPage() > 1) {
-      this.currentPage.update((page) => page - 1)
-    }
-  }
-
-  nextPage() {
-    if (this.currentPage() < this.totalPages()) {
-      this.currentPage.update((page) => page + 1)
-    }
-  }
-
-  goToPage(page: number) {
-    if (page >= 1 && page <= this.totalPages()) {
-      this.currentPage.set(page)
-    }
-  }
-
-  getPageNumbers(): number[] {
-    const total = this.totalPages()
-    const current = this.currentPage()
-    const pages: number[] = []
-
-    // Mostrar máximo 5 páginas
-    const start = Math.max(1, current - 2)
-    const end = Math.min(total, start + 4)
-
-    for (let i = start; i <= end; i++) {
-      pages.push(i)
+    if (!customColumns || !(customColumns.length > 0)) {
+      return []
     }
 
-    return pages
+    return customColumns.map((column) => ({
+      key: column.key as string,
+      label: column.label,
+      type: column.type,
+    }))
   }
 
-  // Método para estilos de estado
+  getValue(item: T, key: string): any {
+    return item[key]
+  }
+
+  getKeys(item: T): string[] {
+    return Object.keys(item)
+  }
+
   getStatusClass(status: string): string {
     switch (status.toLowerCase()) {
       case 'pending':
