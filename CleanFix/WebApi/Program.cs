@@ -23,9 +23,10 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-    db.Database.Migrate();
     if (!db.Apartments.Any() && !db.Companies.Any() && !db.Materials.Any() && !db.Solicitations.Any())  
     {
+        db.Database.Migrate();
+
         // Crear 100 empresas
         Random random = new Random();
         var type = random.Next(0, 7);
