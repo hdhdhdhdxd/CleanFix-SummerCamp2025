@@ -1,4 +1,5 @@
-import { Component, HostListener, signal } from '@angular/core'
+import { Component, HostListener, inject, signal } from '@angular/core'
+import { Router } from '@angular/router'
 
 @Component({
   selector: 'app-header',
@@ -7,9 +8,23 @@ import { Component, HostListener, signal } from '@angular/core'
 })
 export class Header {
   isScrolled = signal(false)
+  router = inject(Router)
+  menuOpen = signal(false)
 
   @HostListener('window:scroll')
   onWindowScroll() {
     this.isScrolled.set(window.scrollY > 50)
+  }
+
+  isHome(): boolean {
+    return this.router.url === '/' || this.router.url.startsWith('/home')
+  }
+
+  toggleMenu() {
+    this.menuOpen.update((open) => !open)
+  }
+
+  closeMenu() {
+    this.menuOpen.set(false)
   }
 }
