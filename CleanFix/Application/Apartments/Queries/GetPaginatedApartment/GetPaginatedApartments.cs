@@ -1,0 +1,32 @@
+﻿using Application.Apartments.Queries.GetApartments;
+using Application.Common.Interfaces;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Infrastructure.Common.Mappings;
+using Infrastructure.Common.Models;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+
+namespace Application.Apartments.Queries.GetPaginatedApartment;
+public record GetPaginatedApartmentsQuery(int PageNumber, int PageSize) : IRequest<PaginatedList<GetPaginatedApartmentDto>>;
+
+public class GetPaginatedApartmentsQueryHandler : IRequestHandler<GetPaginatedApartmentsQuery, PaginatedList<GetPaginatedApartmentDto>>
+{
+    private readonly IApartmentRepository _apartmentRepository;
+    private readonly IMapper _mapper;
+
+    public GetPaginatedApartmentsQueryHandler(IApartmentRepository apartmentRepository, IMapper mapper)
+    {
+        _apartmentRepository = apartmentRepository;
+        _mapper = mapper;
+    }
+
+    public async Task<PaginatedList<GetPaginatedApartmentDto>> Handle(GetPaginatedApartmentsQuery request, CancellationToken cancellationToken)
+    {
+        var apartments = await _apartmentRepository.GetAll()
+            .ProjectTo<GetPaginatedApartmentDto>(_mapper.ConfigurationProvider)
+            .PaginatedListAsync(request.PageNumber, request.PageSize);
+
+        return apartments;
+    }
+}

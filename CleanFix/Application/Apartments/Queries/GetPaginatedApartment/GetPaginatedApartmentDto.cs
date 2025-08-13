@@ -1,9 +1,14 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Application.Apartments.Queries.GetApartments;
+using AutoMapper;
 using Domain.Entities;
 
-
-namespace Application.Apartments.Queries.GetApartments;
-public class GetApartmentsDto
+namespace Application.Apartments.Queries.GetPaginatedApartment;
+public class GetPaginatedApartmentDto
 {
     public int Id { get; set; }
     public int FloorNumber { get; set; } // Piso del apartamento
@@ -15,7 +20,7 @@ public class GetApartmentsDto
     {
         public Mapping()
         {
-            CreateMap<Apartment, GetApartmentsDto>();
+            CreateMap<Apartment, GetPaginatedApartmentDto>();
         }
     }
 }

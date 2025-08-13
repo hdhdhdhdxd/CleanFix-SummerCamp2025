@@ -1,8 +1,10 @@
-﻿using Application.Companies.Commands.CreateCompany;
+﻿using Application.Apartments.Queries.GetPaginatedApartment;
+using Application.Companies.Commands.CreateCompany;
 using Application.Companies.Commands.DeleteCompany;
 using Application.Companies.Commands.UpdateCompany;
-using Application.Companies.Queries.GetCompany;
 using Application.Companies.Queries.GetCompanies;
+using Application.Companies.Queries.GetCompany;
+using Application.Companies.Queries.GetPaginatedCompanies;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,6 +19,15 @@ namespace WebApi.Controllers
         public CompaniesController(ISender sender)
         {
             _sender = sender;
+        }
+
+        // GET: api/Companies/paginated
+        [HttpGet("paginated")]
+        public async Task<ActionResult<IEnumerable<GetPaginatedCompanyDto>>> GetPaginatedCompanies([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _sender.Send(new GetPaginatedCompaniesQuery(pageNumber, pageSize));
+
+            return Ok(result);
         }
 
         // GET: api/Companies

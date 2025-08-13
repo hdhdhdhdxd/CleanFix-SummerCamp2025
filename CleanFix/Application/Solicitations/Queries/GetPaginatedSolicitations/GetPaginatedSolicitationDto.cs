@@ -1,8 +1,8 @@
 using AutoMapper;
 using Domain.Entities;
 
-namespace Application.Solicitations.Commands.UpdateSolicitation;
-public class UpdateSolicitationDto
+namespace Application.Solicitations.Queries.GetPaginatedSolicitations;
+public class GetPaginatedSolicitationDto
 {
     public int Id { get; set; }
     public string Description { get; set; }
@@ -12,7 +12,7 @@ public class UpdateSolicitationDto
     {
         public Mapping()
         {
-            CreateMap<UpdateSolicitationDto, Solicitation>();
+            CreateMap<Solicitation, GetPaginatedSolicitationDto>();
         }
     }
 }

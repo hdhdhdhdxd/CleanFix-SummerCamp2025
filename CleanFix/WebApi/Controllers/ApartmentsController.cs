@@ -3,6 +3,7 @@ using Application.Apartments.Commands.DeleteApartment;
 using Application.Apartments.Commands.UpdateApartment;
 using Application.Apartments.Queries.GetApartment;
 using Application.Apartments.Queries.GetApartments;
+using Application.Apartments.Queries.GetPaginatedApartment;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,6 +19,17 @@ namespace WebApi.Controllers
         {
             _sender = sender;
         }
+
+
+        // GET: api/Apartments/paginated
+        [HttpGet("paginated")]
+        public async Task<ActionResult<IEnumerable<GetPaginatedApartmentDto>>> GetPaginatedApartments([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        {
+            var result = await _sender.Send(new GetPaginatedApartmentsQuery(pageNumber, pageSize));
+
+            return Ok(result);
+        }
+        
 
         // GET: api/Apartments
         [HttpGet]

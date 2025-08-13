@@ -1,8 +1,8 @@
 using AutoMapper;
 using Domain.Entities;
 
-namespace Application.Requests.Queries.GetRequest;
-public class GetRequestDto
+namespace Application.Requests.Queries.GetPaginatedRequests;
+public class GetPaginatedRequestDto
 {
     public int Id { get; set; }
     public string? Description { get; set; }
@@ -15,7 +15,7 @@ public class GetRequestDto
     {
         public Mapping()
         {
-            CreateMap<Request, GetRequestDto>();
+            CreateMap<Request, GetPaginatedRequestDto>();
         }
     }
 }
