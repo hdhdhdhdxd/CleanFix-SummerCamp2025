@@ -14,6 +14,11 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'management',
+    loadChildren: () =>
+      import('@/ui/pages/management/management.routes').then((r) => r.MANAGEMENT_ROUTES),
+  },
+  {
     path: '**',
     redirectTo: 'home',
   },
