@@ -36,6 +36,7 @@ using (var scope = app.Services.CreateScope())
     {
         db.Database.Migrate();
 
+        // Crear 10 usuarios
         var userFaker = new Faker<User>()
             .RuleFor(e => e.Name, f =>
             {
@@ -48,14 +49,11 @@ using (var scope = app.Services.CreateScope())
 
         // Crear 10 empresas
         var companyFaker = new Faker<Company>()
-            .RuleFor(e => e.Name, f => {
-                var type = f.Random.Int(0, 6);
-                return $"Empresa {f.UniqueIndex + 1}_{type}";
-            })
+            .RuleFor(e => e.Type, f => (IssueType)f.Random.Int(0, 6))
+            .RuleFor(e => e.Name, (f, e) => $"Empresa {f.UniqueIndex + 1}_{(int)e.Type}")
             .RuleFor(e => e.Address, f => $"{f.Address}")
             .RuleFor(e => e.Number, f => f.Random.Int(100000000, 999999999).ToString())
             .RuleFor(e => e.Email, f => $"empresa{f.UniqueIndex + 1}@test.com")
-            .RuleFor(e => e.Type, f => (IssueType)f.Random.Int(0, 6))
             .RuleFor(e => e.Price, f => f.Random.Int(20, 500))
             .RuleFor(e => e.WorkTime, f => f.Random.Int(20, 500));
         var companies = companyFaker.Generate(10);
@@ -75,13 +73,10 @@ using (var scope = app.Services.CreateScope())
 
         // Crear 10 materiales
         var materialFaker = new Faker<Material>()
-            .RuleFor(e => e.Name, (f) => {
-                var type = f.Random.Int(0, 6);
-                return $"Material {f.UniqueIndex + 1} _ {type}";
-            })
+            .RuleFor(e => e.Issue, f => (IssueType)f.Random.Int(0, 6))
+            .RuleFor(e => e.Name, (f, e) => $"Material {f.UniqueIndex + 1} _ {(int)e.Issue}")
             .RuleFor(e => e.Cost, f => (decimal)f.Random.Float(10, 1000))
-            .RuleFor(e => e.Available, f => true)
-            .RuleFor(e => e.Issue, f => (IssueType)f.Random.Int(0, 6));
+            .RuleFor(e => e.Available, f => true);
         var materials = materialFaker.Generate(10);
         db.Materials.AddRange(materials);
         db.SaveChanges(); 
