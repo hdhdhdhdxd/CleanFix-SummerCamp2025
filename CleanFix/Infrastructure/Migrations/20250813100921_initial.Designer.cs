@@ -12,7 +12,7 @@ using WebApi.BaseDatos;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250812122239_initial")]
+    [Migration("20250813100921_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -104,8 +104,8 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("Available")
                         .HasColumnType("bit");
 
-                    b.Property<float>("Cost")
-                        .HasColumnType("real");
+                    b.Property<decimal>("Cost")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Issue")
                         .HasColumnType("int");

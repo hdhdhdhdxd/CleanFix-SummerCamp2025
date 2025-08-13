@@ -22,19 +22,33 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-    
-    if (!db.Apartments.Any() && !db.Companies.Any() && !db.Materials.Any() && !db.Solicitations.Any())  
+
+    if (!db.Apartments.Any() && !db.Companies.Any() && !db.Materials.Any() && !db.Solicitations.Any())
     {
         db.Database.Migrate();
+
+        var userFaker = new Faker<User>()
+            .RuleFor(e => e.Name, f =>
+            {
+                var type = f.Random.Int(0, 6);
+                return $"User {f.UniqueIndex + 1}";
+            });
+        var users = userFaker.Generate(10);
+        db.Users.AddRange(users);
+        db.SaveChanges();
+
         // Crear 10 empresas
         Random random = new Random();
         var type = random.Next(0, 7);
         var companyFaker = new Faker<Company>()
-            .RuleFor(e => e.Name, f => $"Empresa {f.UniqueIndex + 1}_{type}")
+            .RuleFor(e => e.Name, f => {
+                var type = f.Random.Int(0, 6);
+                return $"Empresa {f.UniqueIndex + 1}_{type}";
+            })
             .RuleFor(e => e.Address, f => $"{f.Address}")
             .RuleFor(e => e.Number, f => f.Random.Int(100000000, 999999999).ToString())
             .RuleFor(e => e.Email, f => $"empresa{f.UniqueIndex + 1}@test.com")
-            .RuleFor(e => e.Type, f => (IssueType)type)
+            .RuleFor(e => e.Type, f => (IssueType)f.Random.Int(0, 6))
             .RuleFor(e => e.Price, f => f.Random.Int(20, 500))
             .RuleFor(e => e.WorkTime, f => f.Random.Int(20, 500));
         var companies = companyFaker.Generate(10);
@@ -56,10 +70,13 @@ using (var scope = app.Services.CreateScope())
         Random random2 = new Random();
         var type2 = random2.Next(0, 7);
         var materialFaker = new Faker<Material>()
-            .RuleFor(e => e.Name, f => $"Material {f.UniqueIndex + 1} _ {type2}")
-            .RuleFor(e => e.Cost, f => f.Random.Float(10, 1000))
+            .RuleFor(e => e.Name, (f) => {
+                var type = f.Random.Int(0, 6);
+                return $"Material {f.UniqueIndex + 1} _ {type}";
+            })
+            .RuleFor(e => e.Cost, f => (decimal)f.Random.Float(10, 1000))
             .RuleFor(e => e.Available, f => true)
-            .RuleFor(e => e.Issue, f => (IssueType)type2);
+            .RuleFor(e => e.Issue, f => (IssueType)f.Random.Int(0, 6));
         var materials = materialFaker.Generate(10);
         db.Materials.AddRange(materials);
         db.SaveChanges(); 

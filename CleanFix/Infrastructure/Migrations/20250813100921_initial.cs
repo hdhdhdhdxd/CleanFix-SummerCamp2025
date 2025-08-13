@@ -112,7 +112,7 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Cost = table.Column<float>(type: "real", nullable: false),
+                    Cost = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Available = table.Column<bool>(type: "bit", nullable: false),
                     Issue = table.Column<int>(type: "int", nullable: false),
                     SolicitationId = table.Column<int>(type: "int", nullable: true)
