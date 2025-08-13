@@ -35,7 +35,7 @@ public class DBPluginTest
             {
                 companies.Add(new Company
                 {
-                    Id = reader.GetGuid(0),
+                    Id = reader.GetInt32(0),
                     Name = reader.IsDBNull(1) ? null : reader.GetString(1),
                     Address = reader.IsDBNull(2) ? null : reader.GetString(2),
                     Number = reader.IsDBNull(3) ? null : reader.GetString(3),
@@ -71,9 +71,9 @@ public class DBPluginTest
             {
                 materiales.Add(new Material
                 {
-                    Id = reader.GetGuid(0),
+                    Id = reader.GetInt32(0),
                     Name = reader.IsDBNull(1) ? null : reader.GetString(1),
-                    Cost = reader.IsDBNull(2) ? 0 : reader.GetDouble(2),
+                    Cost = reader.IsDBNull(2) ? 0 : reader.GetDecimal(2),
                     Issue = reader.IsDBNull(3) ? 0 : reader.GetInt32(3),
                     Available = true // Assuming materials are available by default
                 });
@@ -91,7 +91,7 @@ public class DBPluginTest
 
 public class Company
 {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     public string Name { get; set; }
     public string Address { get; set; }
     public string Number { get; set; }
@@ -103,13 +103,14 @@ public class Company
 }
 public class Material
 {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
 
     public string Name { get; set; }
-    public double Cost { get; set; }
-    public int Issue { get; set; }
+    public decimal Cost { get; set; }
+
     public bool Available { get; set; } = true; // Assuming materials are available by default
-    public Guid SolicitationId { get; set; }
+    public int Issue { get; set; }
+    public int SolicitationId { get; set; }
 }
 
 

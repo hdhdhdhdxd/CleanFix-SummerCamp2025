@@ -336,17 +336,17 @@ class Program
 
         // 5.1 Definir el prompt con placeholders
         var promptTemplate = @"
-Tienes la siguiente información de empresas en JSON:
-{{$empresas}}
+        Tienes la siguiente información de empresas en JSON:
+        {{$empresas}}
 
-Y también la siguiente información de materiales en JSON:
-{{$materiales}}
+        Y también la siguiente información de materiales en JSON:
+        {{$materiales}}
 
-Usa esta información para responder la pregunta del usuario:
-{{$pregunta}}
+        Usa esta información para responder la pregunta del usuario:
+        {{$pregunta}}
 
-Si no tiene relación, responde que no puedes ayudar.
-";
+        Si no tiene relación, responde que no puedes ayudar.
+        ";
 
         var promptFunction = kernel.CreateFunctionFromPrompt(promptTemplate);
 
