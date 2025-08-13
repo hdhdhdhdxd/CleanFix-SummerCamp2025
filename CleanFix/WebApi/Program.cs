@@ -47,8 +47,6 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
 
         // Crear 10 empresas
-        Random random = new Random();
-        var type = random.Next(0, 7);
         var companyFaker = new Faker<Company>()
             .RuleFor(e => e.Name, f => {
                 var type = f.Random.Int(0, 6);
@@ -76,8 +74,6 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
 
         // Crear 10 materiales
-        Random random2 = new Random();
-        var type2 = random2.Next(0, 7);
         var materialFaker = new Faker<Material>()
             .RuleFor(e => e.Name, (f) => {
                 var type = f.Random.Int(0, 6);
@@ -99,9 +95,33 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.Duration, f => f.Random.Float(1, 10))
             .RuleFor(e => e.Address, f => $"{f.Address}")
             .RuleFor(e => e.Type, f => (IssueType)f.Random.Int(0, 6))
-            .RuleFor(e => e.Materials, f => materials.OrderBy(x => f.Random.Int()).Take(f.Random.Int(1, 5)).ToList());
+            .RuleFor(e => e.Materials, f => materials.OrderBy(x => f.Random.Int()).Take(f.Random.Int(1, 5)).ToList())
+            .RuleFor(e => e.User, f => users[f.Random.Int(0, users.Count - 1)]);
         var solicitations = solicitationFaker.Generate(10);
         db.Solicitations.AddRange(solicitations);
+        db.SaveChanges();
+
+        // Crear 10 requests
+        var requestFaker = new Faker<Request>()
+            .RuleFor(e => e.Description, f => f.Lorem.Sentence())
+            .RuleFor(e => e.Date, f => f.Date.Recent())
+            .RuleFor(e => e.Address, f => f.Address.FullAddress())
+            .RuleFor(e => e.Status, f => f.Random.Word())
+            .RuleFor(e => e.MaintenanceCost, f => f.Random.Double(50, 1000))
+            .RuleFor(e => e.Type, f => (IssueType)f.Random.Int(0, 6));
+        var requests = requestFaker.Generate(10);
+        db.Requests.AddRange(requests);
+        db.SaveChanges();
+
+        // Crear 10 incidencias
+        var incidenceFaker = new Faker<Incidence>()
+            .RuleFor(e => e.Type, f => (IssueType)f.Random.Int(0, 6))
+            .RuleFor(e => e.Date, f => f.Date.Recent())
+            .RuleFor(e => e.Status, f => f.Random.Word())
+            .RuleFor(e => e.Description, f => f.Lorem.Sentence())
+            .RuleFor(e => e.Priority, f => f.PickRandom<Priority>());
+        var incidences = incidenceFaker.Generate(10);
+        db.Incidences.AddRange(incidences);
         db.SaveChanges();
     }
 }

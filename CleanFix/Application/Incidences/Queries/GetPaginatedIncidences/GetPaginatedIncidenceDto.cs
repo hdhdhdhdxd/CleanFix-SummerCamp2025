@@ -1,9 +1,12 @@
+using System;
+using Application.Incidences.Queries.GetIncidences;
 using AutoMapper;
 using Domain.Entities;
 
-namespace Application.Incidences.Commands.CreateIncidence;
-public class CreateIncidenceDto
+namespace Application.Incidences.Queries.GetPaginatedIncidences;
+public class GetPaginatedIncidenceDto
 {
+    public int Id { get; set; }
     public IssueType Type { get; set; }
     public DateTime Date { get; set; }
     public string Status { get; set; }
@@ -14,7 +17,7 @@ public class CreateIncidenceDto
     {
         public Mapping()
         {
-            CreateMap<CreateIncidenceDto, Incidence>();
+            CreateMap<Incidence, GetPaginatedIncidenceDto>();
         }
     }
 }

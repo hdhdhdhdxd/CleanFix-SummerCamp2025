@@ -3,6 +3,7 @@ using AutoMapper;
 using MediatR;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Infrastructure.Common.Mappings;
 
 namespace Application.Apartments.Queries.GetApartments;
 
@@ -21,7 +22,7 @@ public class GetApartmentsQueryHandler : IRequestHandler<GetApartmentsQuery, Lis
 
     public async Task<List<GetApartmentsDto>> Handle(GetApartmentsQuery request, CancellationToken cancellationToken)
     {
-        var apartments = await _apartmentRepository.GetAll().ToListAsync(cancellationToken);
+        var apartments = await _apartmentRepository.GetAll().ToListAsync();
 
         var result = _mapper.Map<List<GetApartmentsDto>>(apartments);
 

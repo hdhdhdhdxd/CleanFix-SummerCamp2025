@@ -1,0 +1,26 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Application.Apartments.Queries.GetApartments;
+using AutoMapper;
+using Domain.Entities;
+
+namespace Application.Apartments.Queries.GetPaginatedApartment;
+public class GetPaginatedApartmentDto
+{
+    public int Id { get; set; }
+    public int FloorNumber { get; set; } // Piso del apartamento
+    public string Address { get; set; } // Dirección del apartamento
+    public double Surface { get; set; } // Superficie del apartamento
+    public int RoomNumber { get; set; } // Número de habitaciones
+    public int BathroomNumber { get; set; } // Número de baños
+    private class Mapping : Profile
+    {
+        public Mapping()
+        {
+            CreateMap<Apartment, GetPaginatedApartmentDto>();
+        }
+    }
+}
