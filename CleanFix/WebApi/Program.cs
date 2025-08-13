@@ -8,6 +8,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddInfrastructureServices();
 builder.AddApplicationServices();
 
+// Configuración de CORS para permitir localhost:4200
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularLocalhost",
+        policy => policy.WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod());
+});
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -88,6 +97,9 @@ if (app.Environment.IsDevelopment())
 }
 //
 app.UseHttpsRedirection();
+
+// Usar la política CORS antes de Authorization
+app.UseCors("AllowAngularLocalhost");
 
 app.UseAuthorization();
 
