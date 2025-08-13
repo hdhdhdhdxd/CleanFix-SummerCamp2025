@@ -28,7 +28,7 @@ public class DBPluginTest
             using var connection = new SqlConnection(_connectionString);
             connection.Open();
 
-            var command = new SqlCommand("SELECT Id, Name, Address, Number, [type], Price, WorkTime FROM dbo.Companies", connection);
+            var command = new SqlCommand("SELECT Id, Name, Address, Number, Email, [type], Price, WorkTime FROM dbo.Companies", connection);
             using var reader = command.ExecuteReader();
 
             while (reader.Read())
@@ -39,9 +39,10 @@ public class DBPluginTest
                     Name = reader.IsDBNull(1) ? null : reader.GetString(1),
                     Address = reader.IsDBNull(2) ? null : reader.GetString(2),
                     Number = reader.IsDBNull(3) ? null : reader.GetString(3),
-                    Type = reader.IsDBNull(4) ? 0 : reader.GetInt32(4),
-                    Price = reader.IsDBNull(5) ? 0 : reader.GetDecimal(5),
-                    WorkTime = reader.IsDBNull(6) ? 0 : reader.GetInt32(6)
+                    Email = reader.IsDBNull(4) ? null : reader.GetString(4),
+                    Type = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
+                    Price = reader.IsDBNull(6) ? 0 : reader.GetDecimal(6),
+                    WorkTime = reader.IsDBNull(7) ? 0 : reader.GetInt32(7)
                 });
             }
         }
@@ -70,10 +71,11 @@ public class DBPluginTest
             {
                 materiales.Add(new Material
                 {
-                    Id = reader.GetInt32(0),
+                    Id = reader.GetGuid(0),
                     Name = reader.IsDBNull(1) ? null : reader.GetString(1),
                     Cost = reader.IsDBNull(2) ? 0 : reader.GetDouble(2),
-                    Issue = reader.IsDBNull(3) ? 0 : reader.GetInt32(3)
+                    Issue = reader.IsDBNull(3) ? 0 : reader.GetInt32(3),
+                    Available = true // Assuming materials are available by default
                 });
             }
         }
@@ -93,17 +95,21 @@ public class Company
     public string Name { get; set; }
     public string Address { get; set; }
     public string Number { get; set; }
+
+    public string Email { get; set; }
     public int Type { get; set; }
     public decimal Price { get; set; }
     public int WorkTime { get; set; }
 }
 public class Material
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     public string Name { get; set; }
     public double Cost { get; set; }
     public int Issue { get; set; }
+    public bool Available { get; set; } = true; // Assuming materials are available by default
+    public Guid SolicitationId { get; set; }
 }
 
 
