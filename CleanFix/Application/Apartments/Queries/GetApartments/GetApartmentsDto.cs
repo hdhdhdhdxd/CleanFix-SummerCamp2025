@@ -5,7 +5,7 @@ using Domain.Entities;
 namespace Application.Apartments.Queries.GetApartments;
 public class GetApartmentsDto
 {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
     public int FloorNumber { get; set; } // Piso del apartamento
     public string Address { get; set; } // Dirección del apartamento
     public double Surface { get; set; } // Superficie del apartamento
