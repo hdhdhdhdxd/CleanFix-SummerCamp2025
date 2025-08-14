@@ -831,34 +831,10 @@ Responde de forma clara y útil. Si la pregunta no tiene relación con los datos
             if (userInput.Equals("salir", StringComparison.OrdinalIgnoreCase)) break;
 
             // 🤖 9. Generación automática de factura si se detecta intención
-            if (ContieneIntencionDeFactura(userInput))
+            if ((userInput.Equals("factura", StringComparison.OrdinalIgnoreCase) ||
+                 userInput.Equals("crear factura", StringComparison.OrdinalIgnoreCase)))
             {
-                var tipoEmpresa = ExtraerTipo(userInput, "empresa");
-                var tipoMaterial = ExtraerTipo(userInput, "material");
-
-                var empresa = companies
-                    .Where(e => !tipoEmpresa.HasValue || e.Type == tipoEmpresa.Value)
-                    .OrderBy(e => e.Price)
-                    .FirstOrDefault(); // Empresa más barata del tipo
-
-                var materialesSeleccionados = materials
-                    .Where(m => (!tipoMaterial.HasValue || m.Issue == tipoMaterial.Value) && m.Available)
-                    .ToList(); // Materiales disponibles del tipo
-
-                if (empresa == null || materialesSeleccionados.Count == 0)
-                {
-                    Console.WriteLine("❌ No se encontró empresa o materiales válidos para generar la factura.");
-                    continue;
-                }
-
-                // 🧾 Generar factura con desglose de IVA
-                await MostrarFacturaAsync(kernel, empresa, materialesSeleccionados);
-                continue;
-            }
-
-            // 🧾 10. Generación manual de factura por comandos explícitos
-            if (userInput.Contains("factura", StringComparison.OrdinalIgnoreCase))
-            {
+                // 👉 Prioridad para generación manual
                 Console.WriteLine("Introduce el ID de la empresa:");
                 var idEmp = Console.ReadLine()?.Trim();
                 var empresa = companies.FirstOrDefault(e => e.Id.ToString() == idEmp);
@@ -886,8 +862,43 @@ Responde de forma clara y útil. Si la pregunta no tiene relación con los datos
 
                 if (selMat.Count == 0) { Console.WriteLine("❌ No se seleccionaron materiales."); continue; }
 
-                // 🧾 Generar factura con desglose de IVA
                 await MostrarFacturaAsync(kernel, empresa, selMat);
+                continue;
+            }
+            else if (ContieneIntencionDeFactura(userInput))
+            {
+                var tipoEmpresa = ExtraerTipo(userInput, "empresa");
+                var tipoMaterial = ExtraerTipo(userInput, "material");
+
+                var empresa = companies
+                    .Where(e => !tipoEmpresa.HasValue || e.Type == tipoEmpresa.Value)
+                    .OrderBy(e => e.Price)
+                    .FirstOrDefault();
+
+                var materialesSeleccionados = materials
+                    .Where(m => (!tipoMaterial.HasValue || m.Issue == tipoMaterial.Value) && m.Available)
+                    .ToList();
+
+                if (empresa == null || materialesSeleccionados.Count == 0)
+                {
+                    Console.WriteLine("❌ No se encontró empresa o materiales válidos para generar la factura.");
+                    continue;
+                }
+
+                // 🟡 Confirmación antes de generar
+                Console.WriteLine($"🧾 Se ha seleccionado la empresa '{empresa.Name}' y {materialesSeleccionados.Count} materiales disponibles.");
+                Console.WriteLine("¿Deseas generar la factura con esta información? (sí/no)");
+                var confirmacion = Console.ReadLine()?.Trim().ToLower();
+
+                if (confirmacion == "sí" || confirmacion == "si")
+                {
+                    await MostrarFacturaAsync(kernel, empresa, materialesSeleccionados);
+                }
+                else
+                {
+                    Console.WriteLine("❌ Factura cancelada por el usuario.");
+                }
+
                 continue;
             }
 
