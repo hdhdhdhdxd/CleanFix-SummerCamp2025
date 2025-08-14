@@ -12,18 +12,24 @@ public record UpdateCompanyCommand : IRequest<int>
 public class UpdateCompanyCommandHandler : IRequestHandler<UpdateCompanyCommand, int>
 {
     private readonly ICompanyRepository _companyRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public UpdateCompanyCommandHandler(ICompanyRepository companyRepository, IMapper mapper)
+    public UpdateCompanyCommandHandler(ICompanyRepository companyRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
         _companyRepository = companyRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
     public async Task<int> Handle(UpdateCompanyCommand request, CancellationToken cancellationToken)
     {
         var company = _mapper.Map<Company>(request.Company);
-        await _companyRepository.UpdateAsync(company, cancellationToken);
+        
+        _companyRepository.Update(company);
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
         return company.Id;
     }
 }

@@ -13,11 +13,13 @@ public record UpdateSolicitationCommand : IRequest
 public class UpdateSolicitationCommandHandler : IRequestHandler<UpdateSolicitationCommand>
 {
     private readonly ISolicitationRepository _solicitationRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public UpdateSolicitationCommandHandler(ISolicitationRepository solicitationRepository, IMapper mapper)
+    public UpdateSolicitationCommandHandler(ISolicitationRepository solicitationRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
         _solicitationRepository = solicitationRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
@@ -25,6 +27,8 @@ public class UpdateSolicitationCommandHandler : IRequestHandler<UpdateSolicitati
     {
         var solicitation = _mapper.Map<Solicitation>(request.Solicitation);
 
-        await _solicitationRepository.UpdateAsync(solicitation, cancellationToken);
+        _solicitationRepository.Update(solicitation);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

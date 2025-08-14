@@ -19,7 +19,7 @@ public class GetMaterialQueryHandler : IRequestHandler<GetMaterialQuery, GetMate
 
     public async Task<GetMaterialDto> Handle(GetMaterialQuery request, CancellationToken cancellationToken)
     {
-        var material = await materialRepository.GetByIdAsync(request.Id, cancellationToken);
+        var material = await materialRepository.GetByIdAsync(request.Id);
         if (material == null)
             return null;
         var result = mapper.Map<GetMaterialDto>(material);

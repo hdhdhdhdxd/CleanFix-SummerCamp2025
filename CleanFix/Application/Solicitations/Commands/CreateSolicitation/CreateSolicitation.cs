@@ -12,11 +12,13 @@ public record CreateSolicitationCommand : IRequest<int>
 public class CreateSolicitationCommandHandler : IRequestHandler<CreateSolicitationCommand, int>
 {
     private readonly ISolicitationRepository _solicitationRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public CreateSolicitationCommandHandler(ISolicitationRepository solicitationRepository, IMapper mapper)
+    public CreateSolicitationCommandHandler(ISolicitationRepository solicitationRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
         _solicitationRepository = solicitationRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
@@ -27,7 +29,9 @@ public class CreateSolicitationCommandHandler : IRequestHandler<CreateSolicitati
         if (solicitation.Id == 0)
             solicitation.Id = 0;
 
-        var result = await _solicitationRepository.AddAsync(solicitation, cancellationToken);
+        var result = _solicitationRepository.Add(solicitation);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return result;
     }

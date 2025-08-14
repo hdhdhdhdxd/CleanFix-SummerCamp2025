@@ -12,11 +12,13 @@ public record CreateRequestCommand : IRequest<int>
 public class CreateRequestCommandHandler : IRequestHandler<CreateRequestCommand, int>
 {
     private readonly IRequestRepository _requestRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public CreateRequestCommandHandler(IRequestRepository requestRepository, IMapper mapper)
+    public CreateRequestCommandHandler(IRequestRepository requestRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
         _requestRepository = requestRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
@@ -25,7 +27,11 @@ public class CreateRequestCommandHandler : IRequestHandler<CreateRequestCommand,
         var entity = _mapper.Map<Request>(request.Request);
         if (entity.Id == 0)
             entity.Id = 0;
-        var result = await _requestRepository.AddAsync(entity, cancellationToken);
+            
+        var result = _requestRepository.Add(entity);
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
         return result;
     }
 }

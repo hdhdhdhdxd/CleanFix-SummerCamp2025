@@ -18,7 +18,7 @@ public class GetSolicitationQueryHandler : IRequestHandler<GetSolicitationQuery,
 
     public async Task<GetSolicitationDto> Handle(GetSolicitationQuery request, CancellationToken cancellationToken)
     {
-        var solicitation = await _solicitationRepository.GetByIdAsync(request.Id, cancellationToken);
+        var solicitation = await _solicitationRepository.GetByIdAsync(request.Id);
         var result = _mapper.Map<GetSolicitationDto>(solicitation);
         return result;
     }

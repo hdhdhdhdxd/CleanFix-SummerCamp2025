@@ -13,17 +13,22 @@ public record UpdateRequestCommand : IRequest
 public class UpdateRequestCommandHandler : IRequestHandler<UpdateRequestCommand>
 {
     private readonly IRequestRepository _requestRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public UpdateRequestCommandHandler(IRequestRepository requestRepository, IMapper mapper)
+    public UpdateRequestCommandHandler(IRequestRepository requestRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
         _requestRepository = requestRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
     public async Task Handle(UpdateRequestCommand request, CancellationToken cancellationToken)
     {
         var entity = _mapper.Map<Request>(request.Request);
-        await _requestRepository.UpdateAsync(entity, cancellationToken);
+        
+        _requestRepository.Update(entity);
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }
