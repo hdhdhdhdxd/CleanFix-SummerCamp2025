@@ -20,7 +20,9 @@ public class GetMaterialsQueryHandler : IRequestHandler<GetMaterialsQuery, List<
 
     public async Task<List<GetMaterialsDto>> Handle(GetMaterialsQuery request, CancellationToken cancellationToken)
     {
-        var materials = await _materialRepository.GetAll().ToListAsync(cancellationToken);
+        var materials = await _materialRepository.GetAll()
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
         var result = _mapper.Map<List<GetMaterialsDto>>(materials);
         return result;
     }

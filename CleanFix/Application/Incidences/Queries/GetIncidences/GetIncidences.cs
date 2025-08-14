@@ -20,7 +20,9 @@ public class GetIncidencesQueryHandler : IRequestHandler<GetIncidencesQuery, Lis
 
     public async Task<List<GetIncidencesDto>> Handle(GetIncidencesQuery request, CancellationToken cancellationToken)
     {
-        var entities = await _incidenceRepository.GetAll().ToListAsync(cancellationToken);
+        var entities = await _incidenceRepository.GetAll()
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
         var result = _mapper.Map<List<GetIncidencesDto>>(entities);
         return result;
     }

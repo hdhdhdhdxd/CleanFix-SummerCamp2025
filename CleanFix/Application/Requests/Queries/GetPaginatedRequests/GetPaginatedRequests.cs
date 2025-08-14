@@ -4,6 +4,7 @@ using AutoMapper.QueryableExtensions;
 using Infrastructure.Common.Mappings;
 using Infrastructure.Common.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Requests.Queries.GetPaginatedRequests;
 public record GetPaginatedRequestsQuery(int PageNumber, int PageSize) : IRequest<PaginatedList<GetPaginatedRequestDto>>;
@@ -22,6 +23,7 @@ public class GetPaginatedRequestsQueryHandler : IRequestHandler<GetPaginatedRequ
     public async Task<PaginatedList<GetPaginatedRequestDto>> Handle(GetPaginatedRequestsQuery request, CancellationToken cancellationToken)
     {
         var requests = await _requestRepository.GetAll()
+            .AsNoTracking()
             .ProjectTo<GetPaginatedRequestDto>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageNumber, request.PageSize);
 

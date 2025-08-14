@@ -10,6 +10,7 @@ using AutoMapper.QueryableExtensions;
 using Infrastructure.Common.Mappings;
 using Infrastructure.Common.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Companies.Queries.GetPaginatedCompanies;
 public record GetPaginatedCompaniesQuery(int PageNumber, int PageSize) : IRequest<PaginatedList<GetPaginatedCompanyDto>>;
@@ -27,7 +28,9 @@ public class GetPaginatedCompaniesQueryHandler : IRequestHandler<GetPaginatedCom
 
     public async Task<PaginatedList<GetPaginatedCompanyDto>> Handle(GetPaginatedCompaniesQuery request, CancellationToken cancellationToken)
     {
-        var companies = await _companyRepository.GetAll().ProjectTo<GetPaginatedCompanyDto>(_mapper.ConfigurationProvider).PaginatedListAsync(request.PageNumber, request.PageSize);
+        var companies = await _companyRepository.GetAll()
+            .AsNoTracking()
+            .ProjectTo<GetPaginatedCompanyDto>(_mapper.ConfigurationProvider).PaginatedListAsync(request.PageNumber, request.PageSize);
        
 
         return companies;
