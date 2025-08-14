@@ -11,13 +11,14 @@ public class GetPaginatedIncidenceDto
     public DateTime Date { get; set; }
     public string Status { get; set; }
     public string Description { get; set; }
-    public int ApartmentId { get; set; }
+    public int? ApartmentId { get; set; }
     public Priority Priority { get; set; }
     private class Mapping : Profile
     {
         public Mapping()
         {
-            CreateMap<Incidence, GetPaginatedIncidenceDto>();
+            CreateMap<Incidence, GetPaginatedIncidenceDto>()
+                .ForMember(dest => dest.ApartmentId, opt => opt.MapFrom(src => src.Apartment != null ? src.Apartment.Id : (int?)null));
         }
     }
 }
