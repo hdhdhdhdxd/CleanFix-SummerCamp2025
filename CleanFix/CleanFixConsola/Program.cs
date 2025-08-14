@@ -605,7 +605,7 @@ public class MaterialResponse
     public string Error { get; set; }
 }
 
-class Program
+/*class Program
 {
     static async Task Main(string[] args)
     {
@@ -746,5 +746,198 @@ class Program
         Console.WriteLine("💰 DESGLOSE DE IVA:");
         Console.WriteLine(resIVA.GetValue<string>());
         Console.WriteLine("------------------------------------\n");
+    }
+}*/
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        // 🔧 1. Crear el kernel y configurar Azure OpenAI
+        var builder = Kernel.CreateBuilder();
+        builder.AddAzureOpenAIChatCompletion(
+            deploymentName: "gpt-4.1",
+            endpoint: "https://hdhdh-mdx2smel-eastus2.cognitiveservices.azure.com/",
+            apiKey: "9ZMpVj9cCWRyv73s8vyxd0RL93ELHrtmNwN68ZPxRlDgBDjEgxR0JQQJ99BHACHYHv6XJ3w3AAAAACOGEv9e"
+        );
+
+        // 🔌 2. Agregar plugins personalizados: base de datos y facturación
+        var dbPlugin = new DBPluginTest("Server=tcp:devdemoserverbbdd.database.windows.net,1433;Initial Catalog=devdemobbdd2;Persist Security Info=False;User ID=admsql;Password=P@ssw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+        builder.Plugins.AddFromObject(dbPlugin, "DBPlugin");
+
+        var facturaPlugin = new FacturaPluginTest();
+        builder.Plugins.AddFromObject(facturaPlugin, "FacturaPlugin");
+
+        // 🧠 3. Construir el kernel con los plugins y configuración
+        var kernel = builder.Build();
+
+        // 🏢 4. Obtener lista de empresas desde el plugin de base de datos
+        var empresasIA = await kernel.InvokeAsync("DBPlugin", "GetAllEmpresas");
+        var empresasResponse = empresasIA.GetValue<EmpresaResponse>();
+
+        if (empresasResponse == null || !empresasResponse.Success || empresasResponse.Data == null)
+        {
+            Console.WriteLine("❌ Error al obtener las empresas.");
+            return;
+        }
+
+        var companies = empresasResponse.Data;
+        var empresasJson = JsonSerializer.Serialize(companies); // Se usa para el prompt
+
+        // 🧱 5. Obtener lista de materiales desde el plugin de base de datos
+        var materialesIA = await kernel.InvokeAsync("DBPlugin", "GetAllMaterials");
+        var materialesResponse = materialesIA.GetValue<MaterialResponse>();
+
+        if (materialesResponse == null || !materialesResponse.Success || materialesResponse.Data == null)
+        {
+            Console.WriteLine("❌ Error al obtener los materiales.");
+            return;
+        }
+
+        var materials = materialesResponse.Data;
+        var materialesJson = JsonSerializer.Serialize(materials); // Se usa para el prompt
+
+        // 🗣️ 6. Definir el prompt para responder preguntas generales
+        var promptTemplate = @"
+Eres un asistente inteligente que responde preguntas sobre empresas y materiales.
+
+Tienes la siguiente información de empresas (companies) en formato JSON:
+{{$empresas}}
+
+Cada empresa tiene propiedades como: Id, Name, Type (tipo), Price.
+
+También tienes la siguiente información de materiales (materials) en formato JSON:
+{{$materiales}}
+
+Cada material tiene propiedades como: Id, Name, Issue (tipo), Available (disponible).
+
+Usa esta información para responder la pregunta del usuario:
+{{$pregunta}}
+
+Responde de forma clara y útil. Si la pregunta no tiene relación con los datos, responde que no puedes ayudar.
+";
+
+        var promptFunction = kernel.CreateFunctionFromPrompt(promptTemplate);
+
+        // 👋 7. Mensaje de bienvenida
+        Console.WriteLine("👋 ¡Hola! Soy CleanFixBot. Escribe 'factura' para generar una manualmente, o hazme una pregunta.");
+
+        // 🔁 8. Bucle principal de interacción con el usuario
+        while (true)
+        {
+            Console.Write("> ");
+            string userInput = Console.ReadLine()?.Trim();
+            if (string.IsNullOrEmpty(userInput)) continue;
+            if (userInput.Equals("salir", StringComparison.OrdinalIgnoreCase)) break;
+
+            // 🤖 9. Generación automática de factura si se detecta intención
+            if (ContieneIntencionDeFactura(userInput))
+            {
+                var tipoEmpresa = ExtraerTipo(userInput, "empresa");
+                var tipoMaterial = ExtraerTipo(userInput, "material");
+
+                var empresa = companies
+                    .Where(e => !tipoEmpresa.HasValue || e.Type == tipoEmpresa.Value)
+                    .OrderBy(e => e.Price)
+                    .FirstOrDefault(); // Empresa más barata del tipo
+
+                var materialesSeleccionados = materials
+                    .Where(m => (!tipoMaterial.HasValue || m.Issue == tipoMaterial.Value) && m.Available)
+                    .ToList(); // Materiales disponibles del tipo
+
+                if (empresa == null || materialesSeleccionados.Count == 0)
+                {
+                    Console.WriteLine("❌ No se encontró empresa o materiales válidos para generar la factura.");
+                    continue;
+                }
+
+                // 🧾 Generar factura con desglose de IVA
+                await MostrarFacturaAsync(kernel, empresa, materialesSeleccionados);
+                continue;
+            }
+
+            // 🧾 10. Generación manual de factura por comandos explícitos
+            if (userInput.Contains("factura", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine("Introduce el ID de la empresa:");
+                var idEmp = Console.ReadLine()?.Trim();
+                var empresa = companies.FirstOrDefault(e => e.Id.ToString() == idEmp);
+                if (empresa == null) { Console.WriteLine("❌ Empresa no encontrada."); continue; }
+
+                var selMat = new List<Material>();
+                while (true)
+                {
+                    Console.WriteLine("ID del material a añadir (o 'fin'):");
+                    var idMatInput = Console.ReadLine()?.Trim();
+                    if (idMatInput?.Equals("fin", StringComparison.OrdinalIgnoreCase) == true) break;
+
+                    if (int.TryParse(idMatInput, out int idMat))
+                    {
+                        var mat = materials.FirstOrDefault(m => m.Id == idMat);
+                        if (mat != null)
+                        {
+                            selMat.Add(mat);
+                            Console.WriteLine($"✅ Añadido: {mat.Name}");
+                        }
+                        else Console.WriteLine("❌ Material no encontrado.");
+                    }
+                    else Console.WriteLine("❌ ID inválido.");
+                }
+
+                if (selMat.Count == 0) { Console.WriteLine("❌ No se seleccionaron materiales."); continue; }
+
+                // 🧾 Generar factura con desglose de IVA
+                await MostrarFacturaAsync(kernel, empresa, selMat);
+                continue;
+            }
+
+            // ❓ 11. Preguntas generales respondidas por el modelo usando el prompt
+            var kernelArgs = new KernelArguments
+            {
+                ["empresas"] = empresasJson,
+                ["materiales"] = materialesJson,
+                ["pregunta"] = userInput
+            };
+
+            var responseData = await promptFunction.InvokeAsync(kernel, kernelArgs);
+            Console.WriteLine($"\n🧠 CleanFixBot: {responseData.GetValue<string>()}\n");
+        }
+    }
+    // 📄 Método para mostrar factura y desglose de IVA
+    private static async Task MostrarFacturaAsync(Kernel kernel, Company empresa, List<Material> materiales)
+    {
+        var resFac = await kernel.InvokeAsync("FacturaPlugin", "GenerarFactura", new()
+        {
+            ["empresa"] = empresa,
+            ["materiales"] = materiales
+        });
+
+        Console.WriteLine("\n📄 FACTURA:");
+        Console.WriteLine(resFac.GetValue<string>());
+
+        var resIVA = await kernel.InvokeAsync("FacturaPlugin", "ObtenerIVA", new()
+        {
+            ["empresa"] = empresa,
+            ["materiales"] = materiales
+        });
+
+        Console.WriteLine("💰 DESGLOSE DE IVA:");
+        Console.WriteLine(resIVA.GetValue<string>());
+        Console.WriteLine("------------------------------------\n");
+    }
+    // 🧠 Detecta si el usuario quiere generar una factura
+    private static bool ContieneIntencionDeFactura(string input)
+    {
+        var palabrasClave = new[] { "hazme", "crea", "genera", "factura", "pedido", "compra" };
+        return palabrasClave.Any(p => input.Contains(p, StringComparison.OrdinalIgnoreCase));
+    }
+    // 🔍 Extrae el tipo solicitado desde el texto del usuario
+    private static int? ExtraerTipo(string input, string entidad)
+    {
+        var match = Regex.Match(input, $@"{entidad}.*tipo\s*(\d+)", RegexOptions.IgnoreCase);
+        if (match.Success && int.TryParse(match.Groups[1].Value, out int tipo))
+            return tipo;
+
+        return null;
     }
 }
