@@ -1,126 +1,10 @@
 <div class="flex h-full flex-col">
   @if (observableData | async; as items) {
-    <!-- Vista de tabla para pantallas medianas y grandes -->
-    <div class="hidden flex-1 overflow-hidden rounded-lg border border-brand-200 sm:flex">
-      <div class="h-full w-full overflow-auto">
-        <table class="w-full divide-y divide-brand-200">
-          <thead class="sticky top-0 bg-brand-50">
-            <tr>
-              @if (items.length > 0) {
-                @for (column of getColumns(); track column.key) {
-                  <th
-                    class="px-3 py-3 text-left text-xs font-semibold tracking-wider text-brand-600 sm:text-sm"
-                  >
-                    {{ column.label }}
-                  </th>
-                }
-              }
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-brand-200 bg-white text-brand-600">
-            @if (items.length > 0) {
-              @for (item of items; track $index) {
-                <tr class="hover:bg-brand-50">
-                  @for (column of getColumns(); track column.key) {
-                    <td class="px-3 py-3 text-xs whitespace-nowrap sm:text-sm">
-                      @switch (column.type) {
-                        @case ('currency') {
-                          {{ getValue(item, column.key) | currency: 'EUR' : 'symbol' : '1.2-2' }}
-                        }
-                        @case ('date') {
-                          {{ getValue(item, column.key) | date: 'dd/MM/yyyy' }}
-                        }
-                        @case ('number') {
-                          {{ getValue(item, column.key) }}
-                        }
-                        @case ('status') {
-                          <span
-                            class="inline-flex rounded-full px-2 py-1 text-xs font-semibold"
-                            [ngClass]="getStatusClass(getValue(item, column.key))"
-                          >
-                            {{ getValue(item, column.key) }}
-                          </span>
-                        }
-                        @default {
-                          {{ getValue(item, column.key) }}
-                        }
-                      }
-                    </td>
-                  }
-                </tr>
-              }
-            } @else {
-              <tr>
-                <td class="px-4 py-8 text-center text-brand-400">
-                  <div class="flex flex-col items-center">
-                    <svg
-                      class="mb-4 h-12 w-12 text-brand-300"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                      ></path>
-                    </svg>
-                    <p class="text-lg font-medium text-brand-500">No hay datos disponibles</p>
-                    <p class="text-sm text-brand-400">
-                      Los datos aparecerán aquí cuando estén disponibles
-                    </p>
-                  </div>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Mobile -->
-    <div class="flex-1 space-y-3 overflow-auto p-4 sm:hidden">
-      @if (items.length > 0) {
-        @for (item of items; track $index) {
-          <div class="rounded-lg border border-brand-200 bg-white p-4 shadow-sm">
-            @for (column of getColumns(); track column.key) {
-              <div
-                class="flex items-center justify-between border-b border-brand-100 py-2 last:border-b-0"
-              >
-                <span class="text-sm font-medium text-brand-700">{{ column.label }}:</span>
-                <span class="text-sm text-brand-600">
-                  @switch (column.type) {
-                    @case ('currency') {
-                      {{ getValue(item, column.key) | currency: 'EUR' : 'symbol' : '1.2-2' }}
-                    }
-                    @case ('date') {
-                      {{ getValue(item, column.key) | date: 'dd/MM/yyyy' }}
-                    }
-                    @case ('number') {
-                      {{ getValue(item, column.key) }}
-                    }
-                    @case ('status') {
-                      <span
-                        class="inline-flex rounded-full px-2 py-1 text-xs font-semibold"
-                        [ngClass]="getStatusClass(getValue(item, column.key))"
-                      >
-                        {{ getValue(item, column.key) }}
-                      </span>
-                    }
-                    @default {
-                      {{ getValue(item, column.key) }}
-                    }
-                  }
-                </span>
-              </div>
-            }
-          </div>
-        }
-      } @else {
-        <div class="flex flex-col items-center justify-center py-12">
+    @if (!hasData(items)) {
+      <div class="flex flex-1 items-center justify-center">
+        <div class="text-center">
           <svg
-            class="mb-4 h-12 w-12 text-brand-300"
+            class="mx-auto mb-4 h-12 w-12 text-brand-300"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -135,17 +19,110 @@
           <p class="text-lg font-medium text-brand-500">No hay datos disponibles</p>
           <p class="text-sm text-brand-400">Los datos aparecerán aquí cuando estén disponibles</p>
         </div>
-      }
-    </div>
+      </div>
+    } @else {
+      <!-- Desktop Table -->
+      <div class="hidden flex-1 overflow-hidden rounded-lg border border-brand-200 sm:flex">
+        <div class="h-full w-full overflow-auto">
+          <table class="w-full divide-y divide-brand-200">
+            <thead class="sticky top-0 bg-brand-50">
+              <tr>
+                @for (column of getColumns(); track column.key) {
+                  <th
+                    class="px-3 py-3 text-left text-xs font-semibold tracking-wider text-brand-600 sm:text-sm"
+                  >
+                    {{ column.label }}
+                  </th>
+                }
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-brand-200 bg-white text-brand-600">
+              @for (item of items; track $index) {
+                <tr class="hover:bg-brand-50">
+                  @for (column of getColumns(); track column.key) {
+                    <td class="px-3 py-3 text-xs whitespace-nowrap sm:text-sm">
+                      @switch (column.type) {
+                        @case ('currency') {
+                          {{
+                            getCurrencyValue(item, column.key)
+                              | currency: 'EUR' : 'symbol' : '1.2-2'
+                          }}
+                        }
+                        @case ('date') {
+                          {{ getDateValue(item, column.key) | date: 'dd/MM/yyyy' }}
+                        }
+                        @case ('number') {
+                          {{ getValue(item, column.key) }}
+                        }
+                        @case ('status') {
+                          <span
+                            class="inline-flex rounded-full px-2 py-1 text-xs font-semibold"
+                            [ngClass]="getStatusClass(getStringValue(item, column.key))"
+                          >
+                            {{ getValue(item, column.key) }}
+                          </span>
+                        }
+                        @default {
+                          {{ getValue(item, column.key) }}
+                        }
+                      }
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Mobile Table -->
+      <div class="flex-1 space-y-3 overflow-auto p-4 sm:hidden">
+        @for (item of items; track $index) {
+          <div class="rounded-lg border border-brand-200 bg-white p-4 shadow-sm">
+            @for (column of getColumns(); track column.key) {
+              <div
+                class="flex items-center justify-between border-b border-brand-100 py-2 last:border-b-0"
+              >
+                <span class="text-sm font-medium text-brand-700">{{ column.label }}:</span>
+                <span class="text-sm text-brand-600">
+                  @switch (column.type) {
+                    @case ('currency') {
+                      {{
+                        getCurrencyValue(item, column.key) | currency: 'EUR' : 'symbol' : '1.2-2'
+                      }}
+                    }
+                    @case ('date') {
+                      {{ getDateValue(item, column.key) | date: 'dd/MM/yyyy' }}
+                    }
+                    @case ('number') {
+                      {{ getValue(item, column.key) }}
+                    }
+                    @case ('status') {
+                      <span
+                        class="inline-flex rounded-full px-2 py-1 text-xs font-semibold"
+                        [ngClass]="getStatusClass(getStringValue(item, column.key))"
+                      >
+                        {{ getValue(item, column.key) }}
+                      </span>
+                    }
+                    @default {
+                      {{ getValue(item, column.key) }}
+                    }
+                  }
+                </span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
 
+    <!-- Footer -->
     <div
       class="mt-4 flex items-center justify-between border-t border-brand-200 bg-white px-3 py-3 sm:px-6"
     >
       <div class="flex items-center text-xs text-brand-500 sm:text-sm">
         <span>{{ items.length }} elementos</span>
       </div>
-
-      <div class="flex items-center space-x-2"></div>
     </div>
   }
 </div>

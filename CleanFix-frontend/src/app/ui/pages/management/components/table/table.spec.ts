@@ -4,8 +4,9 @@ import { Table } from './table'
 import { provideZonelessChangeDetection } from '@angular/core'
 
 describe('Table', () => {
-  let component: Table
-  let fixture: ComponentFixture<Table>
+  type TestTableRow = Record<string, string | number | Date>
+  let component: Table<TestTableRow>
+  let fixture: ComponentFixture<Table<TestTableRow>>
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
