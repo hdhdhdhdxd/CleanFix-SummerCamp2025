@@ -29,10 +29,10 @@ public class CreateSolicitationCommandHandler : IRequestHandler<CreateSolicitati
         if (solicitation.Id == 0)
             solicitation.Id = 0;
 
-        var result = _solicitationRepository.Add(solicitation);
+        _solicitationRepository.Add(solicitation);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return result;
+        return solicitation.Id;
     }
 }

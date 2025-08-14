@@ -29,10 +29,10 @@ public class CreateMaterialCommandHandler : IRequestHandler<CreateMaterialComman
         if (material.Id == 0)
             material.Id = 0; // El Id será autoincremental en la base de datos
             
-        var result = _materialRepository.Add(material);
+        _materialRepository.Add(material);
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        return result;
+        return material.Id;
     }
 }

@@ -28,10 +28,10 @@ public class CreateRequestCommandHandler : IRequestHandler<CreateRequestCommand,
         if (entity.Id == 0)
             entity.Id = 0;
             
-        var result = _requestRepository.Add(entity);
+        _requestRepository.Add(entity);
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        return result;
+        return entity.Id;
     }
 }

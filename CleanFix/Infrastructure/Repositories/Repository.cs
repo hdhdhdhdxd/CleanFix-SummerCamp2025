@@ -25,11 +25,10 @@ public class Repository<T>
     {
         return await _database.Set<T>().FirstOrDefaultAsync(p => p.Id == id);
     }
-
-    public int Add(T entity)
+            
+    public void Add(T entity)
     {
         _database.Set<T>().Add(entity);
-        return entity.Id;
     }
 
     public void Update(T entity)

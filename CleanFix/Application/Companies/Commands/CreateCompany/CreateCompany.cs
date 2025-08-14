@@ -28,10 +28,10 @@ public class CreateCompanyCommandHandler : IRequestHandler<CreateCompanyCommand,
         if (company.Id == 0)
             company.Id = 0; // El Id será autoincremental en la base de datos
         
-        var result = _companyRepository.Add(company);
+        _companyRepository.Add(company);
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        return result;
+        return company.Id;
     }
 }

@@ -26,10 +26,10 @@ public class CreateApartmentCommandHandler : IRequestHandler<CreateApartmentComm
     {
         var apartment = _mapper.Map<Apartment>(request.Apartment);
 
-        var result = _apartmentRepository.Add(apartment);
+        _apartmentRepository.Add(apartment);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return result;
+        return apartment.Id;
     }
 }

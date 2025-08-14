@@ -8,7 +8,7 @@ public interface IRepository<T>
 {
     IQueryable<T> GetAll();
     Task<T?> GetByIdAsync(int id);
-    int Add(T entity);
+    void Add(T entity);
     void Update(T entity);
     void Remove(T entity);
 }

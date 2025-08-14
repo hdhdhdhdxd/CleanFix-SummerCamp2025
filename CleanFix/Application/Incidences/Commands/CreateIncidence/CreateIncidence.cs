@@ -28,10 +28,10 @@ public class CreateIncidenceCommandHandler : IRequestHandler<CreateIncidenceComm
         if (entity.Id == 0)
             entity.Id = 0;
             
-        var result = _incidenceRepository.Add(entity);
+        _incidenceRepository.Add(entity);
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
-        return result;
+        return entity.Id;
     }
 }
