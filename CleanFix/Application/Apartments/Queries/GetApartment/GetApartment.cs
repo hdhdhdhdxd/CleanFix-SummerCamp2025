@@ -18,7 +18,7 @@ public class GetApartmentQueryHandler : IRequestHandler<GetApartmentQuery, GetAp
 
     public async Task<GetApartmentDto> Handle(GetApartmentQuery request, CancellationToken cancellationToken)
     {
-        var apartment = await _apartmentRepository.GetByIdAsync(request.Id, cancellationToken);
+        var apartment = await _apartmentRepository.GetByIdAsync(request.Id);
 
         var result = _mapper.Map<GetApartmentDto>(apartment);
 

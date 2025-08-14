@@ -7,8 +7,8 @@ namespace Application.Common.Interfaces;
 public interface IRepository<T>
 {
     IQueryable<T> GetAll();
-    Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken);
-    Task<int> AddAsync(T entity, CancellationToken cancellationToken);
-    Task UpdateAsync(T entity, CancellationToken cancellationToken);
-    Task RemoveAsync(T entity, CancellationToken cancellationToken);
+    Task<T?> GetByIdAsync(int id);
+    int Add(T entity);
+    void Update(T entity);
+    void Remove(T entity);
 }

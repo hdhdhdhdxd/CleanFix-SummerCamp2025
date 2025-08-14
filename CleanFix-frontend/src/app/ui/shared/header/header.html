@@ -1,35 +1,87 @@
-<header
-  class="fixed z-10 flex w-screen items-center justify-between overflow-hidden px-10 py-5 transition-colors duration-300"
-  [class]="isScrolled() ? 'bg-primary-500' : 'bg-transparent'"
->
-  <nav>
-    <ul
-      class="flex space-x-6 text-xl font-semibold text-brand-0 [&>li]:transition-transform [&>li]:duration-300 [&>li]:ease-linear [&>li]:hover:-translate-y-0.5"
-    >
-      <li>
-        <a href="/home#hero">Inicio</a>
-      </li>
-      <li>
-        <a href="/home#services">Servicios</a>
-      </li>
-      <li>
-        <a href="/home#footer">Contacto</a>
-      </li>
-      <li>
-        <a href="/management">Administración</a>
-      </li>
-    </ul>
-  </nav>
-
-  <div class="text-center">
-    <h1 class="text-2xl font-bold text-brand-0">CleanFix</h1>
-    <p class="text-base font-bold text-brand-200">Reformas y Mantenimientos</p>
-  </div>
-
-  <a
-    href="/service-request"
-    class="rounded-4xl border-2 border-brand-0 p-3 text-center text-xl font-semibold text-brand-0 transition-all duration-300 hover:scale-105 hover:border-accent-500 hover:text-accent-500 hover:shadow-md"
+@if (isHome()) {
+  <header
+    class="fixed z-10 flex w-screen items-center justify-between overflow-hidden px-10 py-5 transition-colors duration-300"
+    [class]="isScrolled() ? 'bg-primary-500' : 'bg-transparent'"
   >
-    Solicitar servicio
-  </a>
-</header>
+    <nav class="hidden md:block">
+      <ul
+        class="flex space-x-6 text-xl font-semibold text-brand-0 [&>li]:transition-transform [&>li]:duration-300 [&>li]:ease-linear [&>li]:hover:-translate-y-0.5"
+      >
+        <li><a href="/home#hero">Inicio</a></li>
+        <li><a href="/home#services">Servicios</a></li>
+        <li><a href="/home#footer">Contacto</a></li>
+        <li><a href="/management">Administración</a></li>
+      </ul>
+    </nav>
+
+    <div
+      class="absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center"
+    >
+      <h1 class="text-2xl font-bold text-brand-0">CleanFix</h1>
+      <p class="text-base font-bold text-brand-200">Reformas y Mantenimientos</p>
+    </div>
+
+    <a
+      href="/service-request"
+      class="hidden rounded-4xl border-2 border-brand-0 p-3 text-center text-xl font-semibold text-brand-0 transition-all duration-300 hover:scale-105 hover:border-accent-500 hover:text-accent-500 hover:shadow-md md:inline-block"
+    >
+      Solicitar servicio
+    </a>
+
+    <button class="z-20 ml-auto block md:hidden" (click)="toggleMenu()">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-8 w-8 text-brand-0"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M4 6h16M4 12h16M4 18h16"
+        />
+      </svg>
+    </button>
+
+    @if (menuOpen()) {
+      <div class="fixed inset-0 z-30 flex">
+        <div
+          class="bg-opacity-40 flex-1 bg-brand-900/55"
+          tabindex="0"
+          role="button"
+          (click)="closeMenu()"
+          (keydown)="($event.key === 'Enter' || $event.key === ' ') && closeMenu()"
+          aria-label="Cerrar menú"
+        ></div>
+        <aside
+          class="animate-slide-in-right flex h-full w-3/4 max-w-xs flex-col items-start bg-primary-500 p-8 shadow-lg"
+        >
+          <button class="mb-8 self-end" (click)="closeMenu()">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-8 w-8 text-brand-0"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+          <ul class="flex flex-col gap-8 text-2xl font-semibold text-brand-0">
+            <li><a href="/home#hero" (click)="closeMenu()">Inicio</a></li>
+            <li><a href="/home#services" (click)="closeMenu()">Servicios</a></li>
+            <li><a href="/home#footer" (click)="closeMenu()">Contacto</a></li>
+            <li><a href="/management" (click)="closeMenu()">Administración</a></li>
+          </ul>
+        </aside>
+      </div>
+    }
+  </header>
+}

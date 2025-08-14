@@ -12,11 +12,13 @@ public record CreateApartmentCommand : IRequest<int>
 public class CreateApartmentCommandHandler : IRequestHandler<CreateApartmentCommand, int>
 {
     private readonly IApartmentRepository _apartmentRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public CreateApartmentCommandHandler(IApartmentRepository apartmentRepository, IMapper mapper)
+    public CreateApartmentCommandHandler(IApartmentRepository apartmentRepository,IUnitOfWork unitOfWork, IMapper mapper)
     {
         _apartmentRepository = apartmentRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
@@ -24,10 +26,9 @@ public class CreateApartmentCommandHandler : IRequestHandler<CreateApartmentComm
     {
         var apartment = _mapper.Map<Apartment>(request.Apartment);
 
-        if (apartment.Id == 0)
-            apartment.Id = 0; // El Id será autoincremental en la base de datos
+        var result = _apartmentRepository.Add(apartment);
 
-        var result = await _apartmentRepository.AddAsync(apartment, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return result;
     }

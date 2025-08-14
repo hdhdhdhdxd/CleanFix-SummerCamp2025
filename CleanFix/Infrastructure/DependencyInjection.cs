@@ -18,6 +18,8 @@ public static class DependencyInjection
 
         builder.Services.AddScoped<IDatabaseContext>(provider => provider.GetRequiredService<DatabaseContext>());
 
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
         builder.Services.AddScoped<IApartmentRepository, ApartmentService>();
         builder.Services.AddScoped<ISolicitationRepository, SolicitationService>();
         builder.Services.AddScoped<ICompanyRepository, CompanyService>();

@@ -12,11 +12,13 @@ public record CreateIncidenceCommand : IRequest<int>
 public class CreateIncidenceCommandHandler : IRequestHandler<CreateIncidenceCommand, int>
 {
     private readonly IIncidenceRepository _incidenceRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public CreateIncidenceCommandHandler(IIncidenceRepository incidenceRepository, IMapper mapper)
+    public CreateIncidenceCommandHandler(IIncidenceRepository incidenceRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
         _incidenceRepository = incidenceRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
@@ -25,7 +27,11 @@ public class CreateIncidenceCommandHandler : IRequestHandler<CreateIncidenceComm
         var entity = _mapper.Map<Incidence>(request.Incidence);
         if (entity.Id == 0)
             entity.Id = 0;
-        var result = await _incidenceRepository.AddAsync(entity, cancellationToken);
+            
+        var result = _incidenceRepository.Add(entity);
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
         return result;
     }
 }

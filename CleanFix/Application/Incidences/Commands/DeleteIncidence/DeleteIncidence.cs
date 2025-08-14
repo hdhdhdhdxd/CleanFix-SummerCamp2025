@@ -8,18 +8,25 @@ public record DeleteIncidenceCommand(int Id) : IRequest<bool>;
 public class DeleteIncidenceCommandHandler : IRequestHandler<DeleteIncidenceCommand, bool>
 {
     private readonly IIncidenceRepository _incidenceRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteIncidenceCommandHandler(IIncidenceRepository incidenceRepository)
+    public DeleteIncidenceCommandHandler(IIncidenceRepository incidenceRepository, IUnitOfWork unitOfWork)
     {
         _incidenceRepository = incidenceRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<bool> Handle(DeleteIncidenceCommand request, CancellationToken cancellationToken)
     {
-        var entity = await _incidenceRepository.GetByIdAsync(request.Id, cancellationToken);
+        var entity = await _incidenceRepository.GetByIdAsync(request.Id);
+
         if (entity == null)
             return false;
-        await _incidenceRepository.RemoveAsync(entity, cancellationToken);
+
+        _incidenceRepository.Remove(entity);
+
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
         return true;
     }
 }

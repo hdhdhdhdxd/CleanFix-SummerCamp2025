@@ -13,17 +13,22 @@ public record UpdateIncidenceCommand : IRequest
 public class UpdateIncidenceCommandHandler : IRequestHandler<UpdateIncidenceCommand>
 {
     private readonly IIncidenceRepository _incidenceRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public UpdateIncidenceCommandHandler(IIncidenceRepository incidenceRepository, IMapper mapper)
+    public UpdateIncidenceCommandHandler(IIncidenceRepository incidenceRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
         _incidenceRepository = incidenceRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
     public async Task Handle(UpdateIncidenceCommand request, CancellationToken cancellationToken)
     {
         var entity = _mapper.Map<Incidence>(request.Incidence);
-        await _incidenceRepository.UpdateAsync(entity, cancellationToken);
+        
+        _incidenceRepository.Update(entity);
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

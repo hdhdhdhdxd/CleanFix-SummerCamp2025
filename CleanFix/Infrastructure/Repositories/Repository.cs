@@ -21,30 +21,24 @@ public class Repository<T>
         return _database.Set<T>();
     }
 
-    public async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<T?> GetByIdAsync(int id)
     {
-        return await _database.Set<T>().SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
+        return await _database.Set<T>().FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<int> AddAsync(T entity, CancellationToken cancellationToken)
+    public int Add(T entity)
     {
         _database.Set<T>().Add(entity);
-
-        await _database.SaveChangesAsync(cancellationToken);
-
         return entity.Id;
     }
 
-    public async Task UpdateAsync(T entity, CancellationToken cancellationToken)
+    public void Update(T entity)
     {
         _database.Set<T>().Update(entity);
-        await _database.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task RemoveAsync(T entity, CancellationToken cancellationToken)
+    public void Remove(T entity)
     {
-        await _database.Set<T>().Where(e => e.Id == entity.Id).ExecuteDeleteAsync();
-
-        await _database.SaveChangesAsync(cancellationToken);
+        _database.Set<T>().Remove(entity);
     }
 }

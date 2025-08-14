@@ -18,7 +18,7 @@ public class GetIncidenceQueryHandler : IRequestHandler<GetIncidenceQuery, GetIn
 
     public async Task<GetIncidenceDto> Handle(GetIncidenceQuery request, CancellationToken cancellationToken)
     {
-        var entity = await _incidenceRepository.GetByIdAsync(request.Id, cancellationToken);
+        var entity = await _incidenceRepository.GetByIdAsync(request.Id);
         var result = _mapper.Map<GetIncidenceDto>(entity);
         return result;
     }

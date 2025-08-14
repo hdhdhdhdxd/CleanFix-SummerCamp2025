@@ -13,11 +13,13 @@ public record CreateMaterialCommand : IRequest<int>
 public class CreateMaterialCommandHandler : IRequestHandler<CreateMaterialCommand, int>
 {
     private readonly IMaterialRepository _materialRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public CreateMaterialCommandHandler(IMaterialRepository materialRepository, IMapper mapper)
+    public CreateMaterialCommandHandler(IMaterialRepository materialRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
         _materialRepository = materialRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
@@ -26,7 +28,11 @@ public class CreateMaterialCommandHandler : IRequestHandler<CreateMaterialComman
         var material = _mapper.Map<Material>(request.Material);
         if (material.Id == 0)
             material.Id = 0; // El Id será autoincremental en la base de datos
-        var result = await _materialRepository.AddAsync(material, cancellationToken);
+            
+        var result = _materialRepository.Add(material);
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
         return result;
     }
 }

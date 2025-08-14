@@ -1,17 +1,20 @@
-import { Component, inject, OnInit } from '@angular/core'
+import { Component, inject, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core'
 import { Router, NavigationEnd, RouterModule } from '@angular/router'
-import { BuildingIcon } from '@/ui/shared/Icons/building-icon/building-icon'
+import { BuildingIcon } from '@/ui/shared/Icons/building-icon'
 import { NgClass } from '@angular/common'
-import { AlertIcon } from '@/ui/shared/Icons/building-icon/alert-icon'
-import { WrenchIcon } from '@/ui/shared/Icons/building-icon/wrench-icon'
+import { AlertIcon } from '@/ui/shared/Icons/alert-icon'
+import { WrenchIcon } from '@/ui/shared/Icons/wrench-icon'
 import { RouterOutlet } from '@angular/router'
+import { HomeIcon } from '@/ui/shared/Icons/home-icon'
 
 @Component({
   selector: 'app-management',
-  imports: [BuildingIcon, NgClass, AlertIcon, WrenchIcon, RouterOutlet, RouterModule],
+  imports: [BuildingIcon, NgClass, AlertIcon, WrenchIcon, RouterOutlet, RouterModule, HomeIcon],
   templateUrl: './management.html',
 })
-export class Management implements OnInit {
+export class Management implements OnInit, AfterViewInit {
+  @ViewChild('tabsContainer', { static: false }) tabsContainer!: ElementRef
+
   tabs = [
     {
       label: 'Solicitudes',
@@ -32,17 +35,34 @@ export class Management implements OnInit {
 
   router = inject(Router)
   currentRoute = ''
+  activeTabIndex = 0
 
   ngOnInit(): void {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.currentRoute = event.urlAfterRedirects
+        this.updateActiveTab()
       }
     })
     this.currentRoute = this.router.url
+    this.updateActiveTab()
+  }
+
+  ngAfterViewInit(): void {
+    setTimeout(() => this.updateActiveTab(), 200)
   }
 
   isActive(tabRoute: string): boolean {
     return this.currentRoute.startsWith(tabRoute)
+  }
+
+  private updateActiveTab(): void {
+    let activeIndex = this.tabs.findIndex((tab) => this.isActive(tab.route))
+
+    if (activeIndex === -1) {
+      activeIndex = 0
+    }
+
+    this.activeTabIndex = activeIndex
   }
 }

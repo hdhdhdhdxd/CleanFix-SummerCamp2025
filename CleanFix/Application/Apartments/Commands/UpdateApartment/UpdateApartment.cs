@@ -13,11 +13,13 @@ public record UpdateApartmentCommand : IRequest
 public class UpdateApartmentCommandHandler : IRequestHandler<UpdateApartmentCommand>
 {
     private readonly IApartmentRepository _apartmentRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public UpdateApartmentCommandHandler(IApartmentRepository apartmentRepository, IMapper mapper)
+    public UpdateApartmentCommandHandler(IApartmentRepository apartmentRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
         _apartmentRepository = apartmentRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
@@ -25,6 +27,8 @@ public class UpdateApartmentCommandHandler : IRequestHandler<UpdateApartmentComm
     {
         var apartment = _mapper.Map<Apartment>(request.Apartment);
 
-        await _apartmentRepository.UpdateAsync(apartment, cancellationToken);
+        _apartmentRepository.Update(apartment);
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

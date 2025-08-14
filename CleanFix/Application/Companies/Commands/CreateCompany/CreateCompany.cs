@@ -12,11 +12,13 @@ public record CreateCompanyCommand : IRequest<int>
 public class CreateCompanyCommandHandler : IRequestHandler<CreateCompanyCommand, int>
 {
     private readonly ICompanyRepository _companyRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public CreateCompanyCommandHandler(ICompanyRepository companyRepository, IMapper mapper)
+    public CreateCompanyCommandHandler(ICompanyRepository companyRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
         _companyRepository = companyRepository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
@@ -25,7 +27,11 @@ public class CreateCompanyCommandHandler : IRequestHandler<CreateCompanyCommand,
         var company = _mapper.Map<Company>(request.Company);
         if (company.Id == 0)
             company.Id = 0; // El Id será autoincremental en la base de datos
-        var result = await _companyRepository.AddAsync(company, cancellationToken);
+        
+        var result = _companyRepository.Add(company);
+        
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        
         return result;
     }
 }

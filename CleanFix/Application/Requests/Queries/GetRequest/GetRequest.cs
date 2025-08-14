@@ -18,7 +18,7 @@ public class GetRequestQueryHandler : IRequestHandler<GetRequestQuery, GetReques
 
     public async Task<GetRequestDto> Handle(GetRequestQuery request, CancellationToken cancellationToken)
     {
-        var entity = await _requestRepository.GetByIdAsync(request.Id, cancellationToken);
+        var entity = await _requestRepository.GetByIdAsync(request.Id);
         var result = _mapper.Map<GetRequestDto>(entity);
         return result;
     }

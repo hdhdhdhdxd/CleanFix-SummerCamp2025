@@ -18,8 +18,8 @@ public class DBPluginTest
         _connectionString = connectionString;
     }
 
-    [KernelFunction, Description("Obtiene todas las empresas desde la base de datos, las convierte a JSON")]
-    public string GetAllEmpresas()
+    [KernelFunction, Description("Obtiene todas las empresas desde la base de datos, las convierte a objeto")]
+    public object GetAllEmpresas()
     {
         var companies = new List<Company>();
 
@@ -48,14 +48,14 @@ public class DBPluginTest
         }
         catch (Exception ex)
         {
-            return JsonSerializer.Serialize(new { success = false, error = ex.Message });
+            return new EmpresaResponse { Success = false, Error = ex.Message };
         }
 
-        return JsonSerializer.Serialize(new { success = true, data = companies }, new JsonSerializerOptions { WriteIndented = true });
+        return new EmpresaResponse { Success = true, Data = companies };
     }
 
-    [KernelFunction, Description("Obtiene todos los materiales desde la base de datos, las convierte a JSON")]
-    public string GetAllMaterials()
+    [KernelFunction, Description("Obtiene todos los materiales desde la base de datos, las convierte a objeto")]
+    public MaterialResponse GetAllMaterials()
     {
         var materiales = new List<Material>();
 
@@ -75,21 +75,29 @@ public class DBPluginTest
                     Name = reader.IsDBNull(1) ? null : reader.GetString(1),
                     Cost = reader.IsDBNull(2) ? 0 : reader.GetDecimal(2),
                     Issue = reader.IsDBNull(3) ? 0 : reader.GetInt32(3),
-                    Available = true // Assuming materials are available by default
+                    Available = true
                 });
             }
         }
         catch (Exception ex)
         {
-            return JsonSerializer.Serialize(new { success = false, error = ex.Message });
+            return new MaterialResponse
+            {
+                Success = false,
+                Error = ex.Message
+            };
         }
 
-        return JsonSerializer.Serialize(new { success = true, data = materiales }, new JsonSerializerOptions { WriteIndented = true });
+        return new MaterialResponse
+        {
+            Success = true,
+            Data = materiales
+        };
     }
 }
 
 
-public class Company
+    public class Company
 {
     public int Id { get; set; }
     public string Name { get; set; }

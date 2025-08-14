@@ -1,47 +1,71 @@
 <div class="flex h-screen items-center justify-center bg-brand-100">
-  <section class="mx-auto flex h-[97%] w-[98%] flex-col rounded-xl bg-brand-0">
-    <header class="px-7 py-5">
-      <h1 class="text-4xl font-bold text-brand-900">Gestión de Proyectos</h1>
-      <p class="text-xl font-medium text-brand-600">
-        Solicitudes, Incidencias y Trabajos en Proceso
-      </p>
+  <section class="mx-auto flex h-[97%] w-[98%] flex-col rounded-lg bg-brand-0">
+    <header class="flex items-center justify-between px-7 pt-5 pb-5">
+      <div>
+        <h1 class="text-4xl font-bold text-brand-700">Administración</h1>
+        <p class="text-xl font-medium text-brand-600">
+          Solicitudes, Incidencias y Trabajos en Proceso
+        </p>
+      </div>
+      <a
+        href="/home"
+        class="inline-flex items-center gap-2.5 rounded-xl px-3 py-2 text-brand-500 transition-colors hover:bg-brand-50 hover:text-brand-700"
+      >
+        <app-svg [svgClass]="'hover:text-brand-900'" home-icon />
+        <span class="text-lg font-medium">Volver al Inicio</span>
+      </a>
     </header>
 
-    <nav class="px-7">
-      <ul class="flex space-x-16 text-xl text-brand-500">
+    <nav class="relative px-7">
+      <ul #tabsContainer class="relative flex space-x-16 text-xl text-brand-500">
         @for (tab of tabs; track $index) {
-          <li
-            [ngClass]="{
-              'border-b-4 py-1': true,
-              'border-brand-900 text-brand-900': isActive(tab.route),
-              'border-transparent': !isActive(tab.route),
-            }"
-          >
-            <a [routerLink]="tab.route">
-              <div class="flex items-center gap-2.5">
+          <li class="relative py-1">
+            <a [routerLink]="tab.route" class="group">
+              <div class="flex items-center gap-2.5 transition-colors">
                 @switch (tab.icon) {
                   @case ('building') {
                     <app-svg
-                      [svgClass]="isActive(tab.route) ? 'text-brand-900' : 'text-brand-500'"
+                      [svgClass]="
+                        (isActive(tab.route) ? 'text-brand-700' : 'text-brand-500') +
+                        ' transition-colors group-hover:text-brand-700'
+                      "
                       building-icon
                     />
                   }
                   @case ('alert') {
                     <app-svg
-                      [svgClass]="isActive(tab.route) ? 'text-brand-900' : 'text-brand-500'"
+                      [svgClass]="
+                        (isActive(tab.route) ? 'text-brand-700' : 'text-brand-500') +
+                        ' transition-colors group-hover:text-brand-700'
+                      "
                       alert-icon
                     />
                   }
                   @case ('wrench') {
                     <app-svg
-                      [svgClass]="isActive(tab.route) ? 'text-brand-900' : 'text-brand-500'"
+                      [svgClass]="
+                        (isActive(tab.route) ? 'text-brand-700' : 'text-brand-500') +
+                        ' transition-colors group-hover:text-brand-700'
+                      "
                       wrench-icon
                     />
                   }
                 }
-                <p class="font-semibold">{{ tab.label }}</p>
+                <p
+                  class="font-semibold transition-colors group-hover:text-brand-700"
+                  [ngClass]="{ 'text-brand-700': isActive(tab.route) }"
+                >
+                  {{ tab.label }}
+                </p>
               </div>
             </a>
+            <div
+              class="absolute right-0 bottom-0 left-0 h-1 rounded-full bg-brand-700 transition-all duration-300 ease-out"
+              [class.opacity-100]="isActive(tab.route)"
+              [class.opacity-0]="!isActive(tab.route)"
+              [class.scale-x-100]="isActive(tab.route)"
+              [class.scale-x-0]="!isActive(tab.route)"
+            ></div>
           </li>
         }
       </ul>
