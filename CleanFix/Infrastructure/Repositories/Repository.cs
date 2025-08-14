@@ -23,7 +23,7 @@ public class Repository<T>
 
     public async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
-        return await _database.Set<T>().SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
+        return await _database.Set<T>().FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
     public async Task<int> AddAsync(T entity, CancellationToken cancellationToken)
