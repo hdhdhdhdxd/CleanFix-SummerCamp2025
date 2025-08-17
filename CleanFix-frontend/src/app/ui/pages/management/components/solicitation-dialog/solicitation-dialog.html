@@ -6,7 +6,7 @@
   (click)="handleBackdropClick($event)"
   (keydown.escape)="closeModal()"
 >
-  <article
+  <div
     #dialogContent
     class="dialog-content flex h-full w-full flex-col bg-white sm:h-auto sm:max-h-[85vh] sm:w-auto sm:max-w-2xl sm:min-w-[500px] sm:rounded-xl sm:shadow-2xl"
   >
@@ -91,5 +91,5 @@
         Cerrar
       </button>
     </footer>
-  </article>
+  </div>
 </dialog>
