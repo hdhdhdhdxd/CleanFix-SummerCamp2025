@@ -1,20 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { Table } from './table'
+import { SolicitationDialog } from './solicitation-dialog'
 import { provideZonelessChangeDetection } from '@angular/core'
-import { Solicitation } from '@/core/domain/models/Solicitation'
 
-describe('Table', () => {
-  let component: Table<Solicitation>
-  let fixture: ComponentFixture<Table<Solicitation>>
+describe('SolicitationDialog', () => {
+  let component: SolicitationDialog
+  let fixture: ComponentFixture<SolicitationDialog>
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Table],
+      imports: [SolicitationDialog],
       providers: [provideZonelessChangeDetection()],
     }).compileComponents()
 
-    fixture = TestBed.createComponent(Table)
+    fixture = TestBed.createComponent(SolicitationDialog)
     component = fixture.componentInstance
     fixture.detectChanges()
   })

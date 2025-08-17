@@ -1,5 +1,6 @@
+import { Solicitation } from '@/core/domain/models/Solicitation'
 import { CurrencyPipe, DatePipe, NgClass, AsyncPipe } from '@angular/common'
-import { Component, input } from '@angular/core'
+import { Component, input, output } from '@angular/core'
 import { Observable } from 'rxjs'
 
 export interface TableColumn<T> {
@@ -13,28 +14,27 @@ export interface TableColumn<T> {
   imports: [CurrencyPipe, DatePipe, NgClass, AsyncPipe],
   templateUrl: './table.html',
 })
-export class Table<
-  T extends Record<string, string | number | Date> = Record<string, string | number | Date>,
-> {
+export class Table<T extends Solicitation> {
   data$ = input.required<Observable<T[]>>()
   tableColumns = input.required<TableColumn<T>[]>()
+  rowClick = output<T>()
+
+  handleRowClick(item: T): void {
+    this.rowClick.emit(item)
+  }
 
   get observableData() {
     return this.data$()
   }
 
-  getColumns(): { key: string; label: string; type: string }[] {
+  getColumns(): TableColumn<T>[] {
     const customColumns = this.tableColumns()
 
     if (!customColumns || !(customColumns.length > 0)) {
       return []
     }
 
-    return customColumns.map((column) => ({
-      key: column.key as string,
-      label: column.label,
-      type: column.type,
-    }))
+    return customColumns
   }
 
   getValue<K extends keyof T>(item: T, key: K): T[K] {

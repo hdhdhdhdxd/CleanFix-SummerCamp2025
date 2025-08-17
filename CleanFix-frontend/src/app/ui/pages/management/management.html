@@ -1,31 +1,36 @@
-<div class="flex min-h-screen items-stretch justify-center bg-brand-100 p-5">
+<div class="flex min-h-screen items-stretch justify-center bg-brand-100 p-1 md:p-5">
   <section class="mx-auto flex w-full flex-col rounded-lg bg-brand-0">
-    <header class="flex flex-wrap items-center justify-between px-7 pt-5 pb-5">
-      <div>
-        <h1 class="text-4xl font-bold text-brand-700">Administración</h1>
-        <p class="text-xl font-medium text-brand-600">
-          Solicitudes, Incidencias y Trabajos en Proceso
+    <header
+      class="flex flex-col gap-4 px-4 pt-4 pb-4 sm:flex-row sm:items-center sm:justify-between sm:px-7 sm:pt-5 sm:pb-5"
+    >
+      <div class="flex-1">
+        <h1 class="text-2xl font-bold text-brand-700 sm:text-4xl">Administración</h1>
+        <p class="text-base font-medium text-brand-600 sm:text-xl">
+          Solicitudes, Incidencias y Historal de Trabajos
         </p>
       </div>
       <a
         href="/home"
-        class="inline-flex items-center gap-2.5 rounded-xl px-3 py-2 text-brand-500 transition-colors hover:bg-brand-50 hover:text-brand-700"
+        class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-50 px-4 py-3 text-brand-600 transition-colors hover:bg-brand-100 hover:text-brand-700 sm:w-auto sm:justify-start sm:bg-transparent sm:px-3 sm:py-2"
       >
-        <app-svg [svgClass]="'hover:text-brand-900'" home-icon />
-        <span class="text-lg font-medium">Volver al Inicio</span>
+        <app-svg [svgClass]="'text-current'" home-icon />
+        <span class="text-sm font-medium sm:text-lg">Volver al Inicio</span>
       </a>
     </header>
 
-    <nav class="relative px-7">
-      <ul #tabsContainer class="relative flex flex-wrap space-x-16 text-xl text-brand-500">
+    <nav class="relative px-4 sm:px-7">
+      <ul
+        #tabsContainer
+        class="no-scrollbar relative flex overflow-x-auto text-sm text-brand-500 sm:flex-wrap sm:gap-0 sm:space-x-16 sm:overflow-x-visible sm:text-xl"
+      >
         @for (tab of tabs; track $index) {
-          <li class="relative py-1">
+          <li class="relative flex-shrink-0 py-1 pr-8 sm:pr-0">
             <a
               [routerLink]="tab.route"
               class="group"
               (click)="navigateWithTransition(tab.route, $event)"
             >
-              <div class="flex items-center gap-2.5 transition-colors">
+              <div class="flex items-center gap-2 transition-colors sm:gap-2.5">
                 @switch (tab.icon) {
                   @case ('building') {
                     <app-svg
@@ -64,7 +69,7 @@
               </div>
             </a>
             <div
-              class="nav-bar-indicator absolute right-0 bottom-0 left-0 h-1 rounded-full bg-brand-700 transition-all duration-300 ease-out"
+              class="nav-bar-indicator absolute right-8 bottom-0 left-0 h-1 rounded-full bg-brand-700 transition-all duration-300 ease-out sm:right-0"
               [class.opacity-100]="isActive(tab.route)"
               [class.opacity-0]="!isActive(tab.route)"
             ></div>

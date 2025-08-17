@@ -38,7 +38,10 @@
             </thead>
             <tbody class="divide-y divide-brand-200 bg-white text-brand-600">
               @for (item of items; track $index) {
-                <tr class="hover:bg-brand-50">
+                <tr
+                  class="cursor-pointer transition-colors hover:bg-brand-50"
+                  (click)="handleRowClick(item)"
+                >
                   @for (column of getColumns(); track column.key) {
                     <td class="px-3 py-3 text-xs whitespace-nowrap sm:text-sm">
                       @switch (column.type) {
@@ -75,9 +78,17 @@
         </div>
       </div>
       <!-- Mobile Table -->
-      <div class="flex-1 space-y-3 overflow-auto p-4 sm:hidden">
+      <div class="flex-1 space-y-3 overflow-auto sm:hidden">
         @for (item of items; track $index) {
-          <div class="rounded-lg border border-brand-200 bg-white p-4 shadow-sm">
+          <div
+            class="cursor-pointer rounded-lg border border-brand-200 bg-white p-4 shadow-sm transition-colors hover:bg-brand-50"
+            (click)="handleRowClick(item)"
+            (keydown.enter)="handleRowClick(item)"
+            (keydown.space)="handleRowClick(item)"
+            tabindex="0"
+            role="button"
+            [attr.aria-label]="'Ver detalles del elemento ' + ($index + 1)"
+          >
             @for (column of getColumns(); track column.key) {
               <div
                 class="flex items-center justify-between border-b border-brand-100 py-2 last:border-b-0"
@@ -118,10 +129,33 @@
 
     <!-- Footer -->
     <div
-      class="mt-4 flex items-center justify-between border-t border-brand-200 bg-white px-3 py-3 sm:px-6"
+      class="mt-4 flex flex-col gap-3 border-t border-brand-200 bg-white px-3 py-3 sm:flex-row sm:items-center sm:justify-end sm:gap-0 sm:space-x-5 sm:px-6"
     >
-      <div class="flex items-center text-xs text-brand-500 sm:text-sm">
-        <span>{{ items.length }} elementos</span>
+      <!-- Selector de registros por página -->
+      <div class="flex items-center justify-center space-x-1.5">
+        <span class="text-xs text-brand-500 sm:text-sm">Registros por página</span>
+        <div class="relative">
+          <select
+            class="rounded-lg border border-brand-300 bg-white px-1 py-2 text-xs text-brand-700 transition-all duration-200 hover:border-brand-400 focus:outline-none sm:text-sm"
+          >
+            <option>5</option>
+            <option>10</option>
+            <option>15</option>
+            <option>20</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between space-x-5">
+        <span class="text-xs text-brand-500 sm:text-sm">1 - 5 de 20</span>
+        <div class="flex items-center space-x-3 sm:space-x-3">
+          <button class="rounded-full bg-brand-50 p-3 transition-colors hover:bg-brand-200 sm:p-2">
+            <img src="/svg/arrow-left.svg" alt="Previous" class="h-5 w-5 sm:h-auto sm:w-auto" />
+          </button>
+          <button class="rounded-full bg-brand-50 p-3 transition-colors hover:bg-brand-200 sm:p-2">
+            <img src="/svg/arrow-right.svg" alt="Next" class="h-5 w-5 sm:h-auto sm:w-auto" />
+          </button>
+        </div>
       </div>
     </div>
   }
