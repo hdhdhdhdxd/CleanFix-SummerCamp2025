@@ -1,4 +1,5 @@
-﻿using Domain.Common.Interfaces;
+﻿using System.Reflection;
+using Domain.Common.Interfaces;
 using Domain.Entities;
 using Infrastructure.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -24,4 +25,10 @@ public class DatabaseContext : DbContext, IDatabaseContext
     public DbSet<Solicitation> Solicitations { get; set; }
     public DbSet<Request> Requests { get; set; }
     public DbSet<Incidence> Incidences { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+    }
 }

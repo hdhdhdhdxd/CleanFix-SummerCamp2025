@@ -25,8 +25,6 @@ public class CreateCompanyCommandHandler : IRequestHandler<CreateCompanyCommand,
     public async Task<int> Handle(CreateCompanyCommand request, CancellationToken cancellationToken)
     {
         var company = _mapper.Map<Company>(request.Company);
-        if (company.Id == 0)
-            company.Id = 0; // El Id será autoincremental en la base de datos
         
         _companyRepository.Add(company);
         

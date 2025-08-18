@@ -1,0 +1,11 @@
+/* View Transition API */
+
+@view-transition {
+  navigation: auto;
+}
+
+/* Navigation Bar - ManagementPage */
+
+.nav-bar-indicator.opacity-100 {
+  view-transition-name: nav-bar-slide;
+}

@@ -83,7 +83,7 @@ using (var scope = app.Services.CreateScope())
 
         // Crear 10 solicitudes
         var solicitationFaker = new Faker<Solicitation>()
-            .RuleFor(e => e.Apartment, f => apartments[f.Random.Int(0, apartments.Count - 1)])
+            .RuleFor(e => e.ApartmentId, f => Guid.NewGuid())
             .RuleFor(e => e.Company, f => companies[f.Random.Int(0, companies.Count - 1)])
             .RuleFor(e => e.Date, f => f.Date.Recent())
             .RuleFor(e => e.Price, f => f.Random.Float(50, 1000))
@@ -114,7 +114,8 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.Date, f => f.Date.Recent())
             .RuleFor(e => e.Status, f => f.Random.Word())
             .RuleFor(e => e.Description, f => f.Lorem.Sentence())
-            .RuleFor(e => e.Priority, f => f.PickRandom<Priority>());
+            .RuleFor(e => e.Priority, f => f.PickRandom<Priority>())
+            .RuleFor(e => e.ApartmentId, f => Guid.NewGuid());
         var incidences = incidenceFaker.Generate(10);
         db.Incidences.AddRange(incidences);
         db.SaveChanges();

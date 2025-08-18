@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Solicitation } from '@/core/domain/models/Solicitation'
 import { CurrencyPipe, DatePipe, NgClass, AsyncPipe } from '@angular/common'
-import { Component, input } from '@angular/core'
+import { Component, input, output } from '@angular/core'
 import { Observable } from 'rxjs'
 
 export interface TableColumn<T> {
@@ -14,38 +14,48 @@ export interface TableColumn<T> {
   imports: [CurrencyPipe, DatePipe, NgClass, AsyncPipe],
   templateUrl: './table.html',
 })
-export class Table<T extends Record<string, any> = Record<string, any>> {
+export class Table<T extends Solicitation> {
   data$ = input.required<Observable<T[]>>()
   tableColumns = input.required<TableColumn<T>[]>()
+  rowClick = output<T>()
+
+  handleRowClick(item: T): void {
+    this.rowClick.emit(item)
+  }
 
   get observableData() {
     return this.data$()
   }
 
-  getColumns(): { key: string; label: string; type: string }[] {
+  getColumns(): TableColumn<T>[] {
     const customColumns = this.tableColumns()
 
     if (!customColumns || !(customColumns.length > 0)) {
       return []
     }
 
-    return customColumns.map((column) => ({
-      key: column.key as string,
-      label: column.label,
-      type: column.type,
-    }))
+    return customColumns
   }
 
-  getValue(item: T, key: string): any {
+  getValue<K extends keyof T>(item: T, key: K): T[K] {
     return item[key]
   }
 
-  getKeys(item: T): string[] {
-    return Object.keys(item)
+  getCurrencyValue<K extends keyof T>(item: T, key: K): number {
+    return this.getValue(item, key) as number
+  }
+
+  getDateValue<K extends keyof T>(item: T, key: K): Date {
+    return this.getValue(item, key) as Date
+  }
+
+  getStringValue<K extends keyof T>(item: T, key: K): string {
+    return String(this.getValue(item, key))
   }
 
   getStatusClass(status: string): string {
-    switch (status.toLowerCase()) {
+    const statusStr = status.toLowerCase()
+    switch (statusStr) {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800'
       case 'in_progress':
@@ -57,5 +67,9 @@ export class Table<T extends Record<string, any> = Record<string, any>> {
       default:
         return 'bg-gray-100 text-gray-800'
     }
+  }
+
+  hasData(items: T[] | null): boolean {
+    return Boolean(items && items.length > 0)
   }
 }

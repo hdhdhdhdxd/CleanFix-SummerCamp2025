@@ -9,7 +9,8 @@ public class Incidence : IEntity
     public DateTime Date { get; set; } // Fecha de la incidencia
     public string Status { get; set; } // Estado de la incidencia (e.g., "Pendiente", "En Progreso", "Resuelta")
     public string Description { get; set; } // Descripción de la incidencia
-    public Apartment? Apartment { get; set; } // Apartamento asociado a la incidencia
+    public Guid ApartmentId { get; set; } // Apartamento asociado a la incidencia
+    public int Surface { get; set; } // Superficie del apartamento
     public Priority Priority { get; set; } // Prioridad de la incidencia (e.g., "Baja", "Media", "Alta", "Crítica")
 }
 

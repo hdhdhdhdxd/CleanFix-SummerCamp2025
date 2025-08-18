@@ -1,8 +1,13 @@
 <article
-  class="image-card flex h-[28rem] min-h-[200px] w-[17rem] items-end bg-cover bg-center"
-  [ngStyle]="{ 'background-image': 'url(' + imageUrl() + ')' }"
+  class="image-card relative flex h-[28rem] min-h-[200px] w-[17rem] items-end overflow-hidden"
 >
-  <header class="w-full bg-black/40 p-4">
+  <img
+    [src]="imageUrl()"
+    [alt]="title()"
+    loading="lazy"
+    class="absolute inset-0 -z-10 h-full w-full object-cover object-center"
+  />
+  <header class="relative z-10 w-full bg-black/40 p-4">
     <h1 class="m-0 text-white">{{ title() }}</h1>
   </header>
 </article>

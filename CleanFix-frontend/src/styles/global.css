@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './preflight.css' layer(base);
+@import './animations.css' layer(base);
 
 @theme {
   --font-fallback:
@@ -12,16 +13,16 @@
   --color-accent-500: oklch(0.8263 0.1634 90.12);
 
   --color-brand-0: oklch(1 0 0);
-  --color-brand-50: oklch(0.9682 0.0017 325.59);
-  --color-brand-100: oklch(0.9373 0.0013 286.37);
-  --color-brand-200: oklch(0.8721 0.0035 325.61);
-  --color-brand-300: oklch(0.8071 0.0047 314.8);
-  --color-brand-400: oklch(0.7393 0.0072 325.65);
-  --color-brand-500: oklch(0.6715 0.0086 319.45);
-  --color-brand-600: oklch(0.4705 0.0054 314.77);
-  --color-brand-700: oklch(0.3627 0.0043 325.67);
-  --color-brand-800: oklch(0.245 0.0024 325.65);
-  --color-brand-900: oklch(0.0969 0 0);
+  --color-brand-50: oklch(0.97 0.01 251);
+  --color-brand-100: oklch(0.94 0.015 251);
+  --color-brand-200: oklch(0.88 0.02 251);
+  --color-brand-300: oklch(0.82 0.025 251);
+  --color-brand-400: oklch(0.76 0.03 251);
+  --color-brand-500: oklch(0.7 0.035 251);
+  --color-brand-600: oklch(0.55 0.04 251);
+  --color-brand-700: oklch(0.4 0.045 251);
+  --color-brand-800: oklch(0.25 0.035 251);
+  --color-brand-900: oklch(0.1 0.02 251);
 }
 
 @layer utilities {
@@ -35,6 +36,16 @@
     /* IE and Edge */
     scrollbar-width: none;
     /* Firefox */
+  }
+
+  /* Clase adicional para ocultar scrollbar en dialogs */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
   .min-h-screen {

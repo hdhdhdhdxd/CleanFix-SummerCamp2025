@@ -27,7 +27,7 @@ export class Management implements OnInit, AfterViewInit {
       route: '/management/incidences',
     },
     {
-      label: 'Trabajos en Proceso',
+      label: 'Historial de Trabajos',
       icon: 'wrench',
       route: '/management/requests',
     },
@@ -54,6 +54,20 @@ export class Management implements OnInit, AfterViewInit {
 
   isActive(tabRoute: string): boolean {
     return this.currentRoute.startsWith(tabRoute)
+  }
+
+  navigateWithTransition(route: string, event: Event): void {
+    event.preventDefault()
+
+    // Verificar si el navegador soporta View Transition API
+    if (!('startViewTransition' in document)) {
+      this.router.navigate([route])
+      return
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ;(document as any).startViewTransition(() => {
+      this.router.navigate([route])
+    })
   }
 
   private updateActiveTab(): void {

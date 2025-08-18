@@ -4,6 +4,17 @@
   </div>
 
   <div class="mx-7 mb-5 flex-1 overflow-hidden">
-    <app-table [data$]="solicitations$" [tableColumns]="columns" />
+    <app-table
+      [data$]="solicitations$"
+      [tableColumns]="columns"
+      (rowClick)="handleRowClick($event)"
+    />
   </div>
+
+  @if (showDialog && selectedSolicitation) {
+    <app-solicitation-dialog
+      [selectedSolicitation]="selectedSolicitation"
+      (closeDialog)="handleCloseDialog()"
+    />
+  }
 </div>
