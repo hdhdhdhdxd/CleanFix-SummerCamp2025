@@ -23,7 +23,7 @@ public class DeleteMaterialCommandHandler : IRequestHandler<DeleteMaterialComman
         if (material == null)
             return false;
 
-        _materialRepository.Add(material);
+        _materialRepository.Remove(material);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
