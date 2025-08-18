@@ -753,7 +753,6 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        // 🔧 1. Crear el kernel y configurar Azure OpenAI
         var builder = Kernel.CreateBuilder();
         builder.AddAzureOpenAIChatCompletion(
             deploymentName: "gpt-4.1",
@@ -761,17 +760,14 @@ class Program
             apiKey: "9ZMpVj9cCWRyv73s8vyxd0RL93ELHrtmNwN68ZPxRlDgBDjEgxR0JQQJ99BHACHYHv6XJ3w3AAAAACOGEv9e"
         );
 
-        // 🔌 2. Agregar plugins personalizados: base de datos y facturación
         var dbPlugin = new DBPluginTest("Server=tcp:devdemoserverbbdd.database.windows.net,1433;Initial Catalog=devdemobbdd2;Persist Security Info=False;User ID=admsql;Password=P@ssw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
         builder.Plugins.AddFromObject(dbPlugin, "DBPlugin");
 
         var facturaPlugin = new FacturaPluginTest();
         builder.Plugins.AddFromObject(facturaPlugin, "FacturaPlugin");
 
-        // 🧠 3. Construir el kernel con los plugins y configuración
         var kernel = builder.Build();
 
-        // 🏢 4. Obtener lista de empresas desde el plugin de base de datos
         var empresasIA = await kernel.InvokeAsync("DBPlugin", "GetAllEmpresas");
         var empresasResponse = empresasIA.GetValue<EmpresaResponse>();
 
@@ -782,9 +778,8 @@ class Program
         }
 
         var companies = empresasResponse.Data;
-        var empresasJson = JsonSerializer.Serialize(companies); // Se usa para el prompt
+        var empresasJson = JsonSerializer.Serialize(companies);
 
-        // 🧱 5. Obtener lista de materiales desde el plugin de base de datos
         var materialesIA = await kernel.InvokeAsync("DBPlugin", "GetAllMaterials");
         var materialesResponse = materialesIA.GetValue<MaterialResponse>();
 
@@ -795,9 +790,8 @@ class Program
         }
 
         var materials = materialesResponse.Data;
-        var materialesJson = JsonSerializer.Serialize(materials); // Se usa para el prompt
+        var materialesJson = JsonSerializer.Serialize(materials);
 
-        // 🗣️ 6. Definir el prompt para responder preguntas generales
         var promptTemplate = @"
 Eres un asistente inteligente que responde preguntas sobre empresas y materiales.
 
@@ -819,10 +813,8 @@ Responde de forma clara y útil. Si la pregunta no tiene relación con los datos
 
         var promptFunction = kernel.CreateFunctionFromPrompt(promptTemplate);
 
-        // 👋 7. Mensaje de bienvenida
         Console.WriteLine("👋 ¡Hola! Soy CleanFixBot. Escribe 'factura' para generar una manualmente, o hazme una pregunta.");
 
-        // 🔁 8. Bucle principal de interacción con el usuario
         while (true)
         {
             Console.Write("> ");
@@ -830,11 +822,9 @@ Responde de forma clara y útil. Si la pregunta no tiene relación con los datos
             if (string.IsNullOrEmpty(userInput)) continue;
             if (userInput.Equals("salir", StringComparison.OrdinalIgnoreCase)) break;
 
-            // 🤖 9. Generación automática de factura si se detecta intención
             if ((userInput.Equals("factura", StringComparison.OrdinalIgnoreCase) ||
                  userInput.Equals("crear factura", StringComparison.OrdinalIgnoreCase)))
             {
-                // 👉 Prioridad para generación manual
                 Console.WriteLine("Introduce el ID de la empresa:");
                 var idEmp = Console.ReadLine()?.Trim();
                 var empresa = companies.FirstOrDefault(e => e.Id.ToString() == idEmp);
@@ -843,24 +833,22 @@ Responde de forma clara y útil. Si la pregunta no tiene relación con los datos
                 var selMat = new List<Material>();
                 while (true)
                 {
-                    Console.WriteLine("ID del material a añadir (o 'fin'):");
+                    Console.WriteLine("ID del material a añadir (o 'fin' para terminar la factura):");
                     var idMatInput = Console.ReadLine()?.Trim();
                     if (idMatInput?.Equals("fin", StringComparison.OrdinalIgnoreCase) == true) break;
 
                     if (int.TryParse(idMatInput, out int idMat))
                     {
-                        var mat = materials.FirstOrDefault(m => m.Id == idMat);
+                        var mat = materials.FirstOrDefault(m => m.Id == idMat && m.Issue == empresa.Type);
                         if (mat != null)
                         {
                             selMat.Add(mat);
                             Console.WriteLine($"✅ Añadido: {mat.Name}");
                         }
-                        else Console.WriteLine("❌ Material no encontrado.");
+                        else Console.WriteLine("❌ Material no encontrado o no pertenece a la empresa.");
                     }
                     else Console.WriteLine("❌ ID inválido.");
                 }
-
-                if (selMat.Count == 0) { Console.WriteLine("❌ No se seleccionaron materiales."); continue; }
 
                 await MostrarFacturaAsync(kernel, empresa, selMat);
                 continue;
@@ -875,18 +863,31 @@ Responde de forma clara y útil. Si la pregunta no tiene relación con los datos
                     .OrderBy(e => e.Price)
                     .FirstOrDefault();
 
-                var materialesSeleccionados = materials
-                    .Where(m => (!tipoMaterial.HasValue || m.Issue == tipoMaterial.Value) && m.Available)
-                    .ToList();
-
-                if (empresa == null || materialesSeleccionados.Count == 0)
+                if (empresa == null)
                 {
-                    Console.WriteLine("❌ No se encontró empresa o materiales válidos para generar la factura.");
+                    Console.WriteLine("❌ No se encontró una empresa válida.");
                     continue;
                 }
 
-                // 🟡 Confirmación antes de generar
-                Console.WriteLine($"🧾 Se ha seleccionado la empresa '{empresa.Name}' y {materialesSeleccionados.Count} materiales disponibles.");
+                List<Material> materialesSeleccionados = new();
+
+                if (!SolicitaSoloEmpresa(userInput))
+                {
+                    materialesSeleccionados = FiltrarMaterialesParaEmpresa(empresa, materials, tipoMaterial);
+
+                    if (materialesSeleccionados.Count == 0)
+                    {
+                        Console.WriteLine("❌ No hay materiales disponibles para esta empresa.");
+                        continue;
+                    }
+
+                    Console.WriteLine($"🧾 Se ha seleccionado la empresa '{empresa.Name}' y {materialesSeleccionados.Count} materiales disponibles.");
+                }
+                else
+                {
+                    Console.WriteLine($"🧾 Se ha seleccionado la empresa '{empresa.Name}' sin materiales.");
+                }
+
                 Console.WriteLine("¿Deseas generar la factura con esta información? (sí/no)");
                 var confirmacion = Console.ReadLine()?.Trim().ToLower();
 
@@ -902,7 +903,6 @@ Responde de forma clara y útil. Si la pregunta no tiene relación con los datos
                 continue;
             }
 
-            // ❓ 11. Preguntas generales respondidas por el modelo usando el prompt
             var kernelArgs = new KernelArguments
             {
                 ["empresas"] = empresasJson,
@@ -914,7 +914,7 @@ Responde de forma clara y útil. Si la pregunta no tiene relación con los datos
             Console.WriteLine($"\n🧠 CleanFixBot: {responseData.GetValue<string>()}\n");
         }
     }
-    // 📄 Método para mostrar factura y desglose de IVA
+
     private static async Task MostrarFacturaAsync(Kernel kernel, Company empresa, List<Material> materiales)
     {
         var resFac = await kernel.InvokeAsync("FacturaPlugin", "GenerarFactura", new()
@@ -936,19 +936,42 @@ Responde de forma clara y útil. Si la pregunta no tiene relación con los datos
         Console.WriteLine(resIVA.GetValue<string>());
         Console.WriteLine("------------------------------------\n");
     }
-    // 🧠 Detecta si el usuario quiere generar una factura
+
     private static bool ContieneIntencionDeFactura(string input)
     {
         var palabrasClave = new[] { "hazme", "crea", "genera", "factura", "pedido", "compra" };
         return palabrasClave.Any(p => input.Contains(p, StringComparison.OrdinalIgnoreCase));
     }
-    // 🔍 Extrae el tipo solicitado desde el texto del usuario
+
     private static int? ExtraerTipo(string input, string entidad)
     {
-        var match = Regex.Match(input, $@"{entidad}.*tipo\s*(\d+)", RegexOptions.IgnoreCase);
-        if (match.Success && int.TryParse(match.Groups[1].Value, out int tipo))
-            return tipo;
-
+        var sinonimos = new[] { entidad, $"{entidad}s", "productos", "insumos" };
+        foreach (var palabra in sinonimos)
+        {
+            var match = Regex.Match(input, $@"{palabra}\s*(?:del\s*tipo|de\s*tipo|tipo)?\s*(\d+)", RegexOptions.IgnoreCase);
+            if (match.Success && int.TryParse(match.Groups[1].Value, out int tipo))
+                return tipo;
+        }
         return null;
+    }
+
+    private static List<Material> FiltrarMaterialesParaEmpresa(Company empresa, List<Material> materiales, int? tipoMaterial)
+    {
+        return materiales
+            .Where(m =>
+                m.Available &&
+                (
+                    tipoMaterial.HasValue
+                        ? m.Issue == tipoMaterial.Value
+                        : m.Issue == empresa.Type
+                )
+            )
+            .ToList();
+    }
+
+    private static bool SolicitaSoloEmpresa(string input)
+    {
+        var palabrasMateriales = new[] { "material", "materiales", "producto", "productos", "insumo", "insumos" };
+        return !palabrasMateriales.Any(p => input.Contains(p, StringComparison.OrdinalIgnoreCase));
     }
 }
