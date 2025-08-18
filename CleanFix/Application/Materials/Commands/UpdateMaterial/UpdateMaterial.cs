@@ -27,7 +27,7 @@ public class UpdateMaterialCommandHandler : IRequestHandler<UpdateMaterialComman
     {
         var material = _mapper.Map<Material>(request.Material);
         
-        _materialRepository.Add(material);
+        _materialRepository.Update(material);
         
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
