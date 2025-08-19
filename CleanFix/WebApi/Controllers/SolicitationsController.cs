@@ -20,7 +20,7 @@ namespace WebApi.Controllers
             _sender = sender;
         }
 
-        // GET: api/Solicitations/paginated
+        // GET: api/solicitations/paginated
         [HttpGet("paginated")]
         public async Task<ActionResult<IEnumerable<GetPaginatedSolicitationDto>>> GetPaginatedSolicitations([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
@@ -28,7 +28,7 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        // GET: api/Solicitations
+        // GET: api/solicitations
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetSolicitationsDto>>> GetSolicitations()
         {
@@ -36,7 +36,7 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        // GET: api/Solicitations/{id}
+        // GET: api/solicitations/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<GetSolicitationDto>> GetSolicitation(int id)
         {
@@ -46,7 +46,7 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        // POST: api/Solicitations
+        // POST: api/solicitations
         [HttpPost]
         public async Task<ActionResult<int>> PostSolicitation([FromBody] CreateSolicitationDto solicitationDto)
         {
@@ -59,7 +59,7 @@ namespace WebApi.Controllers
             );
         }
 
-        // PUT: api/Solicitations/{id}
+        // PUT: api/solicitations/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSolicitation(int id, [FromBody] UpdateSolicitationDto solicitationDto)
         {
@@ -71,7 +71,7 @@ namespace WebApi.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Solicitations/{id}
+        // DELETE: api/solicitations/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSolicitation(int id)
         {

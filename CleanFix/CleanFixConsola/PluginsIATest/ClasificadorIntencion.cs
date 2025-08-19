@@ -12,6 +12,8 @@ public enum IntencionUsuario
     Desconocida
 }
 
+
+//Detección de la intención del usuario basada en el texto de entrada
 public static class ClasificadorIntencion
 {
     public static IntencionUsuario Clasificar(string input)

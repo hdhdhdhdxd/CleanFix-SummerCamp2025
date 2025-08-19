@@ -21,10 +21,10 @@ public static class DependencyInjection
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         builder.Services.AddScoped<IApartmentRepository, ApartmentService>();
-        builder.Services.AddScoped<ISolicitationRepository, SolicitationService>();
         builder.Services.AddScoped<ICompanyRepository, CompanyService>();
         builder.Services.AddScoped<IMaterialRepository, MaterialService>();
-        builder.Services.AddScoped<IRequestRepository, RequestService>();
+        builder.Services.AddScoped<ISolicitationRepository, SolicitationService>();
         builder.Services.AddScoped<IIncidenceRepository, IncidenceService>();
+        builder.Services.AddScoped<ICompletedTaskRepository, CompletedTaskService>();  // Si hay error, comentar esta línea
     }
 }

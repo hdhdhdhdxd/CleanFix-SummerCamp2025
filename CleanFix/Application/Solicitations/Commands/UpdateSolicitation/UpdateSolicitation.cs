@@ -25,10 +25,10 @@ public class UpdateSolicitationCommandHandler : IRequestHandler<UpdateSolicitati
 
     public async Task Handle(UpdateSolicitationCommand request, CancellationToken cancellationToken)
     {
-        var solicitation = _mapper.Map<Solicitation>(request.Solicitation);
-
-        _solicitationRepository.Update(solicitation);
-
+        var entity = _mapper.Map<Solicitation>(request.Solicitation);
+        
+        _solicitationRepository.Update(entity);
+        
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

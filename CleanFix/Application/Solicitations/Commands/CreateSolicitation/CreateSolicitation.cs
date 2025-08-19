@@ -24,15 +24,14 @@ public class CreateSolicitationCommandHandler : IRequestHandler<CreateSolicitati
 
     public async Task<int> Handle(CreateSolicitationCommand request, CancellationToken cancellationToken)
     {
-        var solicitation = _mapper.Map<Solicitation>(request.Solicitation);
-
-        if (solicitation.Id == 0)
-            solicitation.Id = 0;
-
-        _solicitationRepository.Add(solicitation);
-
+        var entity = _mapper.Map<Solicitation>(request.Solicitation);
+        if (entity.Id == 0)
+            entity.Id = 0;
+        
+        _solicitationRepository.Add(entity);
+        
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return solicitation.Id;
+        
+        return entity.Id;
     }
 }

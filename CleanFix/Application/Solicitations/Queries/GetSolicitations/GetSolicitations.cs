@@ -20,10 +20,10 @@ public class GetSolicitationsQueryHandler : IRequestHandler<GetSolicitationsQuer
 
     public async Task<List<GetSolicitationsDto>> Handle(GetSolicitationsQuery request, CancellationToken cancellationToken)
     {
-        var solicitations = await _solicitationRepository.GetAll()
+        var entities = await _solicitationRepository.GetAll()
             .AsNoTracking()
             .ToListAsync(cancellationToken);
-        var result = _mapper.Map<List<GetSolicitationsDto>>(solicitations);
+        var result = _mapper.Map<List<GetSolicitationsDto>>(entities);
         return result;
     }
 }

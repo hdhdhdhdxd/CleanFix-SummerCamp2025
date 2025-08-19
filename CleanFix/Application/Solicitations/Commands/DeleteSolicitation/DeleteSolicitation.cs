@@ -18,12 +18,12 @@ public class DeleteSolicitationCommandHandler : IRequestHandler<DeleteSolicitati
 
     public async Task<bool> Handle(DeleteSolicitationCommand request, CancellationToken cancellationToken)
     {
-        var solicitation = await _solicitationRepository.GetByIdAsync(request.Id);
+        var entity = await _solicitationRepository.GetByIdAsync(request.Id);
 
-        if (solicitation == null)
+        if (entity == null)
             return false;
 
-        _solicitationRepository.Remove(solicitation);
+        _solicitationRepository.Remove(entity);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
