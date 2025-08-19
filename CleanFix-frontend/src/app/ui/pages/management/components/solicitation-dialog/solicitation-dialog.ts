@@ -1,6 +1,6 @@
 import { Solicitation } from '@/core/domain/models/Solicitation'
 import { CurrencyPipe, DatePipe } from '@angular/common'
-import { Component, input, output, ViewChild, ElementRef, AfterViewInit } from '@angular/core'
+import { AfterViewInit, Component, ElementRef, input, output, ViewChild } from '@angular/core'
 
 @Component({
   selector: 'app-solicitation-dialog',

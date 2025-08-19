@@ -3,31 +3,31 @@ using AutoMapper;
 using Domain.Entities;
 using MediatR;
 
-namespace Application.Solicitations.Commands.UpdateSolicitation;
+namespace Application.CompletedTasks.Commands.UpdateCompletedTask;
 
-public record UpdateSolicitationCommand : IRequest
+public record UpdateCompletedTaskCommand : IRequest
 {
-    public UpdateSolicitationDto Solicitation { get; init; }
+    public UpdateCompletedTaskDto CompletedTask { get; init; }
 }
 
-public class UpdateSolicitationCommandHandler : IRequestHandler<UpdateSolicitationCommand>
+public class UpdateCompletedTaskCommandHandler : IRequestHandler<UpdateCompletedTaskCommand>
 {
-    private readonly ISolicitationRepository _solicitationRepository;
+    private readonly ICompletedTaskRepository _completedTaskRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public UpdateSolicitationCommandHandler(ISolicitationRepository solicitationRepository, IUnitOfWork unitOfWork, IMapper mapper)
+    public UpdateCompletedTaskCommandHandler(ICompletedTaskRepository completedTaskRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _solicitationRepository = solicitationRepository;
+        _completedTaskRepository = completedTaskRepository;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
-    public async Task Handle(UpdateSolicitationCommand request, CancellationToken cancellationToken)
+    public async Task Handle(UpdateCompletedTaskCommand request, CancellationToken cancellationToken)
     {
-        var solicitation = _mapper.Map<Solicitation>(request.Solicitation);
+        var completedTask = _mapper.Map<CompletedTask>(request.CompletedTask);
 
-        _solicitationRepository.Update(solicitation);
+        _completedTaskRepository.Update(completedTask);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }

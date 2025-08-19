@@ -22,7 +22,7 @@ public class DatabaseContext : DbContext, IDatabaseContext
     public DbSet<Material> Materials { get; set; }
     public DbSet<Apartment> Apartments { get; set; }
     public DbSet<User> Users { get; set; }
-    public DbSet<Solicitation> Solicitations { get; set; }
+    public DbSet<CompletedTask> CompletedTasks { get; set; }
     public DbSet<Request> Requests { get; set; }
     public DbSet<Incidence> Incidences { get; set; }
 

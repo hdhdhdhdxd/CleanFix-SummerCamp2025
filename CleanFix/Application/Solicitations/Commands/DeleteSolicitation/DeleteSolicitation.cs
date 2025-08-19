@@ -1,29 +1,29 @@
 using Application.Common.Interfaces;
 using MediatR;
 
-namespace Application.Solicitations.Commands.DeleteSolicitation;
+namespace Application.CompletedTasks.Commands.DeleteCompletedTask;
 
-public record DeleteSolicitationCommand(int Id) : IRequest<bool>;
+public record DeleteCompletedTaskCommand(int Id) : IRequest<bool>;
 
-public class DeleteSolicitationCommandHandler : IRequestHandler<DeleteSolicitationCommand, bool>
+public class DeleteCompletedTaskCommandHandler : IRequestHandler<DeleteCompletedTaskCommand, bool>
 {
-    private readonly ISolicitationRepository _solicitationRepository;
+    private readonly ICompletedTaskRepository _completedTaskRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public DeleteSolicitationCommandHandler(ISolicitationRepository solicitationRepository, IUnitOfWork unitOfWork)
+    public DeleteCompletedTaskCommandHandler(ICompletedTaskRepository completedTaskRepository, IUnitOfWork unitOfWork)
     {
-        _solicitationRepository = solicitationRepository;
+        _completedTaskRepository = completedTaskRepository;
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<bool> Handle(DeleteSolicitationCommand request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteCompletedTaskCommand request, CancellationToken cancellationToken)
     {
-        var solicitation = await _solicitationRepository.GetByIdAsync(request.Id);
+        var completedTask = await _completedTaskRepository.GetByIdAsync(request.Id);
 
-        if (solicitation == null)
+        if (completedTask == null)
             return false;
 
-        _solicitationRepository.Remove(solicitation);
+        _completedTaskRepository.Remove(completedTask);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 

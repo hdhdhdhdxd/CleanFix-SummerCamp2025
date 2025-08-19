@@ -4,9 +4,9 @@ using Infrastructure.Common.Interfaces;
 using Infrastructure.Repositories;
 namespace WebApi.Services;
 
-public class SolicitationService : Repository<Solicitation>, ISolicitationRepository
+public class CompletedTaskService : Repository<CompletedTask>, ICompletedTaskRepository
 {
-    public SolicitationService(IDatabaseContext database) : base(database)
+    public CompletedTaskService(IDatabaseContext database) : base(database)
     {
     }
 }

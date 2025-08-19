@@ -23,7 +23,7 @@ export class Solicitations {
     { key: 'address', label: 'Dirección', type: 'text' },
     { key: 'description', label: 'Descripción', type: 'text' },
     { key: 'type', label: 'Tipo', type: 'text' },
-    { key: 'cost', label: 'Coste', type: 'currency' },
+    { key: 'maintenanceCost', label: 'Coste', type: 'currency' },
     { key: 'date', label: 'Fecha', type: 'date' },
     { key: 'status', label: 'Estado', type: 'status' },
   ]

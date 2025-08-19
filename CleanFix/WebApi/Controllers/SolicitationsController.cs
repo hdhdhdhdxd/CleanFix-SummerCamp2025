@@ -1,81 +1,81 @@
-using Application.Solicitations.Queries.GetPaginatedSolicitations;
-using Application.Solicitations.Queries.GetSolicitations;
-using Application.Solicitations.Queries.GetSolicitation;
-using Application.Solicitations.Commands.CreateSolicitation;
-using Application.Solicitations.Commands.UpdateSolicitation;
-using Application.Solicitations.Commands.DeleteSolicitation;
+using Application.CompletedTasks.Queries.GetPaginatedCompletedTasks;
+using Application.CompletedTasks.Queries.GetCompletedTasks;
+using Application.CompletedTasks.Queries.GetCompletedTask;
+using Application.CompletedTasks.Commands.CreateCompletedTask;
+using Application.CompletedTasks.Commands.UpdateCompletedTask;
+using Application.CompletedTasks.Commands.DeleteCompletedTask;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers
 {
-    [Route("api/solicitations")]
+    [Route("api/completedtasks")]
     [ApiController]
-    public class SolicitationsController : ControllerBase
+    public class CompletedTasksController : ControllerBase
     {
         private readonly ISender _sender;
 
-        public SolicitationsController(ISender sender)
+        public CompletedTasksController(ISender sender)
         {
             _sender = sender;
         }
 
-        // GET: api/Solicitations/paginated
+        // GET: api/completedtasks/paginated
         [HttpGet("paginated")]
-        public async Task<ActionResult<IEnumerable<GetPaginatedSolicitationDto>>> GetPaginatedSolicitations([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<ActionResult<IEnumerable<GetPaginatedCompletedTaskDto>>> GetPaginatedCompletedTasks([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _sender.Send(new GetPaginatedSolicitationsQuery(pageNumber, pageSize));
+            var result = await _sender.Send(new GetPaginatedCompletedTasksQuery(pageNumber, pageSize));
             return Ok(result);
         }
 
-        // GET: api/Solicitations
+        // GET: api/completedtasks
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetSolicitationsDto>>> GetSolicitations()
+        public async Task<ActionResult<IEnumerable<GetCompletedTasksDto>>> GetCompletedTasks()
         {
-            var result = await _sender.Send(new GetSolicitationsQuery());
+            var result = await _sender.Send(new GetCompletedTasksQuery());
             return Ok(result);
         }
 
-        // GET: api/Solicitations/{id}
+        // GET: api/completedtasks/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<GetSolicitationDto>> GetSolicitation(int id)
+        public async Task<ActionResult<GetCompletedTaskDto>> GetCompletedTask(int id)
         {
-            var result = await _sender.Send(new GetSolicitationQuery(id));
+            var result = await _sender.Send(new GetCompletedTaskQuery(id));
             if (result == null)
                 return NotFound();
             return Ok(result);
         }
 
-        // POST: api/Solicitations
+        // POST: api/completedtasks
         [HttpPost]
-        public async Task<ActionResult<int>> PostSolicitation([FromBody] CreateSolicitationDto solicitationDto)
+        public async Task<ActionResult<int>> PostCompletedTask([FromBody] CreateCompletedTaskDto completedTaskDto)
         {
-            var command = new CreateSolicitationCommand { Solicitation = solicitationDto };
-            var newSolicitationId = await _sender.Send(command);
+            var command = new CreateCompletedTaskCommand { CompletedTask = completedTaskDto };
+            var newCompletedTaskId = await _sender.Send(command);
             return CreatedAtAction(
-                nameof(GetSolicitation),
-                new { id = newSolicitationId },
-                newSolicitationId
+                nameof(GetCompletedTask),
+                new { id = newCompletedTaskId },
+                newCompletedTaskId
             );
         }
 
-        // PUT: api/Solicitations/{id}
+        // PUT: api/completedtasks/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSolicitation(int id, [FromBody] UpdateSolicitationDto solicitationDto)
+        public async Task<IActionResult> PutCompletedTask(int id, [FromBody] UpdateCompletedTaskDto completedTaskDto)
         {
-            if (solicitationDto.Id != default && solicitationDto.Id != id)
+            if (completedTaskDto.Id != default && completedTaskDto.Id != id)
                 return BadRequest("El id de la ruta y el del cuerpo no coinciden.");
-            solicitationDto.Id = id;
-            var command = new UpdateSolicitationCommand { Solicitation = solicitationDto };
+            completedTaskDto.Id = id;
+            var command = new UpdateCompletedTaskCommand { CompletedTask = completedTaskDto };
             await _sender.Send(command);
             return NoContent();
         }
 
-        // DELETE: api/Solicitations/{id}
+        // DELETE: api/completedtasks/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSolicitation(int id)
+        public async Task<IActionResult> DeleteCompletedTask(int id)
         {
-            var command = new DeleteSolicitationCommand(id);
+            var command = new DeleteCompletedTaskCommand(id);
             var result = await _sender.Send(command);
             if (!result)
                 return NotFound();

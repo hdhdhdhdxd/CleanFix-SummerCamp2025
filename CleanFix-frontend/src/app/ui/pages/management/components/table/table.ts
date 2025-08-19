@@ -1,5 +1,6 @@
+import { PaginationDto } from '@/core/domain/models/PaginationDto'
 import { Solicitation } from '@/core/domain/models/Solicitation'
-import { CurrencyPipe, DatePipe, NgClass, AsyncPipe } from '@angular/common'
+import { AsyncPipe, CurrencyPipe, DatePipe, NgClass } from '@angular/common'
 import { Component, input, output } from '@angular/core'
 import { Observable } from 'rxjs'
 
@@ -15,7 +16,7 @@ export interface TableColumn<T> {
   templateUrl: './table.html',
 })
 export class Table<T extends Solicitation> {
-  data$ = input.required<Observable<T[]>>()
+  data$ = input.required<Observable<PaginationDto<T>>>()
   tableColumns = input.required<TableColumn<T>[]>()
   rowClick = output<T>()
 

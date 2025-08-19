@@ -7,7 +7,7 @@ public interface IDatabaseContext
 {
     DbSet<Apartment> Apartments { get; set; }
     DbSet<User> Users { get; set; }
-    DbSet<Solicitation> Solicitations { get; set; }
+    DbSet<CompletedTask> CompletedTasks { get; set; }
     DbSet<Company> Companies { get; set; }
     DbSet<Material> Materials { get; set; }
 

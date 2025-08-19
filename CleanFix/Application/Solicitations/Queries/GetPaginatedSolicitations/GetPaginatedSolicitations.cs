@@ -6,27 +6,27 @@ using Infrastructure.Common.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Solicitations.Queries.GetPaginatedSolicitations;
-public record GetPaginatedSolicitationsQuery(int PageNumber, int PageSize) : IRequest<PaginatedList<GetPaginatedSolicitationDto>>;
+namespace Application.CompletedTasks.Queries.GetPaginatedCompletedTasks;
+public record GetPaginatedCompletedTasksQuery(int PageNumber, int PageSize) : IRequest<PaginatedList<GetPaginatedCompletedTaskDto>>;
 
-public class GetPaginatedSolicitationsQueryHandler : IRequestHandler<GetPaginatedSolicitationsQuery, PaginatedList<GetPaginatedSolicitationDto>>
+public class GetPaginatedCompletedTasksQueryHandler : IRequestHandler<GetPaginatedCompletedTasksQuery, PaginatedList<GetPaginatedCompletedTaskDto>>
 {
-    private readonly ISolicitationRepository _solicitationRepository;
+    private readonly ICompletedTaskRepository _completedTaskRepository;
     private readonly IMapper _mapper;
 
-    public GetPaginatedSolicitationsQueryHandler(ISolicitationRepository solicitationRepository, IMapper mapper)
+    public GetPaginatedCompletedTasksQueryHandler(ICompletedTaskRepository completedTaskRepository, IMapper mapper)
     {
-        _solicitationRepository = solicitationRepository;
+        _completedTaskRepository = completedTaskRepository;
         _mapper = mapper;
     }
 
-    public async Task<PaginatedList<GetPaginatedSolicitationDto>> Handle(GetPaginatedSolicitationsQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedList<GetPaginatedCompletedTaskDto>> Handle(GetPaginatedCompletedTasksQuery request, CancellationToken cancellationToken)
     {
-        var solicitations = await _solicitationRepository.GetAll()
+        var completedTasks = await _completedTaskRepository.GetAll()
             .AsNoTracking()
-            .ProjectTo<GetPaginatedSolicitationDto>(_mapper.ConfigurationProvider)
+            .ProjectTo<GetPaginatedCompletedTaskDto>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageNumber, request.PageSize);
 
-        return solicitations;
+        return completedTasks;
     }
 }
