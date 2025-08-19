@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.SemanticKernel;
+using Microsoft.Extensions.Configuration;
 
 
 // Clases auxiliares para deserialización
@@ -23,6 +24,16 @@ class Program
 {
     static async Task Main(string[] args)
     {
+        //Cifrado de configuración para Azure OpenAI y la base de datos
+        var config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build();
+
+        string endpoint = config["AzureOpenAI:Endpoint"];
+        string apiKey = config["AzureOpenAI:ApiKey"];
+        string connectionString = config["Database:ConnectionString"];
+
+
         // Configura la codificación de salida de la consola para UTF-8
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
