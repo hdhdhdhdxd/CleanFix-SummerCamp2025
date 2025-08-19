@@ -1,19 +1,32 @@
-import { Component, inject } from '@angular/core'
-import { SearchBar } from '../search-bar/search-bar'
-import { SolicitationService } from '@/ui/services/solicitation/solicitation-service'
-import { Table, TableColumn } from '../table/table'
 import { Solicitation } from '@/core/domain/models/Solicitation'
+import { SolicitationService } from '@/ui/services/solicitation/solicitation-service'
+import { Component, computed, inject, signal } from '@angular/core'
+import { Pagination } from '../pagination/pagination'
+import { SearchBar } from '../search-bar/search-bar'
 import { SolicitationDialog } from '../solicitation-dialog/solicitation-dialog'
+import { Table, TableColumn } from '../table/table'
 
 @Component({
   selector: 'app-solicitations',
-  imports: [SearchBar, Table, SolicitationDialog],
+  imports: [SearchBar, Table, SolicitationDialog, Pagination],
   templateUrl: './solicitations.html',
 })
 export class Solicitations {
+  pageSize = signal<number>(5)
+  pageNumber = signal<number>(1)
+
   solicitationService = inject(SolicitationService)
 
-  solicitations$ = this.solicitationService.getAll()
+  solicitations$ = computed(() =>
+    this.solicitationService.getAll(this.pageNumber(), this.pageSize()),
+  )
+
+  setPageNumber($event: number) {
+    this.pageNumber.set($event)
+  }
+  setPageSize($event: number) {
+    this.pageSize.set($event)
+  }
 
   selectedSolicitation: Solicitation | null = null
   showDialog = false

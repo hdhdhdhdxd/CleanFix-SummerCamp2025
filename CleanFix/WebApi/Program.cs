@@ -82,10 +82,11 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges(); 
 
         // Crear 10 solicitudes
+        var solicitationStatusOptions = new[] { "In progress", "Ready", "Waiting" };
         var solicitationFaker = new Faker<Solicitation>()
             .RuleFor(e => e.Description, f => f.Lorem.Sentence())
             .RuleFor(e => e.Date, f => f.Date.Recent())
-            .RuleFor(e => e.Status, f => f.Random.Word())
+            .RuleFor(e => e.Status, f => f.PickRandom(solicitationStatusOptions))
             .RuleFor(e => e.Address, f => f.Address.FullAddress())
             .RuleFor(e => e.MaintenanceCost, f => f.Random.Double(50, 1000))
             .RuleFor(e => e.Type, f => (IssueType)f.Random.Int(0, 6));

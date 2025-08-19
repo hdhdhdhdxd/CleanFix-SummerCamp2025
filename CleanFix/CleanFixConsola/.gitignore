@@ -64,7 +64,6 @@ project.fragment.lock.json
 artifacts/
 
 # Ia Keys and API
-CleanFixConsola/*.json
 appsettingsIaBot.json
 
 # ASP.NET Scaffolding

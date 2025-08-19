@@ -3,12 +3,22 @@
     <app-search-bar />
   </div>
 
-  <div class="mx-7 mb-5 flex-1 overflow-hidden">
-    <app-table
-      [data$]="solicitations$"
-      [tableColumns]="columns"
-      (rowClick)="handleRowClick($event)"
-    />
+  <div class="mx-7 mb-5 flex min-h-0 flex-grow flex-col">
+    <div class="min-h-0 flex-grow">
+      <app-table
+        [data$]="solicitations$()"
+        [tableColumns]="columns"
+        (rowClick)="handleRowClick($event)"
+      />
+    </div>
+    <div>
+      <app-pagination
+        [pageSizeInput]="pageSize()"
+        [pageNumberInput]="pageNumber()"
+        (pageSizeChange)="setPageSize($event)"
+        (pageNumberChange)="setPageNumber($event)"
+      />
+    </div>
   </div>
 
   @if (showDialog && selectedSolicitation) {

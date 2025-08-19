@@ -1,11 +1,16 @@
 import { Solicitation } from '@/core/domain/models/Solicitation'
 import { SolicitationRepository } from '@/core/domain/repositories/SolicitationRepository'
 import { environment } from 'src/environments/environment'
-import { SolicitationDto } from './SolicitationDto'
 import { PaginationDto } from '../../../domain/models/PaginationDto'
+import { SolicitationDto } from './SolicitationDto'
 
-const getAll = async (): Promise<PaginationDto<Solicitation>> => {
-  const response = await fetch(environment.baseUrl + 'requests/paginated')
+const getAll = async (
+  pageNumber: number,
+  pageSize: number,
+): Promise<PaginationDto<Solicitation>> => {
+  const response = await fetch(
+    environment.baseUrl + `requests/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+  )
   if (!response.ok) {
     throw new Error('Error al obtener las empresas')
   }
