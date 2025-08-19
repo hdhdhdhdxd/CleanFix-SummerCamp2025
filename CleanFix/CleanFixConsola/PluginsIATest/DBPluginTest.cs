@@ -11,13 +11,16 @@ using Microsoft.SemanticKernel;
 
 public class DBPluginTest
 {
+    // Almacena la cadena de conexión a la base de datos
     private readonly string _connectionString;
 
+    // Constructor que recibe la cadena de conexión y la guarda
     public DBPluginTest(string connectionString)
     {
         _connectionString = connectionString;
     }
 
+    // Función expuesta al kernel que obtiene todas las empresas desde la base de datos
     [KernelFunction, Description("Obtiene todas las empresas desde la base de datos, las convierte a objeto")]
     public object GetAllEmpresas()
     {
@@ -25,12 +28,15 @@ public class DBPluginTest
 
         try
         {
+            // Abre conexión con la base de datos
             using var connection = new SqlConnection(_connectionString);
             connection.Open();
 
+            // Ejecuta consulta SQL para obtener los datos de las empresas
             var command = new SqlCommand("SELECT Id, Name, Address, Number, Email, [type], Price, WorkTime FROM dbo.Companies", connection);
             using var reader = command.ExecuteReader();
 
+            // Recorre los resultados y los convierte en objetos Company
             while (reader.Read())
             {
                 companies.Add(new Company
@@ -48,12 +54,15 @@ public class DBPluginTest
         }
         catch (Exception ex)
         {
+            // En caso de error, devuelve una respuesta con el mensaje de excepción
             return new EmpresaResponse { Success = false, Error = ex.Message };
         }
 
+        // Devuelve la lista de empresas con éxito
         return new EmpresaResponse { Success = true, Data = companies };
     }
 
+    // Función expuesta al kernel que obtiene todos los materiales desde la base de datos
     [KernelFunction, Description("Obtiene todos los materiales desde la base de datos, las convierte a objeto")]
     public MaterialResponse GetAllMaterials()
     {
@@ -61,12 +70,15 @@ public class DBPluginTest
 
         try
         {
+            // Abre conexión con la base de datos
             using var connection = new SqlConnection(_connectionString);
             connection.Open();
 
+            // Ejecuta consulta SQL para obtener los datos de los materiales
             var command = new SqlCommand("SELECT Id, Name, Cost, Issue FROM dbo.Materials", connection);
             using var reader = command.ExecuteReader();
 
+            // Recorre los resultados y los convierte en objetos Material
             while (reader.Read())
             {
                 materiales.Add(new Material
@@ -75,12 +87,13 @@ public class DBPluginTest
                     Name = reader.IsDBNull(1) ? null : reader.GetString(1),
                     Cost = reader.IsDBNull(2) ? 0 : reader.GetDecimal(2),
                     Issue = reader.IsDBNull(3) ? 0 : reader.GetInt32(3),
-                    Available = true
+                    Available = true // Se marca como disponible por defecto
                 });
             }
         }
         catch (Exception ex)
         {
+            // En caso de error, devuelve una respuesta con el mensaje de excepción
             return new MaterialResponse
             {
                 Success = false,
@@ -88,6 +101,7 @@ public class DBPluginTest
             };
         }
 
+        // Devuelve la lista de materiales con éxito
         return new MaterialResponse
         {
             Success = true,
@@ -97,7 +111,9 @@ public class DBPluginTest
 }
 
 
-    public class Company
+//Clases con los datos de respuesta
+
+public class Company
 {
     public int Id { get; set; }
     public string Name { get; set; }
