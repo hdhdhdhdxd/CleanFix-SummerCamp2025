@@ -6,8 +6,8 @@ const init = (repository: SolicitationRepository) => {
   solicitationRepository = repository
 }
 
-const getAll = async () => {
-  return solicitationRepository.getAll()
+const getAll = async (pageNumber: number, pageSize: number) => {
+  return solicitationRepository.getAll(pageNumber, pageSize)
 }
 
 export const solicitationService = {
