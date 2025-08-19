@@ -1,8 +1,8 @@
 using AutoMapper;
 using Domain.Entities;
 
-namespace Application.Requests.Queries.GetRequests;
-public class GetRequestsDto
+namespace Application.Solicitations.Queries.GetSolicitations;
+public class GetSolicitationsDto
 {
     public int Id { get; set; }
     public string? Description { get; set; }
@@ -15,7 +15,7 @@ public class GetRequestsDto
     {
         public Mapping()
         {
-            CreateMap<Request, GetRequestsDto>();
+            CreateMap<Solicitation, GetSolicitationsDto>();
         }
     }
 }

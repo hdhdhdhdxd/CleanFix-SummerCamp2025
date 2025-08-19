@@ -2,8 +2,8 @@ using System.ComponentModel.DataAnnotations;
 using AutoMapper;
 using Domain.Entities;
 
-namespace Application.Requests.Commands.CreateRequest;
-public class CreateRequestDto
+namespace Application.Solicitations.Commands.CreateSolicitation;
+public class CreateSolicitationDto
 {
     [StringLength(200, MinimumLength = 5, ErrorMessage = "La descripción debe tener entre 5 y 200 caracteres.")]
     public string? Description { get; set; }
@@ -21,7 +21,7 @@ public class CreateRequestDto
     {
         public Mapping()
         {
-            CreateMap<CreateRequestDto, Request>();
+            CreateMap<CreateSolicitationDto, Solicitation>();
         }
     }
 }

@@ -5,9 +5,9 @@ using Infrastructure.Repositories;
 
 namespace WebApi.Services;
 
-public class RequestService : Repository<Request>, IRequestRepository
+public class SolicitationService : Repository<Solicitation>, ISolicitationRepository
 {
-    public RequestService(IDatabaseContext database) : base(database)
+    public SolicitationService(IDatabaseContext database) : base(database)
     {
     }
 }
