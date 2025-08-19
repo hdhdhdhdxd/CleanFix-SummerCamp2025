@@ -54,7 +54,7 @@ class Program
         // Verifica si la respuesta es válida
         if (empresasResponse == null || !empresasResponse.Success || empresasResponse.Data == null)
         {
-            Console.WriteLine("❌ Error al obtener las empresas.");
+            Console.WriteLine(" ❌ Error al obtener las empresas.");
             return;
         }
 
@@ -69,7 +69,7 @@ class Program
         // Verifica si la respuesta es válida
         if (materialesResponse == null || !materialesResponse.Success || materialesResponse.Data == null)
         {
-            Console.WriteLine("❌ Error al obtener los materiales.");
+            Console.WriteLine(" ❌ Error al obtener los materiales.");
             return;
         }
 
@@ -92,7 +92,7 @@ class Program
         var promptFunction = kernel.CreateFunctionFromPrompt(promptTemplate);
 
         // Mensaje de bienvenida del chatbot
-        Console.WriteLine("👋 ¡Hola! Soy CleanFixBot. Escribe 'factura' para generar una manualmente, o hazme una pregunta.");
+        Console.WriteLine(" 👋 ¡Hola! Soy CleanFixBot. Escribe 'factura' para generar una manualmente, o hazme una pregunta.");
 
         // Bucle principal del chatbot
         while (true)
@@ -114,15 +114,15 @@ class Program
             // Modo manual de creación de factura
             if (userInput.Equals("factura") || userInput.Equals("crear factura"))
             {
-                Console.WriteLine("Introduce el ID de la empresa:");
+                Console.WriteLine(" Introduce el ID de la empresa:");
                 var idEmp = Console.ReadLine()?.Trim();
                 var empresa = companies.FirstOrDefault(e => e.Id.ToString() == idEmp);
-                if (empresa == null) { Console.WriteLine("❌ Empresa no encontrada."); continue; }
+                if (empresa == null) { Console.WriteLine(" ❌ Empresa no encontrada."); continue; }
 
                 var selMat = new List<Material>();
                 while (true)
                 {
-                    Console.WriteLine("ID del material a añadir (o 'fin' para terminar la factura):");
+                    Console.WriteLine(" ID del material a añadir (o 'fin' para terminar la factura):");
                     var idMatInput = Console.ReadLine()?.Trim();
                     if (idMatInput?.Equals("fin", StringComparison.OrdinalIgnoreCase) == true) break;
 
@@ -133,11 +133,11 @@ class Program
                         if (mat != null)
                         {
                             selMat.Add(mat);
-                            Console.WriteLine($"✅ Añadido: {mat.Name}");
+                            Console.WriteLine($" ✅ Añadido: {mat.Name}");
                         }
-                        else Console.WriteLine("❌ Material no encontrado.");
+                        else Console.WriteLine(" ❌ Material no encontrado.");
                     }
-                    else Console.WriteLine("❌ ID inválido.");
+                    else Console.WriteLine(" ❌ ID inválido.");
                 }
 
                 // Genera la factura con los datos seleccionados
@@ -158,7 +158,7 @@ class Program
 
                 if (empresa == null)
                 {
-                    Console.WriteLine("❌ No se encontró una empresa válida.");
+                    Console.WriteLine(" ❌ No se encontró una empresa válida.");
                     continue;
                 }
 
@@ -167,18 +167,18 @@ class Program
                 // Determina qué materiales incluir según la intención del usuario
                 if (SolicitaSinMateriales(userInput))
                 {
-                    Console.WriteLine($"🧾 Se ha seleccionado la empresa '{empresa.Name}' sin materiales.");
+                    Console.WriteLine($" 🧾 Se ha seleccionado la empresa '{empresa.Name}' sin materiales.");
                 }
                 else if (SolicitaTodosMateriales(userInput))
                 {
                     materialesSeleccionados = materials.Where(m => m.Available).ToList();
-                    Console.WriteLine($"🧾 Se han seleccionado todos los materiales disponibles ({materialesSeleccionados.Count}).");
+                    Console.WriteLine($" 🧾 Se han seleccionado todos los materiales disponibles ({materialesSeleccionados.Count}).");
                 }
                 else
                 {
                     if (!tipoMaterial.HasValue)
                     {
-                        Console.WriteLine("❌ No se pudo determinar el tipo de material.");
+                        Console.WriteLine(" ❌ No se pudo determinar el tipo de material.");
                         continue;
                     }
 
@@ -188,11 +188,11 @@ class Program
 
                         if (materialesSeleccionados.Count == 0)
                         {
-                            Console.WriteLine("❌ No hay materiales disponibles del tipo solicitado.");
+                            Console.WriteLine(" ❌ No hay materiales disponibles del tipo solicitado.");
                             continue;
                         }
 
-                        Console.WriteLine($"🧾 Se han seleccionado la empresa y el material más barato del tipo {tipoMaterial.Value}.");
+                        Console.WriteLine($" 🧾 Se han seleccionado la empresa y el material más barato del tipo {tipoMaterial.Value}.");
                     }
                     else
                     {
@@ -200,19 +200,19 @@ class Program
 
                         if (materialesSeleccionados.Count == 0)
                         {
-                            Console.WriteLine("❌ No hay materiales disponibles del tipo solicitado.");
+                            Console.WriteLine(" ❌ No hay materiales disponibles del tipo solicitado.");
                             continue;
                         }
 
-                        Console.WriteLine($"🧾 Se han seleccionado {materialesSeleccionados.Count} materiales del tipo {tipoMaterial.Value}.");
+                        Console.WriteLine($" 🧾 Se han seleccionado {materialesSeleccionados.Count} materiales del tipo {tipoMaterial.Value}.");
                     }
                 }
 
                 // Muestra resumen de selección y solicita confirmación
-                Console.WriteLine($"🔍 Empresa: {empresa.Name}");
-                Console.WriteLine($"🔍 Materiales: {string.Join(", ", materialesSeleccionados.Select(m => m.Name))}");
+                Console.WriteLine($" 🔍 Empresa: {empresa.Name}");
+                Console.WriteLine($" 🔍 Materiales: {string.Join(", ", materialesSeleccionados.Select(m => m.Name))}");
 
-                Console.WriteLine("¿Deseas generar la factura con esta información? (sí/no)");
+                Console.WriteLine(" ¿Deseas generar la factura con esta información? (sí/no)");
                 var confirmacion = Console.ReadLine()?.Trim().ToLower();
 
                 if (confirmacion == "sí" || confirmacion == "si")
@@ -221,7 +221,7 @@ class Program
                 }
                 else
                 {
-                    Console.WriteLine("❌ Factura cancelada por el usuario.");
+                    Console.WriteLine(" ❌ Factura cancelada por el usuario.");
                 }
 
                 continue;
@@ -252,7 +252,7 @@ class Program
             ["materiales"] = materiales
         });
 
-        Console.WriteLine("\n📄 FACTURA:");
+        Console.WriteLine("\n 📄 FACTURA:");
         Console.WriteLine(resFac.GetValue<string>());
 
         // Invoca la función del plugin para obtener el desglose de IVA
@@ -261,10 +261,10 @@ class Program
             ["empresa"] = empresa,
             ["materiales"] = materiales
         });
-
-        Console.WriteLine("💰 DESGLOSE DE IVA:");
+        Console.WriteLine(" 💰 DESGLOSE DE IVA:");
         Console.WriteLine(resIVA.GetValue<string>());
-        Console.WriteLine("------------------------------------\n");
+        Console.WriteLine("");
+        Console.WriteLine(" ------------------------------------\n");
     }
 
     // Detecta si el texto del usuario contiene intención de generar una factura
