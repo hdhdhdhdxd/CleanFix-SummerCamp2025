@@ -3,36 +3,36 @@ using AutoMapper;
 using Domain.Entities;
 using MediatR;
 
-namespace Application.Solicitations.Commands.CreateSolicitation;
+namespace Application.CompletedTasks.Commands.CreateCompletedTask;
 
-public record CreateSolicitationCommand : IRequest<int>
+public record CreateCompletedTaskCommand : IRequest<int>
 {
-    public CreateSolicitationDto Solicitation { get; init; }
+    public CreateCompletedTaskDto CompletedTask { get; init; }
 }
-public class CreateSolicitationCommandHandler : IRequestHandler<CreateSolicitationCommand, int>
+public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompletedTaskCommand, int>
 {
-    private readonly ISolicitationRepository _solicitationRepository;
+    private readonly ICompletedTaskRepository _completedTaskRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public CreateSolicitationCommandHandler(ISolicitationRepository solicitationRepository, IUnitOfWork unitOfWork, IMapper mapper)
+    public CreateCompletedTaskCommandHandler(ICompletedTaskRepository completedTaskRepository, IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _solicitationRepository = solicitationRepository;
+        _completedTaskRepository = completedTaskRepository;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
-    public async Task<int> Handle(CreateSolicitationCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateCompletedTaskCommand request, CancellationToken cancellationToken)
     {
-        var solicitation = _mapper.Map<Solicitation>(request.Solicitation);
+        var completedTask = _mapper.Map<CompletedTask>(request.CompletedTask);
 
-        if (solicitation.Id == 0)
-            solicitation.Id = 0;
+        if (completedTask.Id == 0)
+            completedTask.Id = 0;
 
-        _solicitationRepository.Add(solicitation);
+        _completedTaskRepository.Add(completedTask);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return solicitation.Id;
+        return completedTask.Id;
     }
 }

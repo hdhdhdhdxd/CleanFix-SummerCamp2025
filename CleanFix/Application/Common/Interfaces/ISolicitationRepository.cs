@@ -1,6 +1,6 @@
 ﻿using Domain.Entities;
 
 namespace Application.Common.Interfaces;
-public interface ISolicitationRepository : IRepository<Solicitation>
+public interface ICompletedTaskRepository : IRepository<CompletedTask>
 {
 }

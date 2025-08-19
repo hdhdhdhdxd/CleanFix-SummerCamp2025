@@ -4,26 +4,26 @@ using MediatR;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 
-namespace Application.Solicitations.Queries.GetSolicitations;
-public record GetSolicitationsQuery : IRequest<List<GetSolicitationsDto>>;
+namespace Application.CompletedTasks.Queries.GetCompletedTasks;
+public record GetCompletedTasksQuery : IRequest<List<GetCompletedTasksDto>>;
 
-public class GetSolicitationsQueryHandler : IRequestHandler<GetSolicitationsQuery, List<GetSolicitationsDto>>
+public class GetCompletedTasksQueryHandler : IRequestHandler<GetCompletedTasksQuery, List<GetCompletedTasksDto>>
 {
-    private readonly ISolicitationRepository _solicitationRepository;
+    private readonly ICompletedTaskRepository _completedTaskRepository;
     private readonly IMapper _mapper;
 
-    public GetSolicitationsQueryHandler(ISolicitationRepository solicitationRepository, IMapper mapper)
+    public GetCompletedTasksQueryHandler(ICompletedTaskRepository completedTaskRepository, IMapper mapper)
     {
-        _solicitationRepository = solicitationRepository;
+        _completedTaskRepository = completedTaskRepository;
         _mapper = mapper;
     }
 
-    public async Task<List<GetSolicitationsDto>> Handle(GetSolicitationsQuery request, CancellationToken cancellationToken)
+    public async Task<List<GetCompletedTasksDto>> Handle(GetCompletedTasksQuery request, CancellationToken cancellationToken)
     {
-        var solicitations = await _solicitationRepository.GetAll()
+        var completedTasks = await _completedTaskRepository.GetAll()
             .AsNoTracking()
             .ToListAsync(cancellationToken);
-        var result = _mapper.Map<List<GetSolicitationsDto>>(solicitations);
+        var result = _mapper.Map<List<GetCompletedTasksDto>>(completedTasks);
         return result;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Domain.Entities;
 
-public class Solicitation : IEntity
+public class CompletedTask : IEntity
 {
     public int Id { get; set; } // Identificador único de la solicitud
     public string Address { get; set; }
