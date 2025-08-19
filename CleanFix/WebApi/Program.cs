@@ -81,16 +81,16 @@ using (var scope = app.Services.CreateScope())
         db.Materials.AddRange(materials);
         db.SaveChanges(); 
 
-        // Crear 10 requests
-        var requestFaker = new Faker<Request>()
+        // Crear 10 solicitudes
+        var solicitationFaker = new Faker<Solicitation>()
             .RuleFor(e => e.Description, f => f.Lorem.Sentence())
             .RuleFor(e => e.Date, f => f.Date.Recent())
-            .RuleFor(e => e.Address, f => f.Address.FullAddress())
             .RuleFor(e => e.Status, f => f.Random.Word())
+            .RuleFor(e => e.Address, f => f.Address.FullAddress())
             .RuleFor(e => e.MaintenanceCost, f => f.Random.Double(50, 1000))
             .RuleFor(e => e.Type, f => (IssueType)f.Random.Int(0, 6));
-        var requests = requestFaker.Generate(10);
-        db.Requests.AddRange(requests);
+        var solicitations = solicitationFaker.Generate(10);
+        db.Solicitations.AddRange(solicitations);
         db.SaveChanges();
 
         // Crear 10 incidencias
@@ -107,15 +107,17 @@ using (var scope = app.Services.CreateScope())
 
         // Crear 10 tareas completadas
         var completedTaskFaker = new Faker<CompletedTask>()
-            .RuleFor(e => e.ApartmentId, f => Guid.NewGuid())
+            .RuleFor(e => e.ApartmentId, f => apartments[f.Random.Int(0, apartments.Count - 1)].Id)
             .RuleFor(e => e.Company, f => companies[f.Random.Int(0, companies.Count - 1)])
             .RuleFor(e => e.Date, f => f.Date.Recent())
             .RuleFor(e => e.Price, f => f.Random.Float(50, 1000))
             .RuleFor(e => e.Duration, f => f.Random.Float(1, 10))
-            .RuleFor(e => e.Address, f => $"{f.Address}")
+            .RuleFor(e => e.Address, f => f.Address.FullAddress())
             .RuleFor(e => e.Type, f => (IssueType)f.Random.Int(0, 6))
             .RuleFor(e => e.Materials, f => materials.OrderBy(x => f.Random.Int()).Take(f.Random.Int(1, 5)).ToList())
-            .RuleFor(e => e.User, f => users[f.Random.Int(0, users.Count - 1)]);
+            .RuleFor(e => e.User, f => users[f.Random.Int(0, users.Count - 1)])
+            .RuleFor(e => e.Surface, f => f.Random.Int(50, 200))
+            .RuleFor(e => e.IsRequest, f => f.Random.Bool());
         var completedTasks = completedTaskFaker.Generate(10);
         db.CompletedTasks.AddRange(completedTasks);
         db.SaveChanges();
