@@ -1,10 +1,1 @@
-if [ -f "package.json" ] && [ -f "angular.json" ]; then
-  npm run lint-staged
-elif [ -d "CleanFix-frontend" ]; then
-  cd CleanFix-frontend && npm run lint-staged
-elif [ -d "../CleanFix-frontend" ]; then
-  cd ../CleanFix-frontend && npm run lint-staged
-else
-  echo "⚠️  No se encontró el proyecto Angular."
-  exit 1
-fi  
+cd CleanFix-frontend && npm run lint-staged
