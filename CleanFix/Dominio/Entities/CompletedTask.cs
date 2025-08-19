@@ -6,7 +6,7 @@ public class CompletedTask : IEntity
 {
     public int Id { get; set; } // Identificador único de la tarea completada
     public string Address { get; set; }
-    public Guid ApartmentId { get; set; }
+    public int ApartmentId { get; set; }
     public Company Company { get; set; }
     public DateTime Date { get; set; }
     public double Price { get; set; }
