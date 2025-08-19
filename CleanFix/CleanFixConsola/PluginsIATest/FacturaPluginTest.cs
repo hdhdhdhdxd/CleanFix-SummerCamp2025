@@ -27,45 +27,40 @@ public class FacturaPluginTest
 
         // Construye el contenido de la factura en formato Markdown
         StringBuilder sb = new();
-        sb.AppendLine("---");
-        sb.AppendLine("- Factura");
         sb.AppendLine();
-
         // Información de la empresa proveedora
-        sb.AppendLine("Empresa proveedora:");
-        sb.AppendLine($"- Nombre: {empresa.Name}");
-        sb.AppendLine($"- Precio de servicio: €{costoEmpresa:F2}");
-        sb.AppendLine($"- IVA servicio (21%): €{ivaEmpresa:F2}");
+        sb.AppendLine(" Empresa proveedora:");
+        sb.AppendLine();
+        sb.AppendLine($" - Nombre: {empresa.Name}");
         sb.AppendLine();
 
         // Tabla con los materiales incluidos en la factura
-        sb.AppendLine("Materiales incluidos:");
+        sb.AppendLine(" Materiales incluidos:");
         sb.AppendLine();
-        sb.AppendLine("| ID | Nombre             | Costo    | IVA (21%) | Total    |");
-        sb.AppendLine("|----|--------------------|----------|-----------|----------|");
+        sb.AppendLine(" | ID | Nombre             | Costo    | IVA (21%) | Total    |");
+        sb.AppendLine(" |----|--------------------|----------|-----------|----------|");
 
         // Recorre cada material y calcula su IVA y total individual
         foreach (var m in materiales)
         {
             decimal ivaMat = m.Cost * IVA;
             decimal totalMat = m.Cost + ivaMat;
-            sb.AppendLine($"| {m.Id}  | {m.Name}    | €{m.Cost:F2} | €{ivaMat:F2}    | €{totalMat:F2} |");
+            sb.AppendLine($" | {m.Id}  | {m.Name}    | €{m.Cost:F2} | €{ivaMat:F2}    | €{totalMat:F2} |");
+            sb.AppendLine();
         }
 
         // Resumen de costes y totales
         sb.AppendLine();
-        sb.AppendLine($"Total materiales: €{costoMateriales:F2}");
-        sb.AppendLine($"IVA materiales (21%): €{ivaMateriales:F2}");
-        sb.AppendLine();
-        sb.AppendLine($"Costo empresa: €{costoEmpresa:F2}");
-        sb.AppendLine($"IVA empresa (21%): €{ivaEmpresa:F2}");
-        sb.AppendLine();
-        sb.AppendLine("---");
-        sb.AppendLine();
-        sb.AppendLine($"*TOTAL FACTURA:*");
-        sb.AppendLine($"  *€{total:F2}*");
-        sb.AppendLine();
-        sb.AppendLine("---");
+        sb.AppendLine(" -----------------------------------------");
+        sb.AppendLine($" Total materiales: €{costoMateriales:F2}");
+        sb.AppendLine($" IVA materiales (21%): €{ivaMateriales:F2}");
+        sb.AppendLine(" -----------------------------------------");
+        sb.AppendLine($" Costo empresa: €{costoEmpresa:F2}");
+        sb.AppendLine($" IVA empresa (21%): €{ivaEmpresa:F2}");
+        sb.AppendLine(" -----------------------------------------");
+        sb.AppendLine($" *TOTAL FACTURA:*");
+        sb.AppendLine($"   *€{total:F2}*");
+        sb.AppendLine(" -----------------------------------------");
 
         // Devuelve la factura como cadena de texto
         return sb.ToString();
@@ -85,7 +80,7 @@ public class FacturaPluginTest
         decimal ivaTotal = ivaEmpresa + ivaMateriales;
 
         // Devuelve el desglose en formato texto
-        return $"IVA empresa: €{ivaEmpresa:F2}\nIVA materiales: €{ivaMateriales:F2}\nIVA total: €{ivaTotal:F2}";
+        return $" IVA empresa: €{ivaEmpresa:F2}\n IVA materiales: €{ivaMateriales:F2}\n IVA total: €{ivaTotal:F2}";
     }
 }
 
