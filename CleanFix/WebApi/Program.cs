@@ -94,13 +94,14 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
 
         // Crear 10 incidencias
+        var statusOptions = new[] { "In progress", "Ready", "Waiting" };
         var incidenceFaker = new Faker<Incidence>()
             .RuleFor(e => e.Type, f => (IssueType)f.Random.Int(0, 6))
             .RuleFor(e => e.Date, f => f.Date.Recent())
-            .RuleFor(e => e.Status, f => f.Random.Word())
+            .RuleFor(e => e.Status, f => f.PickRandom(statusOptions))
             .RuleFor(e => e.Description, f => f.Lorem.Sentence())
             .RuleFor(e => e.Priority, f => f.PickRandom<Priority>())
-            .RuleFor(e => e.ApartmentId, f => Guid.NewGuid());
+            .RuleFor(e => e.ApartmentId, f => f.Random.Int(0, 10));
         var incidences = incidenceFaker.Generate(10);
         db.Incidences.AddRange(incidences);
         db.SaveChanges();
