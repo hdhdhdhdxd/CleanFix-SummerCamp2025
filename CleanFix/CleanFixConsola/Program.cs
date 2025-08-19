@@ -182,7 +182,19 @@ class Program
                         continue;
                     }
 
-                    if (SolicitaMaterialMasBarato(userInput))
+                    if (SolicitaMaterialMasCaro(userInput))
+                    {
+                        materialesSeleccionados = SeleccionarMaterialMasCaro(materials, tipoMaterial.Value);
+
+                        if (materialesSeleccionados.Count == 0)
+                        {
+                            Console.WriteLine(" ❌ No hay materiales disponibles del tipo solicitado.");
+                            continue;
+                        }
+
+                        Console.WriteLine($" 🧾 Se han seleccionado la empresa y el material más caro del tipo {tipoMaterial.Value}.");
+                    }
+                    else if (SolicitaMaterialMasBarato(userInput))
                     {
                         materialesSeleccionados = SeleccionarMaterialMasBarato(materials, tipoMaterial.Value);
 
@@ -351,6 +363,27 @@ class Program
         return patrones.Any(p => Regex.IsMatch(input, p));
     }
 
+    // Detecta si el usuario solicita el material más caro de un tipo específico
+    private static bool SolicitaMaterialMasCaro(string input)
+    {
+        // Normaliza el texto para facilitar el análisis
+        input = input.ToLowerInvariant();
+        input = input.Normalize(NormalizationForm.FormC);
+        input = Regex.Replace(input, @"\s+", " ");
+
+        // Patrones que indican intención de buscar el más caro/cara
+        var patrones = new[]
+        {
+            @"material\s+(de\s+tipo|del\s+tipo|tipo)?\s*\d+\s+(más caro|mas caro|más cara|mas cara)",
+            @"el\s+material\s+(más caro|mas caro|más cara|mas cara)",
+            @"producto\s+(más caro|mas caro|más cara|mas cara)",
+            @"insumo\s+(más caro|mas caro|más cara|mas cara)",
+            @"el\s+(más caro|mas caro|más cara|mas cara)"
+        };
+
+        return patrones.Any(p => Regex.IsMatch(input, p));
+    }
+
     // Selecciona el material más barato disponible del tipo indicado
     private static List<Material> SeleccionarMaterialMasBarato(List<Material> materiales, int tipo)
     {
@@ -361,6 +394,18 @@ class Program
 
         // Devuelve el material más barato como lista (o vacía si no hay)
         return materialMasBarato != null ? new List<Material> { materialMasBarato } : new List<Material>();
+    }
+
+    // Selecciona el material más caro disponible del tipo indicado
+    private static List<Material> SeleccionarMaterialMasCaro(List<Material> materiales, int tipo)
+    {
+        var materialMasCaro = materiales
+            .Where(m => m.Available && m.Issue == tipo)
+            .OrderByDescending(m => m.Cost)
+            .FirstOrDefault();
+
+        // Devuelve el material más caro como lista (o vacía si no hay)
+        return materialMasCaro != null ? new List<Material> { materialMasCaro } : new List<Material>();
     }
 }
 
