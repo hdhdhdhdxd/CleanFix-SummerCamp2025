@@ -1,45 +1,29 @@
 import { Solicitation } from '@/core/domain/models/Solicitation'
 import { SolicitationRepository } from '@/core/domain/repositories/SolicitationRepository'
+import { environment } from 'src/environments/environment'
+import { SolicitationDto } from './SolicitationDto'
+import { PaginationDto } from '../../../domain/models/PaginationDto'
 
-const getAll = async (): Promise<Solicitation[]> => {
-  return [
-    {
-      id: 1,
-      address: '123 Main St',
-      description: 'Fix the leaky faucet',
-      type: 'plumbing',
-      cost: 100,
-      date: new Date(),
-      status: 'canceled',
-    },
-    {
-      id: 2,
-      address: '456 Elm St',
-      description: 'Install new light fixture',
-      type: 'electricity',
-      cost: 150,
-      date: new Date(),
-      status: 'completed',
-    },
-    {
-      id: 3,
-      address: '789 Oak St',
-      description: 'Paint the living room',
-      type: 'painting',
-      cost: 200,
-      date: new Date(),
-      status: 'pending',
-    },
-    {
-      id: 4,
-      address: '101 Pine St',
-      description: 'Clean the gutters',
-      type: 'cleaning',
-      cost: 75,
-      date: new Date(),
-      status: 'in_progress',
-    },
-  ]
+const getAll = async (): Promise<PaginationDto<Solicitation>> => {
+  const response = await fetch(environment.baseUrl + 'requests/paginated')
+  if (!response.ok) {
+    throw new Error('Error al obtener las empresas')
+  }
+
+  const responseJson: PaginationDto<SolicitationDto> = await response.json()
+
+  return {
+    ...responseJson,
+    items: responseJson.items.map((solicitation: SolicitationDto) => ({
+      id: solicitation.id,
+      address: solicitation.address,
+      description: solicitation.description,
+      type: solicitation.type,
+      maintenanceCost: solicitation.maintenanceCost,
+      date: new Date(solicitation.date),
+      status: solicitation.status,
+    })),
+  }
 }
 
 export const solicitationApiRepository: SolicitationRepository = {
