@@ -1,4 +1,4 @@
-﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces;
 using Domain.Entities;
 using Infrastructure.Common.Interfaces;
 using Infrastructure.Repositories;
@@ -10,4 +10,3 @@ public class CompletedTaskService : Repository<CompletedTask>, ICompletedTaskRep
     {
     }
 }
-
