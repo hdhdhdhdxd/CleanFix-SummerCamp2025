@@ -45,12 +45,13 @@ class Program
         // Configura el servicio de Azure OpenAI para generación de texto
         builder.AddAzureOpenAIChatCompletion(
             deploymentName: "gpt-4.1",
-            endpoint: "https://hdhdh-mdx2smel-eastus2.cognitiveservices.azure.com/",
-            apiKey: "9ZMpVj9cCWRyv73s8vyxd0RL93ELHrtmNwN68ZPxRlDgBDjEgxR0JQQJ99BHACHYHv6XJ3w3AAAAACOGEv9e"
+            endpoint: endpoint,
+            apiKey: apiKey
         );
 
         // Agrega el plugin de base de datos para consultar empresas y materiales
-        var dbPlugin = new DBPluginTest("Server=tcp:devdemoserverbbdd.database.windows.net,1433;Initial Catalog=devdemobbdd2;Persist Security Info=False;User ID=admsql;Password=P@ssw0rd;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+        var dbPlugin = new DBPluginTest(connectionString);
+
         builder.Plugins.AddFromObject(dbPlugin, "DBPlugin");
 
         // Agrega el plugin de facturación para generar facturas
