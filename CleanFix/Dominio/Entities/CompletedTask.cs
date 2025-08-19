@@ -1,10 +1,10 @@
-﻿using Domain.Common.Interfaces;
+using Domain.Common.Interfaces;
 
 namespace Domain.Entities;
 
 public class CompletedTask : IEntity
 {
-    public int Id { get; set; } // Identificador único de la solicitud
+    public int Id { get; set; } // Identificador �nico de la tarea completada
     public string Address { get; set; }
     public Guid ApartmentId { get; set; }
     public Company Company { get; set; }
