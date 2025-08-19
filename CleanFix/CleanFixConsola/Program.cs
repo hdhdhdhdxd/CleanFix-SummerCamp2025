@@ -23,6 +23,9 @@ class Program
 {
     static async Task Main(string[] args)
     {
+        // Configura la codificación de salida de la consola para UTF-8
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+
         // Inicializa el constructor del kernel de Semantic Kernel
         var builder = Kernel.CreateBuilder();
 
