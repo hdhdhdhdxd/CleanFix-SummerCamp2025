@@ -32,6 +32,8 @@ class Program
         string endpoint = config["AzureOpenAI:Endpoint"];
         string apiKey = config["AzureOpenAI:ApiKey"];
         string connectionString = config["Database:ConnectionString"];
+        decimal iva = decimal.Parse(config["Bot:IVA"]);
+        string moneda = config["Bot:Moneda"];
 
 
         // Configura la codificación de salida de la consola para UTF-8
