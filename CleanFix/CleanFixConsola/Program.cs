@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Microsoft.SemanticKernel;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
@@ -819,6 +820,14 @@ Responde de forma clara y útil. Si la pregunta no tiene relación con los datos
         {
             Console.Write("> ");
             string userInput = Console.ReadLine()?.Trim();
+
+            if (string.IsNullOrEmpty(userInput)) continue;
+
+            // Normalización completa
+            userInput = userInput.Normalize(NormalizationForm.FormC);
+            userInput = Regex.Replace(userInput, @"\s+", " "); // elimina espacios dobles
+            userInput = userInput.ToLowerInvariant(); // para que las funciones de detección funcionen
+
             if (string.IsNullOrEmpty(userInput)) continue;
             if (userInput.Equals("salir", StringComparison.OrdinalIgnoreCase)) break;
 
@@ -839,13 +848,13 @@ Responde de forma clara y útil. Si la pregunta no tiene relación con los datos
 
                     if (int.TryParse(idMatInput, out int idMat))
                     {
-                        var mat = materials.FirstOrDefault(m => m.Id == idMat && m.Issue == empresa.Type);
+                        var mat = materials.FirstOrDefault(m => m.Id == idMat);
                         if (mat != null)
                         {
                             selMat.Add(mat);
                             Console.WriteLine($"✅ Añadido: {mat.Name}");
                         }
-                        else Console.WriteLine("❌ Material no encontrado o no pertenece a la empresa.");
+                        else Console.WriteLine("❌ Material no encontrado.");
                     }
                     else Console.WriteLine("❌ ID inválido.");
                 }
@@ -871,22 +880,52 @@ Responde de forma clara y útil. Si la pregunta no tiene relación con los datos
 
                 List<Material> materialesSeleccionados = new();
 
-                if (!SolicitaSoloEmpresa(userInput))
-                {
-                    materialesSeleccionados = FiltrarMaterialesParaEmpresa(empresa, materials, tipoMaterial);
-
-                    if (materialesSeleccionados.Count == 0)
-                    {
-                        Console.WriteLine("❌ No hay materiales disponibles para esta empresa.");
-                        continue;
-                    }
-
-                    Console.WriteLine($"🧾 Se ha seleccionado la empresa '{empresa.Name}' y {materialesSeleccionados.Count} materiales disponibles.");
-                }
-                else
+                if (SolicitaSinMateriales(userInput))
                 {
                     Console.WriteLine($"🧾 Se ha seleccionado la empresa '{empresa.Name}' sin materiales.");
                 }
+                else if (SolicitaTodosMateriales(userInput))
+                {
+                    materialesSeleccionados = materials.Where(m => m.Available).ToList();
+                    Console.WriteLine($"🧾 Se han seleccionado todos los materiales disponibles ({materialesSeleccionados.Count}).");
+                }
+                else
+                {
+                    if (!tipoMaterial.HasValue)
+                    {
+                        Console.WriteLine("❌ No se pudo determinar el tipo de material.");
+                        continue;
+                    }
+                   // Console.WriteLine($"🧪 ¿Solicita el más barato? {SolicitaMaterialMasBarato(userInput)}");
+
+                    if (SolicitaMaterialMasBarato(userInput))
+                    {
+                        materialesSeleccionados = SeleccionarMaterialMasBarato(materials, tipoMaterial.Value);
+
+                        if (materialesSeleccionados.Count == 0)
+                        {
+                            Console.WriteLine("❌ No hay materiales disponibles del tipo solicitado.");
+                            continue;
+                        }
+
+                        Console.WriteLine($"🧾 Se han seleccionado la empresa y el material más barato del tipo {tipoMaterial.Value}."); 
+                    }
+                    else
+                    {
+                        materialesSeleccionados = FiltrarMateriales(materials, tipoMaterial.Value);
+
+                        if (materialesSeleccionados.Count == 0)
+                        {
+                            Console.WriteLine("❌ No hay materiales disponibles del tipo solicitado.");
+                            continue;
+                        }
+
+                        Console.WriteLine($"🧾 Se han seleccionado {materialesSeleccionados.Count} materiales del tipo {tipoMaterial.Value}.");
+                    }
+                }
+
+                Console.WriteLine($"🔍 Empresa: {empresa.Name}");
+                Console.WriteLine($"🔍 Materiales: {string.Join(", ", materialesSeleccionados.Select(m => m.Name))}");
 
                 Console.WriteLine("¿Deseas generar la factura con esta información? (sí/no)");
                 var confirmacion = Console.ReadLine()?.Trim().ToLower();
@@ -915,7 +954,7 @@ Responde de forma clara y útil. Si la pregunta no tiene relación con los datos
         }
     }
 
-    private static async Task MostrarFacturaAsync(Kernel kernel, Company empresa, List<Material> materiales)
+   private static async Task MostrarFacturaAsync(Kernel kernel, Company empresa, List<Material> materiales)
     {
         var resFac = await kernel.InvokeAsync("FacturaPlugin", "GenerarFactura", new()
         {
@@ -945,33 +984,80 @@ Responde de forma clara y útil. Si la pregunta no tiene relación con los datos
 
     private static int? ExtraerTipo(string input, string entidad)
     {
-        var sinonimos = new[] { entidad, $"{entidad}s", "productos", "insumos" };
-        foreach (var palabra in sinonimos)
+        var match = Regex.Match(input, $@"{entidad}\s*(?:del\s*tipo|de\s*tipo|tipo)?\s*(\d+)", RegexOptions.IgnoreCase);
+        if (match.Success && int.TryParse(match.Groups[1].Value, out int tipo))
+            return tipo;
+
+        if (entidad == "material")
         {
-            var match = Regex.Match(input, $@"{palabra}\s*(?:del\s*tipo|de\s*tipo|tipo)?\s*(\d+)", RegexOptions.IgnoreCase);
-            if (match.Success && int.TryParse(match.Groups[1].Value, out int tipo))
+            var matchMaterial = Regex.Match(input, @"material\s*(?:del\s*tipo|de\s*tipo|tipo)?\s*(\d+)", RegexOptions.IgnoreCase);
+            if (matchMaterial.Success && int.TryParse(matchMaterial.Groups[1].Value, out tipo))
                 return tipo;
         }
+
         return null;
     }
 
-    private static List<Material> FiltrarMaterialesParaEmpresa(Company empresa, List<Material> materiales, int? tipoMaterial)
+    private static List<Material> FiltrarMateriales(List<Material> materiales, int? tipoMaterial)
     {
         return materiales
-            .Where(m =>
-                m.Available &&
-                (
-                    tipoMaterial.HasValue
-                        ? m.Issue == tipoMaterial.Value
-                        : m.Issue == empresa.Type
-                )
-            )
+            .Where(m => m.Available && (!tipoMaterial.HasValue || m.Issue == tipoMaterial.Value))
             .ToList();
     }
 
-    private static bool SolicitaSoloEmpresa(string input)
+    private static bool SolicitaSinMateriales(string input)
     {
-        var palabrasMateriales = new[] { "material", "materiales", "producto", "productos", "insumo", "insumos" };
-        return !palabrasMateriales.Any(p => input.Contains(p, StringComparison.OrdinalIgnoreCase));
+        var frases = new[]
+        {
+        "sin materiales",
+        "solo empresa",
+        "no quiero materiales",
+        "empresa sin productos"
+    };
+
+        return frases.Any(f => input.Contains(f, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static bool SolicitaTodosMateriales(string input)
+    {
+        var frases = new[]
+        {
+        "todos los materiales",
+        "materiales disponibles",
+        "todo lo que haya",
+        "todos los productos",
+        "todo lo disponible"
+    };
+
+        return frases.Any(f => input.Contains(f, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static bool SolicitaMaterialMasBarato(string input)
+    {
+        input = input.ToLowerInvariant();
+        input = input.Normalize(NormalizationForm.FormC);
+        input = Regex.Replace(input, @"\s+", " ");
+
+        var patrones = new[]
+        {
+        @"material\s+(de\s+tipo|del\s+tipo|tipo)?\s*\d+\s+(más barato|mas barato)",
+        @"el\s+material\s+(más barato|mas barato)",
+        @"producto\s+(más barato|mas barato)",
+        @"insumo\s+(más barato|mas barato)",
+        @"el\s+(más barato|mas barato)"
+    };
+
+        return patrones.Any(p => Regex.IsMatch(input, p));
+    }
+
+    private static List<Material> SeleccionarMaterialMasBarato(List<Material> materiales, int tipo)
+    {
+        var materialMasBarato = materiales
+            .Where(m => m.Available && m.Issue == tipo)
+            .OrderBy(m => m.Cost)
+            .FirstOrDefault();
+
+        return materialMasBarato != null ? new List<Material> { materialMasBarato } : new List<Material>();
     }
 }
+
