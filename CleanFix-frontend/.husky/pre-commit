@@ -1,2 +1,1 @@
-cd "$(dirname "$0")/../.."
-cd CleanFix-frontend && npm run lint-staged
+node ./CleanFix-frontend/run-lint-staged.js
