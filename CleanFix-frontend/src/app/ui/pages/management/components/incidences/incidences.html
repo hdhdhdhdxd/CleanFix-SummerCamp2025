@@ -8,14 +8,17 @@
       <app-table
         [data$]="incidences$()"
         [tableColumns]="columns"
-        (rowClick)="handleRowClick($event)"
+        (response)="handleTableResponse($event)"
       />
     </div>
     <div>
       <app-pagination
-        [paginationData]="incidencesSignal()"
-        [currentPageSize]="pageSize()"
-        [currentPageNumber]="pageNumber()"
+        [pageSize]="pageSize()"
+        [pageNumber]="pageNumber()"
+        [totalPages]="totalPages()"
+        [totalCount]="totalCount()"
+        [hasPreviousPage]="hasPreviousPage()"
+        [hasNextPage]="hasNextPage()"
         (pageSizeChange)="setPageSize($event)"
         (pageNumberChange)="setPageNumber($event)"
       />
