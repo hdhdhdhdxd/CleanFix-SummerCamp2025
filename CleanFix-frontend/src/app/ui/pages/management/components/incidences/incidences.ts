@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core'
+import { Component, computed, inject, OnInit, signal } from '@angular/core'
 import { Table, TableColumn } from '../table/table'
 import { Incidence } from '@/core/domain/models/Incedence'
 import { IncidenceService } from '@/ui/services/incidence/incidence-service'
