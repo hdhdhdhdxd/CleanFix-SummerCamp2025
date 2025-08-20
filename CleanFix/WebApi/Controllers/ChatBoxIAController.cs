@@ -1,25 +1,28 @@
-﻿using CleanFixConsola.PluginsIATest;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.AI;
-namespace WebApi.Controllers;
+﻿using Microsoft.AspNetCore.Mvc;
+using WebApi.Servicios;
 
-
-[ApiController]
-[Route("api/[controller]")]
-public class ChatBoxIAController : ControllerBase
+namespace WebApi.Controllers
 {
-    private readonly BotService _bot;
-
-    public ChatBoxIAController()
+    [ApiController]
+    [Route("api/chatboxia")]
+    public class ChatBoxIAController : ControllerBase
     {
-        _bot = new BotService();
-    }
+        private readonly BotService _botService;
 
-    [HttpPost]
-    public IActionResult Post([FromBody] ChatRequest request)
-    {
-        var respuesta = _bot.ProcesarMensaje(request.Mensaje);
-        return Ok(new ChatResponse { Respuesta = respuesta });
+        public ChatBoxIAController(BotService botService)
+        {
+            _botService = botService;
+        }
+
+        [HttpPost]
+        public IActionResult Post([FromBody] string mensaje)
+        {
+            if (string.IsNullOrWhiteSpace(mensaje))
+                return BadRequest("El mensaje no puede estar vacío.");
+
+            var respuesta = _botService.ProcesarMensaje(mensaje);
+            return Ok(new { respuesta });
+        }
     }
 }
 
