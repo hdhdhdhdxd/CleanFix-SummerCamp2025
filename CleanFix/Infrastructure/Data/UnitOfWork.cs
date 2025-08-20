@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces;
+using Infrastructure.Common.Interfaces;
 
-namespace Infrastructure.Common.Interfaces;
+namespace Infrastructure.Data;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly IDatabaseContext _database;

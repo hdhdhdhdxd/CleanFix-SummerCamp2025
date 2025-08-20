@@ -9,7 +9,7 @@ const getAll = async (
   pageSize: number,
 ): Promise<PaginationDto<Solicitation>> => {
   const response = await fetch(
-    environment.baseUrl + `requests/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+    environment.baseUrl + `solicitations/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
   )
   if (!response.ok) {
     throw new Error('Error al obtener las empresas')
