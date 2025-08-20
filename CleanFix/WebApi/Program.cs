@@ -1,7 +1,8 @@
 using Bogus;
+using CleanFixConsola.PluginsIATest;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebApi.BaseDatos;
-using Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -143,3 +144,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
