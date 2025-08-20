@@ -3,11 +3,16 @@ using CleanFixConsola.PluginsIATest;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebApi.BaseDatos;
+using CleanFixConsola.PluginsIATest;
+using WebApi.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddInfrastructureServices();
 builder.AddApplicationServices();
+// Registro de servicios
+builder.Services.AddScoped<IClasificadorIntencion, ClasificadorIntencion>();
+builder.Services.AddScoped<BotService>();
 
 // Configuración de CORS para permitir localhost:4200
 builder.Services.AddCors(options =>
