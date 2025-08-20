@@ -1,14 +1,13 @@
 <div
   class="mt-4 flex flex-col gap-3 border-t border-brand-200 bg-white px-3 py-3 sm:flex-row sm:items-center sm:justify-end sm:gap-0 sm:space-x-5 sm:px-6"
 >
-  <!-- Selector de registros por página -->
   <div class="flex items-center justify-center space-x-1.5">
     <span class="text-xs text-brand-500 sm:text-sm">Registros por página</span>
     <div class="relative">
       <select
         class="rounded-lg border border-brand-300 bg-white px-1 py-2 text-xs text-brand-700 transition-all duration-200 hover:border-brand-400 focus:outline-none sm:text-sm"
         [value]="pageSize()"
-        (change)="setPageSize($event)"
+        (change)="setPageSize(+$any($event.target).value)"
       >
         <option value="5">5</option>
         <option value="10">10</option>
@@ -20,33 +19,31 @@
 
   <div class="flex items-center justify-between space-x-5">
     <span class="text-xs text-brand-500 sm:text-sm"
-      >{{ startItem() }} - {{ endItem() }} de {{ totalItems() }}</span
+      >{{ ((pageNumber() || 1) - 1) * (pageSize() || 10) + 1 }} -
+      {{ (pageNumber() || 1) * (pageSize() || 10) }} de {{ totalCount() || 0 }}</span
     >
     <div class="flex items-center space-x-3 sm:space-x-3">
       <button
         class="rounded-full p-3 transition-colors sm:p-2"
         [class]="
-          canGoPrevious()
+          (pageNumber() || 1) > 1
             ? 'bg-brand-50 hover:bg-brand-200'
             : 'cursor-not-allowed bg-brand-100 opacity-50'
         "
-        [disabled]="!canGoPrevious()"
-        (click)="setPageNumber(pageNumber() - 1)"
+        [disabled]="(pageNumber() || 1) <= 1"
+        (click)="setPageNumber((pageNumber() || 1) - 1)"
       >
         <img src="/svg/arrow-left.svg" alt="Previous" class="h-5 w-5 sm:h-auto sm:w-auto" />
       </button>
-      <span class="text-xs text-brand-500 sm:text-sm">
-        {{ pageNumber() }} de {{ totalPages() }}
-      </span>
       <button
         class="rounded-full p-3 transition-colors sm:p-2"
         [class]="
-          canGoNext()
+          (pageNumber() || 1) < (totalPages() || 1)
             ? 'bg-brand-50 hover:bg-brand-200'
             : 'cursor-not-allowed bg-brand-100 opacity-50'
         "
-        [disabled]="!canGoNext()"
-        (click)="setPageNumber(pageNumber() + 1)"
+        [disabled]="(pageNumber() || 1) >= (totalPages() || 1)"
+        (click)="setPageNumber((pageNumber() || 1) + 1)"
       >
         <img src="/svg/arrow-right.svg" alt="Next" class="h-5 w-5 sm:h-auto sm:w-auto" />
       </button>
