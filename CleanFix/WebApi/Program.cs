@@ -1,12 +1,19 @@
 using Bogus;
+using CleanFixConsola.PluginsIATest;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebApi.BaseDatos;
-using Domain.Entities;
+using CleanFixConsola.PluginsIATest;
+using WebApi.Servicios;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddInfrastructureServices();
 builder.AddApplicationServices();
+// Registro de servicios
+builder.Services.AddScoped<IClasificadorIntencion, ClasificadorIntencion>();
+builder.Services.AddScoped<BotService>();
+builder.Services.AddControllers();
 
 // Configuración de CORS para permitir localhost:4200
 builder.Services.AddCors(options =>
@@ -27,8 +34,12 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+
 // Seeding de datos de Apartamento, Edificio y Distrito, y migración automática solo en desarrollo
-using (var scope = app.Services.CreateScope())
+/*using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 
@@ -124,7 +135,7 @@ using (var scope = app.Services.CreateScope())
         db.CompletedTasks.AddRange(completedTasks);
         db.SaveChanges();
     }
-}
+}*/
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -143,3 +154,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+

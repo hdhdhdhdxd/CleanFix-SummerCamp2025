@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.SemanticKernel;
 using Microsoft.Extensions.Configuration;
+using System.Globalization;
 
 
 // Clases auxiliares para deserialización
@@ -19,6 +20,8 @@ public class MaterialResponse
     public List<Material> Data { get; set; }
     public string Error { get; set; }
 }
+
+
 
 class Program
 {
