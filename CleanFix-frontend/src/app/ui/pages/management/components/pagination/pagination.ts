@@ -1,6 +1,7 @@
 import { Component, input, output, computed } from '@angular/core'
 import { PaginationDto } from '@/core/domain/models/PaginationDto'
 import { Solicitation } from '@/core/domain/models/Solicitation'
+import { Incidence } from '@/core/domain/models/Incedence'
 
 @Component({
   selector: 'app-pagination',
@@ -8,7 +9,7 @@ import { Solicitation } from '@/core/domain/models/Solicitation'
   templateUrl: './pagination.html',
 })
 export class Pagination {
-  paginationData = input<PaginationDto<Solicitation>>()
+  paginationData = input<PaginationDto<Solicitation | Incidence>>()
   currentPageSize = input<number>(10)
   currentPageNumber = input<number>(1)
 

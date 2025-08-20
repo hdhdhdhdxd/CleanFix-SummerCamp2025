@@ -2,11 +2,14 @@ import { Component, computed, inject, input } from '@angular/core'
 import { Table, TableColumn } from '../table/table'
 import { Incidence } from '@/core/domain/models/Incedence'
 import { IncidenceService } from '@/ui/services/incidence/incidence-service'
-import { Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
+import { SearchBar } from '../search-bar/search-bar'
+import { Pagination } from '../pagination/pagination'
+import { toSignal } from '@angular/core/rxjs-interop'
 
 @Component({
   selector: 'app-incidences',
-  imports: [Table],
+  imports: [Table, SearchBar, Pagination],
   templateUrl: './incidences.html',
 })
 export class Incidences {
@@ -15,14 +18,20 @@ export class Incidences {
 
   incidenceService = inject(IncidenceService)
   router = inject(Router)
-  incidences$ = computed(() => this.incidenceService.getAll(1, 5))
+  route = inject(ActivatedRoute)
+
+  incidencesSignal = toSignal(
+    computed(() => this.incidenceService.getAll(this.pageNumber(), this.pageSize()))(),
+  )
+
+  incidences$ = computed(() => this.incidenceService.getAll(this.pageNumber(), this.pageSize()))
 
   setPageNumber($event: number) {
-    this.router.navigate(['/management/solicitations', this.pageSize(), $event])
+    this.router.navigate(['/management/incidences', this.pageSize(), $event])
   }
 
   setPageSize($event: number) {
-    this.router.navigate(['/management/solicitations', $event, 1])
+    this.router.navigate(['/management/incidences', $event, 1])
     this.pageSize.apply($event)
   }
 

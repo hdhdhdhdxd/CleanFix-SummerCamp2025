@@ -15,7 +15,7 @@ export const MANAGEMENT_ROUTES: Routes = [
         component: Solicitations,
       },
       { path: 'requests', component: Requests },
-      { path: 'incidences', component: Incidences },
+      { path: 'incidences/:pageSize/:pageNumber', component: Incidences },
       { path: '**', redirectTo: 'solicitations/10/1' },
     ],
   },
