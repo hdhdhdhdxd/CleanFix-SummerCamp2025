@@ -25,11 +25,7 @@
       >
         @for (tab of tabs; track $index) {
           <li class="relative flex-shrink-0 py-1 pr-8 sm:pr-0">
-            <a
-              [routerLink]="tab.route"
-              class="group"
-              (click)="navigateWithTransition(tab.route, $event)"
-            >
+            <a [routerLink]="tab.route" class="group" (click)="navigate(tab.route, $event)">
               <div class="flex items-center gap-2 transition-colors sm:gap-2.5">
                 @switch (tab.icon) {
                   @case ('building') {
