@@ -1,14 +1,13 @@
 import { Solicitation } from '@/core/domain/models/Solicitation'
 import { SolicitationService } from '@/ui/services/solicitation/solicitation-service'
 import { Component, computed, inject, OnInit, signal } from '@angular/core'
-import { Router, ActivatedRoute } from '@angular/router'
-import { toSignal } from '@angular/core/rxjs-interop'
+import { ActivatedRoute } from '@angular/router'
+import { Location } from '@angular/common'
 import { Pagination } from '../pagination/pagination'
 import { SearchBar } from '../search-bar/search-bar'
 import { SolicitationDialog } from '../solicitation-dialog/solicitation-dialog'
 import { Table, TableColumn } from '../table/table'
 import { PaginationDto } from '@/core/domain/models/PaginationDto'
-import { map } from 'rxjs'
 
 @Component({
   selector: 'app-solicitations',
@@ -16,8 +15,8 @@ import { map } from 'rxjs'
   templateUrl: './solicitations.html',
 })
 export class Solicitations implements OnInit {
-  private router = inject(Router)
   private route = inject(ActivatedRoute)
+  private location = inject(Location)
   private solicitationService = inject(SolicitationService)
 
   totalPages = signal<number>(0)
@@ -25,14 +24,8 @@ export class Solicitations implements OnInit {
   hasPreviousPage = signal<boolean>(false)
   hasNextPage = signal<boolean>(false)
 
-  pageSize = toSignal(this.route.queryParams.pipe(map((params) => +(params['pageSize'] || 10))), {
-    initialValue: 10,
-  })
-
-  pageNumber = toSignal(
-    this.route.queryParams.pipe(map((params) => +(params['pageNumber'] || 1))),
-    { initialValue: 1 },
-  )
+  pageSize = signal<number>(10)
+  pageNumber = signal<number>(1)
 
   solicitations$ = computed(() => {
     return this.solicitationService.getAll(this.pageNumber(), this.pageSize())
@@ -53,13 +46,24 @@ export class Solicitations implements OnInit {
 
   ngOnInit() {
     const currentParams = this.route.snapshot.queryParams
+    const initialPageSize = +(currentParams['pageSize'] || 10)
+    const initialPageNumber = +(currentParams['pageNumber'] || 1)
+
+    this.pageSize.set(initialPageSize)
+    this.pageNumber.set(initialPageNumber)
+
     if (!currentParams['pageSize'] && !currentParams['pageNumber']) {
-      this.router.navigate([], {
-        relativeTo: this.route,
-        queryParams: { pageSize: 10, pageNumber: 1 },
-        replaceUrl: true,
-      })
+      this.updateUrl()
     }
+  }
+
+  private updateUrl(): void {
+    const queryParams = new URLSearchParams()
+    queryParams.set('pageSize', this.pageSize().toString())
+    queryParams.set('pageNumber', this.pageNumber().toString())
+
+    const url = `${this.location.path().split('?')[0]}?${queryParams.toString()}`
+    this.location.replaceState(url)
   }
 
   handleTableResponse($event: PaginationDto<Solicitation>) {
@@ -70,23 +74,14 @@ export class Solicitations implements OnInit {
   }
 
   setPageNumber($event: number) {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {
-        pageSize: this.pageSize(),
-        pageNumber: $event,
-      },
-    })
+    this.pageNumber.set($event)
+    this.updateUrl()
   }
 
   setPageSize($event: number) {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {
-        pageSize: $event,
-        pageNumber: 1,
-      },
-    })
+    this.pageSize.set($event)
+    this.pageNumber.set(1)
+    this.updateUrl()
   }
 
   handleRowClick(item: Solicitation): void {

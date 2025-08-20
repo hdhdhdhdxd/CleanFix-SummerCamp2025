@@ -2,11 +2,10 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core'
 import { Table, TableColumn } from '../table/table'
 import { Incidence } from '@/core/domain/models/Incedence'
 import { IncidenceService } from '@/ui/services/incidence/incidence-service'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute } from '@angular/router'
+import { Location } from '@angular/common'
 import { SearchBar } from '../search-bar/search-bar'
 import { Pagination } from '../pagination/pagination'
-import { toSignal } from '@angular/core/rxjs-interop'
-import { map } from 'rxjs'
 import { PaginationDto } from '@/core/domain/models/PaginationDto'
 
 @Component({
@@ -15,8 +14,8 @@ import { PaginationDto } from '@/core/domain/models/PaginationDto'
   templateUrl: './incidences.html',
 })
 export class Incidences implements OnInit {
-  private router = inject(Router)
   private route = inject(ActivatedRoute)
+  private location = inject(Location)
   private incidenceService = inject(IncidenceService)
 
   totalPages = signal<number>(0)
@@ -24,14 +23,8 @@ export class Incidences implements OnInit {
   hasPreviousPage = signal<boolean>(false)
   hasNextPage = signal<boolean>(false)
 
-  pageSize = toSignal(this.route.queryParams.pipe(map((params) => +(params['pageSize'] || 10))), {
-    initialValue: 10,
-  })
-
-  pageNumber = toSignal(
-    this.route.queryParams.pipe(map((params) => +(params['pageNumber'] || 1))),
-    { initialValue: 1 },
-  )
+  pageSize = signal<number>(10)
+  pageNumber = signal<number>(1)
 
   incidences$ = computed(() => {
     return this.incidenceService.getAll(this.pageNumber(), this.pageSize())
@@ -39,24 +32,35 @@ export class Incidences implements OnInit {
 
   columns: TableColumn<Incidence>[] = [
     { key: 'id', label: 'ID', type: 'number' },
-    { key: 'type', label: 'Dirección', type: 'text' },
-    { key: 'date', label: 'Descripción', type: 'date' },
-    { key: 'status', label: 'Tipo', type: 'text' },
-    { key: 'description', label: 'Coste', type: 'text' },
-    { key: 'apartmentId', label: 'Fecha', type: 'number' },
-    { key: 'surface', label: 'Estado', type: 'number' },
-    { key: 'priority', label: 'Estado', type: 'text' },
+    { key: 'type', label: 'Tipo', type: 'text' },
+    { key: 'date', label: 'Fecha', type: 'date' },
+    { key: 'status', label: 'Estado', type: 'text' },
+    { key: 'description', label: 'Descripción', type: 'text' },
+    { key: 'apartmentId', label: 'Apartamento', type: 'number' },
+    { key: 'surface', label: 'Superficie', type: 'number' },
+    { key: 'priority', label: 'Prioridad', type: 'text' },
   ]
 
   ngOnInit() {
     const currentParams = this.route.snapshot.queryParams
+    const initialPageSize = +(currentParams['pageSize'] || 10)
+    const initialPageNumber = +(currentParams['pageNumber'] || 1)
+
+    this.pageSize.set(initialPageSize)
+    this.pageNumber.set(initialPageNumber)
+
     if (!currentParams['pageSize'] && !currentParams['pageNumber']) {
-      this.router.navigate([], {
-        relativeTo: this.route,
-        queryParams: { pageSize: 10, pageNumber: 1 },
-        replaceUrl: true,
-      })
+      this.updateUrl()
     }
+  }
+
+  private updateUrl(): void {
+    const queryParams = new URLSearchParams()
+    queryParams.set('pageSize', this.pageSize().toString())
+    queryParams.set('pageNumber', this.pageNumber().toString())
+
+    const url = `${this.location.path().split('?')[0]}?${queryParams.toString()}`
+    this.location.replaceState(url)
   }
 
   handleTableResponse($event: PaginationDto<Incidence>) {
@@ -67,22 +71,13 @@ export class Incidences implements OnInit {
   }
 
   setPageNumber($event: number) {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {
-        pageSize: this.pageSize(),
-        pageNumber: $event,
-      },
-    })
+    this.pageNumber.set($event)
+    this.updateUrl()
   }
 
   setPageSize($event: number) {
-    this.router.navigate([], {
-      relativeTo: this.route,
-      queryParams: {
-        pageSize: $event,
-        pageNumber: 1,
-      },
-    })
+    this.pageSize.set($event)
+    this.pageNumber.set(1)
+    this.updateUrl()
   }
 }
