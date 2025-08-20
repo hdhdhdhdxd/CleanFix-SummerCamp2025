@@ -15,13 +15,15 @@ namespace WebApi.Servicios
         {
             var intencion = _clasificador.Clasificar(mensaje);
 
+            // Simula el estilo conversacional que usabas en consola
             return intencion switch
             {
-                IntencionUsuario.GenerarFactura => "Entendido: quieres generar una factura.",
-                IntencionUsuario.ConsultarDatos => "Vamos a consultar los datos que necesitas.",
-                IntencionUsuario.Salir => "Hasta luego. ¡Gracias por usar el servicio!",
-                _ => "No he podido entender tu intención. ¿Puedes reformular?"
+                IntencionUsuario.GenerarFactura => "Bot: Claro, puedo ayudarte a generar una factura. ¿Tienes el número de pedido?",
+                IntencionUsuario.ConsultarDatos => "Bot: ¿Qué datos necesitas consultar? Puedo ayudarte con información de empresa o materiales.",
+                IntencionUsuario.Salir => "Bot: Ha sido un placer ayudarte. ¡Hasta pronto!",
+                _ => "Bot: Lo siento, no entendí tu solicitud. ¿Puedes explicarlo de otra forma?"
             };
         }
     }
 }
+

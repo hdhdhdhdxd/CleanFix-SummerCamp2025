@@ -14,14 +14,14 @@ namespace CleanFixConsola.PluginsIATest
 
         // Función expuesta al kernel que genera una factura detallada en formato texto
         [KernelFunction]
-        public string GenerarFactura(Company empresa, List<Material> materiales)
+        public string GenerarFactura(CompanyIa empresa, List<MaterialIa> materialesIa)
         {
             // Calcula el coste del servicio de la empresa y su IVA
             decimal costoEmpresa = empresa.Price;
             decimal ivaEmpresa = costoEmpresa * IVA;
 
             // Calcula el coste total de los materiales y su IVA
-            decimal costoMateriales = materiales.Sum(m => m.Cost);
+            decimal costoMateriales = materialesIa.Sum(m => m.Cost);
             decimal ivaMateriales = costoMateriales * IVA;
 
             // Calcula el total general de la factura (empresa + materiales + IVA)
@@ -43,7 +43,7 @@ namespace CleanFixConsola.PluginsIATest
             sb.AppendLine(" |----|--------------------|----------|-----------|----------|");
 
             // Recorre cada material y calcula su IVA y total individual
-            foreach (var m in materiales)
+            foreach (var m in materialesIa)
             {
                 decimal ivaMat = m.Cost * IVA;
                 decimal totalMat = m.Cost + ivaMat;
@@ -70,13 +70,13 @@ namespace CleanFixConsola.PluginsIATest
 
         // Función expuesta al kernel que calcula y devuelve solo el desglose del IVA
         [KernelFunction]
-        public string ObtenerIVA(Company empresa, List<Material> materiales)
+        public string ObtenerIVA(CompanyIa empresa, List<MaterialIa> materialesIa)
         {
             // Calcula el IVA del servicio de la empresa
             decimal ivaEmpresa = empresa.Price * IVA;
 
             // Calcula el IVA total de los materiales
-            decimal ivaMateriales = materiales.Sum(m => m.Cost) * IVA;
+            decimal ivaMateriales = materialesIa.Sum(m => m.Cost) * IVA;
 
             // Suma ambos para obtener el IVA total de la factura
             decimal ivaTotal = ivaEmpresa + ivaMateriales;
@@ -93,7 +93,7 @@ namespace CleanFixConsola.PluginsIATest
         public string Direccion { get; set; }
         public string Telefono { get; set; }
 
-        public List<Material> Materiales { get; set; }
+        public List<MaterialIa> Materiales { get; set; }
 
         public decimal Subtotal { get; set; }
         public decimal Impuestos { get; set; }
