@@ -13,8 +13,9 @@
     </div>
     <div>
       <app-pagination
-        [pageSizeInput]="pageSize()"
-        [pageNumberInput]="pageNumber()"
+        [paginationData]="solicitationsSignal()"
+        [currentPageSize]="pageSize()"
+        [currentPageNumber]="pageNumber()"
         (pageSizeChange)="setPageSize($event)"
         (pageNumberChange)="setPageNumber($event)"
       />

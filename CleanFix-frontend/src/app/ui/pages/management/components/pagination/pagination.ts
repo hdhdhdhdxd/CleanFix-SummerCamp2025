@@ -1,4 +1,6 @@
-import { Component, input, output, signal } from '@angular/core'
+import { Component, input, output, computed } from '@angular/core'
+import { PaginationDto } from '@/core/domain/models/PaginationDto'
+import { Solicitation } from '@/core/domain/models/Solicitation'
 
 @Component({
   selector: 'app-pagination',
@@ -6,38 +8,46 @@ import { Component, input, output, signal } from '@angular/core'
   templateUrl: './pagination.html',
 })
 export class Pagination {
-  pageSizeInput = input<number>()
-  pageNumberInput = input<number>()
-  totalItemsInput = input<number>()
+  paginationData = input<PaginationDto<Solicitation>>()
+  currentPageSize = input<number>(10)
+  currentPageNumber = input<number>(1)
 
-  pageSize = signal<number>(5)
-  pageNumber = signal<number>(1)
-  totalItems = signal<number>(0)
+  pageSize = computed(() => this.currentPageSize())
+  pageNumber = computed(() => this.currentPageNumber())
+  totalItems = computed(() => this.paginationData()?.totalCount ?? 0)
+  totalPages = computed(() => this.paginationData()?.totalPages ?? 1)
+  hasPreviousPage = computed(() => this.paginationData()?.hasPreviousPage ?? false)
+  hasNextPage = computed(() => this.paginationData()?.hasNextPage ?? false)
+
+  startItem = computed(() => {
+    const data = this.paginationData()
+    if (!data || data.totalCount === 0) return 0
+    return (this.pageNumber() - 1) * this.pageSize() + 1
+  })
+
+  endItem = computed(() => {
+    const data = this.paginationData()
+    if (!data || data.totalCount === 0) return 0
+    const itemsInCurrentPage = data.items.length
+    return (this.pageNumber() - 1) * this.pageSize() + itemsInCurrentPage
+  })
+
+  canGoPrevious = computed(() => this.hasPreviousPage())
+  canGoNext = computed(() => this.hasNextPage())
 
   pageSizeChange = output<number>()
   pageNumberChange = output<number>()
-
-  constructor() {
-    const initialSize = this.pageSizeInput() ?? 5
-    const initialNumber = this.pageNumberInput() ?? 1
-    const initialTotal = this.totalItemsInput() ?? 0
-    this.pageSize.set(initialSize)
-    this.pageNumber.set(initialNumber)
-    this.totalItems.set(initialTotal)
-  }
 
   setPageSize($event: Event) {
     const target = $event.target as HTMLSelectElement
     const size = Number(target.value)
     if (!isNaN(size) && size > 0) {
-      this.pageSize.set(size)
       this.pageSizeChange.emit(size)
     }
   }
 
   setPageNumber(num: number) {
-    if (num < 1) return
-    this.pageNumber.set(num)
+    if (num < 1 || num > this.totalPages()) return
     this.pageNumberChange.emit(num)
   }
 }

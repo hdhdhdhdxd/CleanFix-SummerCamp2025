@@ -1,6 +1,8 @@
 import { Solicitation } from '@/core/domain/models/Solicitation'
 import { SolicitationService } from '@/ui/services/solicitation/solicitation-service'
-import { Component, computed, inject, signal } from '@angular/core'
+import { Component, computed, inject, input } from '@angular/core'
+import { Router, ActivatedRoute } from '@angular/router'
+import { toSignal } from '@angular/core/rxjs-interop'
 import { Pagination } from '../pagination/pagination'
 import { SearchBar } from '../search-bar/search-bar'
 import { SolicitationDialog } from '../solicitation-dialog/solicitation-dialog'
@@ -12,20 +14,28 @@ import { Table, TableColumn } from '../table/table'
   templateUrl: './solicitations.html',
 })
 export class Solicitations {
-  pageSize = signal<number>(5)
-  pageNumber = signal<number>(1)
+  pageSize = input<number>(10)
+  pageNumber = input<number>(1)
 
+  router = inject(Router)
+  route = inject(ActivatedRoute)
   solicitationService = inject(SolicitationService)
+
+  solicitationsSignal = toSignal(
+    computed(() => this.solicitationService.getAll(this.pageNumber(), this.pageSize()))(),
+  )
 
   solicitations$ = computed(() =>
     this.solicitationService.getAll(this.pageNumber(), this.pageSize()),
   )
 
   setPageNumber($event: number) {
-    this.pageNumber.set($event)
+    this.router.navigate(['/management/solicitations', this.pageSize(), $event])
   }
+
   setPageSize($event: number) {
-    this.pageSize.set($event)
+    this.router.navigate(['/management/solicitations', $event, 1])
+    this.pageSize.apply($event)
   }
 
   selectedSolicitation: Solicitation | null = null
