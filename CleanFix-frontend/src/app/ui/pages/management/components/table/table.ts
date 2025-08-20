@@ -1,3 +1,4 @@
+import { Incidence } from '@/core/domain/models/Incedence'
 import { PaginationDto } from '@/core/domain/models/PaginationDto'
 import { Solicitation } from '@/core/domain/models/Solicitation'
 import { AsyncPipe, CurrencyPipe, DatePipe, NgClass } from '@angular/common'
@@ -15,7 +16,7 @@ export interface TableColumn<T> {
   imports: [CurrencyPipe, DatePipe, NgClass, AsyncPipe],
   templateUrl: './table.html',
 })
-export class Table<T extends Solicitation> {
+export class Table<T extends Solicitation | Incidence> {
   data$ = input.required<Observable<PaginationDto<T>>>()
   tableColumns = input.required<TableColumn<T>[]>()
   rowClick = output<T>()

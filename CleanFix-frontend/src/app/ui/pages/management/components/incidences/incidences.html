@@ -1,1 +1,1 @@
-<p>incidences works!</p>
+<app-table [data$]="incidences$()" [tableColumns]="columns" (rowClick)="handleRowClick($event)" />
