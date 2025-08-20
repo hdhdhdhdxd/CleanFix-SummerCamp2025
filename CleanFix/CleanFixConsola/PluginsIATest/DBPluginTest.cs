@@ -26,7 +26,7 @@ namespace CleanFixConsola.PluginsIATest
         [KernelFunction, Description("Obtiene todas las empresas desde la base de datos, las convierte a objeto")]
         public object GetAllEmpresas()
         {
-            var companies = new List<Company>();
+            var companiesIa = new List<CompanyIa>();
 
             try
             {
@@ -38,10 +38,10 @@ namespace CleanFixConsola.PluginsIATest
                 var command = new SqlCommand("SELECT Id, Name, Address, Number, Email, [type], Price, WorkTime FROM dbo.Companies", connection);
                 using var reader = command.ExecuteReader();
 
-                // Recorre los resultados y los convierte en objetos Company
+                // Recorre los resultados y los convierte en objetos CompanyIa
                 while (reader.Read())
                 {
-                    companies.Add(new Company
+                    companiesIa.Add(new CompanyIa
                     {
                         Id = reader.GetInt32(0),
                         Name = reader.IsDBNull(1) ? null : reader.GetString(1),
@@ -61,14 +61,14 @@ namespace CleanFixConsola.PluginsIATest
             }
 
             // Devuelve la lista de empresas con éxito
-            return new EmpresaResponse { Success = true, Data = companies };
+            return new EmpresaResponse { Success = true, Data = companiesIa };
         }
 
         // Función expuesta al kernel que obtiene todos los materiales desde la base de datos
         [KernelFunction, Description("Obtiene todos los materiales desde la base de datos, las convierte a objeto")]
         public MaterialResponse GetAllMaterials()
         {
-            var materiales = new List<Material>();
+            var materialesIa = new List<MaterialIa>();
 
             try
             {
@@ -80,10 +80,10 @@ namespace CleanFixConsola.PluginsIATest
                 var command = new SqlCommand("SELECT Id, Name, Cost, Issue FROM dbo.Materials", connection);
                 using var reader = command.ExecuteReader();
 
-                // Recorre los resultados y los convierte en objetos Material
+                // Recorre los resultados y los convierte en objetos MaterialIa
                 while (reader.Read())
                 {
-                    materiales.Add(new Material
+                    materialesIa.Add(new MaterialIa
                     {
                         Id = reader.GetInt32(0),
                         Name = reader.IsDBNull(1) ? null : reader.GetString(1),
@@ -107,15 +107,14 @@ namespace CleanFixConsola.PluginsIATest
             return new MaterialResponse
             {
                 Success = true,
-                Data = materiales
+                Data = materialesIa
             };
         }
     }
 
-
     //Clases con los datos de respuesta
 
-    public class Company
+    public class CompanyIa
     {
         public int Id { get; set; }
         public string Name { get; set; }
@@ -127,7 +126,7 @@ namespace CleanFixConsola.PluginsIATest
         public decimal Price { get; set; }
         public int WorkTime { get; set; }
     }
-    public class Material
+    public class MaterialIa
     {
         public int Id { get; set; }
 

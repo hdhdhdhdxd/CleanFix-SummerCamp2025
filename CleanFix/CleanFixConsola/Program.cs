@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using CleanFixConsola.PluginsIATest;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.SemanticKernel;
@@ -10,14 +11,14 @@ using System.Globalization;
 public class EmpresaResponse
 {
     public bool Success { get; set; }
-    public List<Company> Data { get; set; }
+    public List<CompanyIa> Data { get; set; }
     public string Error { get; set; }
 }
 
 public class MaterialResponse
 {
     public bool Success { get; set; }
-    public List<Material> Data { get; set; }
+    public List<MaterialIa> Data { get; set; }
     public string Error { get; set; }
 }
 
@@ -76,8 +77,8 @@ class Program
         }
 
         // Serializa la lista de empresas a formato JSON
-        var companies = empresasResponse.Data;
-        var empresasJson = JsonSerializer.Serialize(companies);
+        var companiesIa = empresasResponse.Data;
+        var empresasJson = JsonSerializer.Serialize(companiesIa);
 
         // Invoca la función del plugin para obtener todos los materiales
         var materialesIA = await kernel.InvokeAsync("DBPlugin", "GetAllMaterials");
@@ -91,8 +92,8 @@ class Program
         }
 
         // Serializa la lista de materiales a formato JSON
-        var materials = materialesResponse.Data;
-        var materialesJson = JsonSerializer.Serialize(materials);
+        var materialsIa = materialesResponse.Data;
+        var materialesJson = JsonSerializer.Serialize(materialsIa);
 
         // Define el prompt que usará el modelo para responder preguntas
         var promptTemplate = @" Eres un asistente inteligente que responde preguntas sobre empresas y materiales. 
@@ -133,10 +134,10 @@ class Program
             {
                 Console.WriteLine(" Introduce el ID de la empresa:");
                 var idEmp = Console.ReadLine()?.Trim();
-                var empresa = companies.FirstOrDefault(e => e.Id.ToString() == idEmp);
+                var empresa = companiesIa.FirstOrDefault(e => e.Id.ToString() == idEmp);
                 if (empresa == null) { Console.WriteLine(" ❌ Empresa no encontrada."); continue; }
 
-                var selMat = new List<Material>();
+                var selMat = new List<MaterialIa>();
                 while (true)
                 {
                     Console.WriteLine(" ID del material a añadir (o 'fin' para terminar la factura):");
@@ -146,7 +147,7 @@ class Program
                     // Añade materiales seleccionados por el usuario
                     if (int.TryParse(idMatInput, out int idMat))
                     {
-                        var mat = materials.FirstOrDefault(m => m.Id == idMat);
+                        var mat = materialsIa.FirstOrDefault(m => m.Id == idMat);
                         if (mat != null)
                         {
                             selMat.Add(mat);
@@ -168,7 +169,7 @@ class Program
                 var tipoMaterial = ExtraerTipo(userInput, "material");
 
                 // Selecciona la empresa más barata del tipo indicado
-                var empresa = companies
+                var empresa = companiesIa
                     .Where(e => !tipoEmpresa.HasValue || e.Type == tipoEmpresa.Value)
                     .OrderBy(e => e.Price)
                     .FirstOrDefault();
@@ -179,7 +180,7 @@ class Program
                     continue;
                 }
 
-                List<Material> materialesSeleccionados = new();
+                List<MaterialIa> materialesSeleccionados = new();
 
                 // Determina qué materiales incluir según la intención del usuario
                 if (SolicitaSinMateriales(userInput))
@@ -188,7 +189,7 @@ class Program
                 }
                 else if (SolicitaTodosMateriales(userInput))
                 {
-                    materialesSeleccionados = materials.Where(m => m.Available).ToList();
+                    materialesSeleccionados = materialsIa.Where(m => m.Available).ToList();
                     Console.WriteLine($" 🧾 Se han seleccionado todos los materiales disponibles ({materialesSeleccionados.Count}).");
                 }
                 else
@@ -201,7 +202,7 @@ class Program
 
                     if (SolicitaMaterialMasCaro(userInput))
                     {
-                        materialesSeleccionados = SeleccionarMaterialMasCaro(materials, tipoMaterial.Value);
+                        materialesSeleccionados = SeleccionarMaterialMasCaro(materialsIa, tipoMaterial.Value);
 
                         if (materialesSeleccionados.Count == 0)
                         {
@@ -213,7 +214,7 @@ class Program
                     }
                     else if (SolicitaMaterialMasBarato(userInput))
                     {
-                        materialesSeleccionados = SeleccionarMaterialMasBarato(materials, tipoMaterial.Value);
+                        materialesSeleccionados = SeleccionarMaterialMasBarato(materialsIa, tipoMaterial.Value);
 
                         if (materialesSeleccionados.Count == 0)
                         {
@@ -225,7 +226,7 @@ class Program
                     }
                     else
                     {
-                        materialesSeleccionados = FiltrarMateriales(materials, tipoMaterial.Value);
+                        materialesSeleccionados = FiltrarMateriales(materialsIa, tipoMaterial.Value);
 
                         if (materialesSeleccionados.Count == 0)
                         {
@@ -272,13 +273,13 @@ class Program
 
 
     // Genera y muestra una factura junto con el desglose de IVA usando el plugin de facturación
-    private static async Task MostrarFacturaAsync(Kernel kernel, Company empresa, List<Material> materiales)
+    private static async Task MostrarFacturaAsync(Kernel kernel, CompanyIa empresa, List<MaterialIa> materialesIa)
     {
         // Invoca la función del plugin para generar la factura
         var resFac = await kernel.InvokeAsync("FacturaPlugin", "GenerarFactura", new()
         {
             ["empresa"] = empresa,
-            ["materiales"] = materiales
+            ["materialesIa"] = materialesIa
         });
 
         Console.WriteLine("\n 📄 FACTURA:");
@@ -288,7 +289,7 @@ class Program
         var resIVA = await kernel.InvokeAsync("FacturaPlugin", "ObtenerIVA", new()
         {
             ["empresa"] = empresa,
-            ["materiales"] = materiales
+            ["materialesIa"] = materialesIa
         });
         Console.WriteLine(" 💰 DESGLOSE DE IVA:");
         Console.WriteLine(resIVA.GetValue<string>());
@@ -323,9 +324,9 @@ class Program
     }
 
     // Filtra los materiales disponibles según el tipo indicado
-    private static List<Material> FiltrarMateriales(List<Material> materiales, int? tipoMaterial)
+    private static List<MaterialIa> FiltrarMateriales(List<MaterialIa> materialesIa, int? tipoMaterial)
     {
-        return materiales
+        return materialesIa
             .Where(m => m.Available && (!tipoMaterial.HasValue || m.Issue == tipoMaterial.Value))
             .ToList();
     }
@@ -402,27 +403,27 @@ class Program
     }
 
     // Selecciona el material más barato disponible del tipo indicado
-    private static List<Material> SeleccionarMaterialMasBarato(List<Material> materiales, int tipo)
+    private static List<MaterialIa> SeleccionarMaterialMasBarato(List<MaterialIa> materialesIa, int tipo)
     {
-        var materialMasBarato = materiales
+        var materialMasBarato = materialesIa
             .Where(m => m.Available && m.Issue == tipo)
             .OrderBy(m => m.Cost)
             .FirstOrDefault();
 
         // Devuelve el material más barato como lista (o vacía si no hay)
-        return materialMasBarato != null ? new List<Material> { materialMasBarato } : new List<Material>();
+        return materialMasBarato != null ? new List<MaterialIa> { materialMasBarato } : new List<MaterialIa>();
     }
 
     // Selecciona el material más caro disponible del tipo indicado
-    private static List<Material> SeleccionarMaterialMasCaro(List<Material> materiales, int tipo)
+    private static List<MaterialIa> SeleccionarMaterialMasCaro(List<MaterialIa> materialesIa, int tipo)
     {
-        var materialMasCaro = materiales
+        var materialMasCaro = materialesIa
             .Where(m => m.Available && m.Issue == tipo)
             .OrderByDescending(m => m.Cost)
             .FirstOrDefault();
 
         // Devuelve el material más caro como lista (o vacía si no hay)
-        return materialMasCaro != null ? new List<Material> { materialMasCaro } : new List<Material>();
+        return materialMasCaro != null ? new List<MaterialIa> { materialMasCaro } : new List<MaterialIa>();
     }
 }
 
