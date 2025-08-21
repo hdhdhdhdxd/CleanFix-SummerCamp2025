@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CleanFix.Plugins;
-using WebApi.CoreBot.Models;
 using Microsoft.SemanticKernel;
 
 namespace CleanFix.Plugins
@@ -39,22 +38,26 @@ namespace CleanFix.Plugins
 
         public async Task<PluginRespuesta> EjecutarAsync(string mensaje)
         {
-            var empresa = new CompanyIa { Name = "Empresa Test", Price = 1000 };
-            var materiales = new List<MaterialIa>
-        {
-            new MaterialIa { Id = 1, Name = "Material A", Cost = 200 },
-            new MaterialIa { Id = 2, Name = "Material B", Cost = 300 }
+            var empresa = new { Nombre = "Empresa Test", Precio = 1000 };
+            var materiales = new List<object>
+            {
+                new { Id = 1, Nombre = "Material A", Costo = 200 },
+                new { Id = 2, Nombre = "Material B", Costo = 300 }
             };
 
-            string resultado = mensaje.Contains("iva", StringComparison.OrdinalIgnoreCase)
-                ? ObtenerIVA(empresa, materiales)
-                : GenerarFactura(empresa, materiales);
+            var total = 1000 + 200 + 300;
+            var resultado = mensaje.Contains("iva") ? total * 1.21 : total;
 
             return await Task.FromResult(new PluginRespuesta
             {
                 Success = true,
                 Error = null,
-                Data = resultado
+                Data = new
+                {
+                    Empresa = empresa,
+                    Materiales = materiales,
+                    Total = resultado
+                }
             });
         }
     }

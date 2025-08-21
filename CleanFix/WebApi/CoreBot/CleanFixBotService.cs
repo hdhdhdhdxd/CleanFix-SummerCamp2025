@@ -1,6 +1,7 @@
-﻿using CleanFix.Plugins;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using WebApi.CoreBot.Models;
+using CleanFix.Plugins;
 
 namespace WebApi.CoreBot
 {
@@ -41,7 +42,7 @@ namespace WebApi.CoreBot
             mensaje = mensaje.ToLower();
 
             if (mensaje.Contains("factura")) return "factura";
-            if (mensaje.Contains("base de datos") || mensaje.Contains("empresa") || mensaje.Contains("material")) return "db";
+            if (mensaje.Contains("empresa") || mensaje.Contains("material")) return "db";
 
             return "desconocido";
         }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 using CleanFix.Plugins;
-using WebApi.CoreBot.Models;
 using Microsoft.SemanticKernel;
 
 namespace CleanFix.Plugins
@@ -92,32 +91,42 @@ namespace CleanFix.Plugins
 
             if (mensaje.Contains("empresa"))
             {
-                var response = await Task.Run(() => GetAllEmpresas());
-                return new PluginRespuesta
+                var empresas = new List<object>
                 {
-                    Success = response.Success,
-                    Error = response.Error,
-                    Data = response.Data
+                    new { Id = 1, Nombre = "Empresa A" },
+                    new { Id = 2, Nombre = "Empresa B" }
                 };
+
+                return await Task.FromResult(new PluginRespuesta
+                {
+                    Success = true,
+                    Error = null,
+                    Data = empresas
+                });
             }
 
             if (mensaje.Contains("material"))
             {
-                var response = await Task.Run(() => GetAllMaterials());
-                return new PluginRespuesta
+                var materiales = new List<object>
                 {
-                    Success = response.Success,
-                    Error = response.Error,
-                    Data = response.Data
+                    new { Id = 1, Nombre = "Material X" },
+                    new { Id = 2, Nombre = "Material Y" }
                 };
+
+                return await Task.FromResult(new PluginRespuesta
+                {
+                    Success = true,
+                    Error = null,
+                    Data = materiales
+                });
             }
 
-            return new PluginRespuesta
+            return await Task.FromResult(new PluginRespuesta
             {
                 Success = false,
                 Error = "🤖 No entendí tu mensaje. Prueba con 'empresas' o 'materiales'.",
                 Data = null
-            };
+            });
         }
     }
 

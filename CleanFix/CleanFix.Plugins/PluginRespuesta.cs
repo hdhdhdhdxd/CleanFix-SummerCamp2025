@@ -1,4 +1,4 @@
-﻿namespace WebApi.CoreBot.Models
+﻿namespace CleanFix.Plugins
 {
     public class PluginRespuesta
     {

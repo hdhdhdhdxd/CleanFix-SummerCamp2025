@@ -1,7 +1,4 @@
 ﻿using System.Threading.Tasks;
-using WebApi.CoreBot.Models;
-
-using System.Threading.Tasks;
 
 namespace CleanFix.Plugins
 {
