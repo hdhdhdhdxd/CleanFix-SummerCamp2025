@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CleanFix.Plugins;
 using Microsoft.SemanticKernel;
+using System.Text.RegularExpressions;
 
 namespace CleanFix.Plugins
 {
@@ -90,73 +91,77 @@ namespace CleanFix.Plugins
         {
             mensaje = mensaje.ToLower();
 
-            if (mensaje.StartsWith("empresas"))
+            // Obtener todas las empresas y materiales (como en la consola)
+            var empresasResponse = await Task.Run(() => GetAllEmpresas());
+            var empresas = empresasResponse.Data as List<CompanyIa>;
+            if (!empresasResponse.Success || empresas == null)
+                return new PluginRespuesta { Success = false, Error = empresasResponse.Error ?? "Error al obtener empresas." };
+
+            // --- FILTRADO NATURAL COMO EN LA CONSOLA ---
+            // Extraer tipo
+            int? tipoEmpresa = ConsultaParser.ExtraerTipo(mensaje, "empresa");
+            if (tipoEmpresa.HasValue)
+                empresas = empresas.Where(e => e.Type == tipoEmpresa.Value).ToList();
+
+            // Filtro por precio
+            if (mensaje.Contains("precio>"))
             {
-                var response = await Task.Run(() => GetAllEmpresas());
-                var empresas = response.Data as List<CompanyIa>;
-                if (!response.Success || empresas == null)
-                    return new PluginRespuesta { Success = false, Error = response.Error ?? "Error al obtener empresas." };
-
-                // Filtros
-                if (mensaje.Contains("tipo="))
-                {
-                    var tipoStr = mensaje.Split("tipo=")[1].Split(' ')[0];
-                    if (int.TryParse(tipoStr, out int tipo))
-                        empresas = empresas.Where(e => e.Type == tipo).ToList(); // Cambiado a Where+ToList para evitar problemas de FindAll
-                }
-
-                if (mensaje.Contains("precio>"))
-                {
-                    var precioStr = mensaje.Split("precio>")[1].Split(' ')[0];
-                    if (decimal.TryParse(precioStr, out decimal precio))
-                        empresas = empresas.Where(e => e.Price > precio).ToList();
-                }
-
-                if (mensaje.Contains("más barata"))
-                {
-                    var empresaMasBarata = empresas.OrderBy(e => e.Price).FirstOrDefault();
-                    return new PluginRespuesta { Success = true, Data = empresaMasBarata != null ? new List<CompanyIa> { empresaMasBarata } : new List<CompanyIa>() };
-                }
-
-                if (mensaje.Contains("más cara"))
-                {
-                    var empresaMasCara = empresas.OrderByDescending(e => e.Price).FirstOrDefault();
-                    return new PluginRespuesta { Success = true, Data = empresaMasCara != null ? new List<CompanyIa> { empresaMasCara } : new List<CompanyIa>() };
-                }
-
-                return new PluginRespuesta { Success = true, Data = empresas };
+                var precioStr = mensaje.Split("precio>")[1].Split(' ')[0];
+                if (decimal.TryParse(precioStr, out decimal precio))
+                    empresas = empresas.Where(e => e.Price > precio).ToList();
             }
 
+            // Más barata
+            if (mensaje.Contains("más barata"))
+            {
+                var empresaMasBarata = empresas.OrderBy(e => e.Price).FirstOrDefault();
+                return new PluginRespuesta { Success = true, Data = empresaMasBarata != null ? new List<CompanyIa> { empresaMasBarata } : new List<CompanyIa>() };
+            }
+
+            // Más cara
+            if (mensaje.Contains("más cara"))
+            {
+                var empresaMasCara = empresas.OrderByDescending(e => e.Price).FirstOrDefault();
+                return new PluginRespuesta { Success = true, Data = empresaMasCara != null ? new List<CompanyIa> { empresaMasCara } : new List<CompanyIa>() };
+            }
+
+            // Si el mensaje pide empresas
+            if (mensaje.StartsWith("empresas"))
+                return new PluginRespuesta { Success = true, Data = empresas };
+
+            // --- MATERIALES (igual que empresas) ---
             if (mensaje.StartsWith("materiales"))
             {
-                var response = await Task.Run(() => GetAllMaterials());
-                var materiales = response.Data as List<MaterialIa>;
-                if (!response.Success || materiales == null)
-                    return new PluginRespuesta { Success = false, Error = response.Error ?? "Error al obtener materiales." };
+                var materialesResponse = await Task.Run(() => GetAllMaterials());
+                var materiales = materialesResponse.Data as List<MaterialIa>;
+                if (!materialesResponse.Success || materiales == null)
+                    return new PluginRespuesta { Success = false, Error = materialesResponse.Error ?? "Error al obtener materiales." };
 
                 // Filtros
+                int? tipoMaterial = ConsultaParser.ExtraerTipo(mensaje, "material");
+                if (tipoMaterial.HasValue)
+                    materiales = materiales.Where(m => m.Issue == tipoMaterial.Value).ToList();
+
                 if (mensaje.Contains("costo<"))
                 {
                     var costoStr = mensaje.Split("costo<")[1].Split(' ')[0];
                     if (decimal.TryParse(costoStr, out decimal costo))
-                        materiales = materiales.FindAll(m => m.Cost < costo);
+                        materiales = materiales.Where(m => m.Cost < costo).ToList();
                 }
 
                 if (mensaje.Contains("disponibles"))
-                {
-                    materiales = materiales.FindAll(m => m.Available);
-                }
+                    materiales = materiales.Where(m => m.Available).ToList();
 
                 if (mensaje.Contains("más barato"))
                 {
                     var materialMasBarato = materiales.OrderBy(m => m.Cost).FirstOrDefault();
-                    return new PluginRespuesta { Success = true, Data = new List<MaterialIa> { materialMasBarato } };
+                    return new PluginRespuesta { Success = true, Data = materialMasBarato != null ? new List<MaterialIa> { materialMasBarato } : new List<MaterialIa>() };
                 }
 
                 if (mensaje.Contains("más caro"))
                 {
                     var materialMasCaro = materiales.OrderByDescending(m => m.Cost).FirstOrDefault();
-                    return new PluginRespuesta { Success = true, Data = new List<MaterialIa> { materialMasCaro } };
+                    return new PluginRespuesta { Success = true, Data = materialMasCaro != null ? new List<MaterialIa> { materialMasCaro } : new List<MaterialIa>() };
                 }
 
                 return new PluginRespuesta { Success = true, Data = materiales };
