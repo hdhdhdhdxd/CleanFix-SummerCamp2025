@@ -9,13 +9,17 @@
         [data$]="solicitations$()"
         [tableColumns]="columns"
         (rowClick)="handleRowClick($event)"
+        (response)="handleTableResponse($event)"
       />
     </div>
     <div>
       <app-pagination
-        [paginationData]="solicitationsSignal()"
-        [currentPageSize]="pageSize()"
-        [currentPageNumber]="pageNumber()"
+        [pageSize]="pageSize()"
+        [pageNumber]="pageNumber()"
+        [totalPages]="totalPages()"
+        [totalCount]="totalCount()"
+        [hasPreviousPage]="hasPreviousPage()"
+        [hasNextPage]="hasNextPage()"
         (pageSizeChange)="setPageSize($event)"
         (pageNumberChange)="setPageNumber($event)"
       />

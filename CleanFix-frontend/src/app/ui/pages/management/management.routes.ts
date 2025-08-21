@@ -9,14 +9,11 @@ export const MANAGEMENT_ROUTES: Routes = [
     path: '',
     component: Management,
     children: [
-      { path: '', redirectTo: 'solicitations/10/1', pathMatch: 'full' },
-      {
-        path: 'solicitations/:pageSize/:pageNumber',
-        component: Solicitations,
-      },
+      { path: '', redirectTo: 'solicitations', pathMatch: 'full' },
+      { path: 'solicitations', component: Solicitations },
       { path: 'requests', component: Requests },
       { path: 'incidences', component: Incidences },
-      { path: '**', redirectTo: 'solicitations/10/1' },
+      { path: '**', redirectTo: 'solicitations' },
     ],
   },
 ]

@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router'
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: '', redirectTo: '', pathMatch: 'full' },
   {
-    path: 'home',
+    path: '',
     loadChildren: () => import('@/ui/pages/home/home.routes').then((r) => r.HOME_ROUTES),
   },
   {
@@ -20,6 +20,6 @@ export const routes: Routes = [
   },
   {
     path: '**',
-    redirectTo: 'home',
+    redirectTo: '',
   },
 ]

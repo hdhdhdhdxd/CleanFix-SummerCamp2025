@@ -1,43 +1,35 @@
 <div class="flex h-full flex-col">
-  @if (observableData | async; as pagination) {
-    @if (!hasData(pagination.items)) {
-      <div class="flex flex-1 items-center justify-center">
-        <div class="text-center">
-          <svg
-            class="mx-auto mb-4 h-12 w-12 text-brand-300"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            ></path>
-          </svg>
-          <p class="text-lg font-medium text-brand-500">No hay datos disponibles</p>
-          <p class="text-sm text-brand-400">Los datos aparecerán aquí cuando estén disponibles</p>
-        </div>
-      </div>
-    } @else {
-      <!-- Desktop Table -->
-      <div class="hidden flex-1 overflow-hidden rounded-lg border border-brand-200 sm:flex">
-        <div class="h-full w-full overflow-auto">
-          <table class="w-full divide-y divide-brand-200">
-            <thead class="sticky top-0 bg-brand-50">
-              <tr>
-                @for (column of getColumns(); track column.key) {
-                  <th
-                    class="px-3 py-3 text-left text-xs font-semibold tracking-wider text-brand-600 sm:text-sm"
-                  >
-                    {{ column.label }}
-                  </th>
-                }
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-brand-200 bg-white text-brand-600">
-              @for (item of pagination.items; track $index) {
+  @if (items()) {
+    <!-- Desktop Table -->
+    <div class="hidden flex-1 overflow-hidden rounded-lg border border-brand-200 sm:flex">
+      <div class="h-full w-full overflow-auto">
+        <table class="w-full divide-y divide-brand-200">
+          <thead class="sticky top-0 bg-brand-50">
+            <tr>
+              @for (column of getColumns(); track column.key) {
+                <th
+                  class="px-3 py-3 text-left text-xs font-semibold tracking-wider text-brand-600 sm:text-sm"
+                >
+                  {{ column.label }}
+                </th>
+              }
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-brand-200 bg-white text-brand-600">
+            @if (items().length === 0) {
+              <!-- Skeleton Rows -->
+              @for (row of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track row) {
+                <tr class="animate-pulse">
+                  @for (column of getColumns(); track column.key) {
+                    <td class="px-3 py-3 text-xs whitespace-nowrap sm:text-sm">
+                      <div class="h-4 rounded bg-brand-100"></div>
+                    </td>
+                  }
+                </tr>
+              }
+            } @else {
+              <!-- Real Data Rows -->
+              @for (item of items(); track $index) {
                 <tr
                   class="cursor-pointer transition-colors hover:bg-brand-50"
                   (click)="handleRowClick(item)"
@@ -73,13 +65,31 @@
                   }
                 </tr>
               }
-            </tbody>
-          </table>
-        </div>
+            }
+          </tbody>
+        </table>
       </div>
-      <!-- Mobile Table -->
-      <div class="flex-1 space-y-3 overflow-auto sm:hidden">
-        @for (item of pagination.items; track $index) {
+    </div>
+
+    <!-- Mobile Table -->
+    <div class="flex-1 space-y-3 overflow-auto sm:hidden">
+      @if (items().length === 0) {
+        <!-- Skeleton Cards -->
+        @for (card of [1, 2, 3, 4, 5, 6, 7, 8]; track card) {
+          <div class="animate-pulse rounded-lg border border-brand-200 bg-white p-4 shadow-sm">
+            @for (column of getColumns(); track column.key) {
+              <div
+                class="flex items-center justify-between border-b border-brand-100 py-2 last:border-b-0"
+              >
+                <span class="text-sm font-medium text-brand-700">{{ column.label }}:</span>
+                <div class="h-4 rounded bg-brand-100"></div>
+              </div>
+            }
+          </div>
+        }
+      } @else {
+        <!-- Real Data Cards -->
+        @for (item of items(); track $index) {
           <div
             class="cursor-pointer rounded-lg border border-brand-200 bg-white p-4 shadow-sm transition-colors hover:bg-brand-50"
             (click)="handleRowClick(item)"
@@ -124,9 +134,7 @@
             }
           </div>
         }
-      </div>
-    }
-
-    <!-- Footer -->
+      }
+    </div>
   }
 </div>

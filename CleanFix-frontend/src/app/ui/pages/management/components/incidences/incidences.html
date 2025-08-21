@@ -1,1 +1,27 @@
-<p>incidences works!</p>
+<div class="flex h-full flex-col">
+  <div class="mx-7 my-5">
+    <app-search-bar />
+  </div>
+
+  <div class="mx-7 mb-5 flex min-h-0 flex-grow flex-col">
+    <div class="min-h-0 flex-grow">
+      <app-table
+        [data$]="incidences$()"
+        [tableColumns]="columns"
+        (response)="handleTableResponse($event)"
+      />
+    </div>
+    <div>
+      <app-pagination
+        [pageSize]="pageSize()"
+        [pageNumber]="pageNumber()"
+        [totalPages]="totalPages()"
+        [totalCount]="totalCount()"
+        [hasPreviousPage]="hasPreviousPage()"
+        [hasNextPage]="hasNextPage()"
+        (pageSizeChange)="setPageSize($event)"
+        (pageNumberChange)="setPageNumber($event)"
+      />
+    </div>
+  </div>
+</div>

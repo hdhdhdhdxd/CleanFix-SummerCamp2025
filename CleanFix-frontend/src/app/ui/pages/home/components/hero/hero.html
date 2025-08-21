@@ -2,19 +2,13 @@
   id="hero"
   class="relative flex h-screen w-full items-end overflow-hidden px-4 py-16 sm:px-8 sm:py-24 md:bg-bottom md:px-16 md:py-48 lg:px-28 lg:py-72"
 >
-  <div class="absolute inset-0 -z-10 aspect-[1440/1024] h-full w-full">
-    <img
-      src="/images/hero.webp"
-      loading="lazy"
-      alt="background hero"
-      style="
-        background-image: url('/images/hero-lowres.webp');
-        background-size: cover;
-        background-position: center;
-      "
-      class="h-full w-full object-cover object-center"
-    />
-  </div>
+  <img
+    src="/images/hero.webp"
+    loading="lazy"
+    alt="background hero"
+    class="absolute inset-0 -z-10 aspect-[1440/1024] h-full w-full bg-[url(/images/hero-lowres.webp)] bg-cover bg-center bg-no-repeat object-cover object-bottom"
+  />
+
   <div class="flex max-w-full flex-col items-start space-y-4 sm:space-y-6">
     <header>
       <h1
