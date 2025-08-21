@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
+using Bogus;
 using CleanFix.Plugins;
 using Microsoft.SemanticKernel;
 
@@ -91,44 +92,50 @@ namespace CleanFix.Plugins
 
             if (mensaje.Contains("empresa"))
             {
-                var empresas = new List<object>
-                {
-                    new { Id = 1, Nombre = "Empresa A" },
-                    new { Id = 2, Nombre = "Empresa B" }
-                };
+                var empresas = GenerarEmpresasFalsas();
 
-                return await Task.FromResult(new PluginRespuesta
+                return new PluginRespuesta
                 {
                     Success = true,
                     Error = null,
-                    Data = empresas
-                });
-            }
-
-            if (mensaje.Contains("material"))
-            {
-                var materiales = new List<object>
-                {
-                    new { Id = 1, Nombre = "Material X" },
-                    new { Id = 2, Nombre = "Material Y" }
+                    Data = empresas // ✅ devolvemos el objeto directamente
                 };
-
-                return await Task.FromResult(new PluginRespuesta
-                {
-                    Success = true,
-                    Error = null,
-                    Data = materiales
-                });
             }
 
-            return await Task.FromResult(new PluginRespuesta
+            return new PluginRespuesta
             {
                 Success = false,
-                Error = "🤖 No entendí tu mensaje. Prueba con 'empresas' o 'materiales'.",
+                Error = "🤖 No entendí tu mensaje. Prueba con 'empresas'.",
                 Data = null
-            });
+            };
+        }
+
+        private List<object> GenerarEmpresasFalsas()
+        {
+            var faker = new Faker();
+
+            var empresas = new List<object>();
+
+            for (int i = 1; i <= 10; i++)
+            {
+                empresas.Add(new
+                {
+                    Id = i,
+                    Name = $"Empresa {i}",
+                    Address = faker.Address.FullAddress(),
+                    Number = faker.Phone.PhoneNumber(),
+                    Email = faker.Internet.Email(),
+                    Type = faker.Random.Int(0, 6),
+                    Price = faker.Finance.Amount(200, 500),
+                    WorkTime = faker.Random.Int(50, 500)
+                });
+            }
+
+            return empresas;
         }
     }
+
+    
 
 
 

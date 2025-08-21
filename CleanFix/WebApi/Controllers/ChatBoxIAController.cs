@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace WebApi.Controllers
 {
     [ApiController]
-    [Route("api/chatboxiacontroller")]
+    [Route("api/chatboxia")]
     public class BotController : ControllerBase
     {
         private readonly IBotService _botService;
@@ -19,7 +19,7 @@ namespace WebApi.Controllers
         public async Task<IActionResult> ProcesarMensaje([FromBody] string mensaje)
         {
             var respuesta = await _botService.ProcesarMensajeAsync(mensaje);
-            return Ok(respuesta); // ASP.NET Core serializa automáticamente como JSON
+            return Ok(respuesta); // ✅ ASP.NET Core lo serializa como JSON automáticamente
         }
     }
 }

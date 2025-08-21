@@ -15,7 +15,6 @@ namespace WebApi.CoreBot
 
             _plugins = new Dictionary<string, IPlugin>
             {
-                { "factura", new FacturaPluginTestPG() },
                 { "db", new DBPluginTestPG(connectionString) }
             };
         }
@@ -32,7 +31,7 @@ namespace WebApi.CoreBot
             return new PluginRespuesta
             {
                 Success = false,
-                Error = "🤖 No entendí tu mensaje. Prueba con 'empresas', 'materiales' o 'factura'.",
+                Error = "🤖 No entendí tu mensaje. Prueba con 'empresas'.",
                 Data = null
             };
         }
@@ -41,8 +40,7 @@ namespace WebApi.CoreBot
         {
             mensaje = mensaje.ToLower();
 
-            if (mensaje.Contains("factura")) return "factura";
-            if (mensaje.Contains("empresa") || mensaje.Contains("material")) return "db";
+            if (mensaje.Contains("empresa")) return "db";
 
             return "desconocido";
         }

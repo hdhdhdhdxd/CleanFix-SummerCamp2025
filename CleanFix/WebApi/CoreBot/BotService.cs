@@ -1,19 +1,24 @@
 ﻿using System.Threading.Tasks;
+using CleanFix.Plugins;
 
 namespace WebApi.CoreBot
 {
     public class BotService : IBotService
     {
-        public async Task<string> ProcesarMensajeAsync(string mensaje)
+        public async Task<PluginRespuesta> ProcesarMensajeAsync(string mensaje)
         {
-            // Aquí puedes integrar tu lógica real del bot
             var respuesta = await SimularRespuestaAsync(mensaje);
-            return respuesta;
+
+            return new PluginRespuesta
+            {
+                Success = true,
+                Error = null,
+                Data = new { Mensaje = respuesta }
+            };
         }
 
         private Task<string> SimularRespuestaAsync(string mensaje)
         {
-            // Simulación básica
             return Task.FromResult($"🤖 Bot responde: '{mensaje}'");
         }
     }
