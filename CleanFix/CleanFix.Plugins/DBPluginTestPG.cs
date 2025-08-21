@@ -102,26 +102,26 @@ namespace CleanFix.Plugins
                 {
                     var tipoStr = mensaje.Split("tipo=")[1].Split(' ')[0];
                     if (int.TryParse(tipoStr, out int tipo))
-                        empresas = empresas.FindAll(e => e.Type == tipo);
+                        empresas = empresas.Where(e => e.Type == tipo).ToList(); // Cambiado a Where+ToList para evitar problemas de FindAll
                 }
 
                 if (mensaje.Contains("precio>"))
                 {
                     var precioStr = mensaje.Split("precio>")[1].Split(' ')[0];
                     if (decimal.TryParse(precioStr, out decimal precio))
-                        empresas = empresas.FindAll(e => e.Price > precio);
+                        empresas = empresas.Where(e => e.Price > precio).ToList();
                 }
 
                 if (mensaje.Contains("más barata"))
                 {
                     var empresaMasBarata = empresas.OrderBy(e => e.Price).FirstOrDefault();
-                    return new PluginRespuesta { Success = true, Data = new List<CompanyIa> { empresaMasBarata } };
+                    return new PluginRespuesta { Success = true, Data = empresaMasBarata != null ? new List<CompanyIa> { empresaMasBarata } : new List<CompanyIa>() };
                 }
 
                 if (mensaje.Contains("más cara"))
                 {
                     var empresaMasCara = empresas.OrderByDescending(e => e.Price).FirstOrDefault();
-                    return new PluginRespuesta { Success = true, Data = new List<CompanyIa> { empresaMasCara } };
+                    return new PluginRespuesta { Success = true, Data = empresaMasCara != null ? new List<CompanyIa> { empresaMasCara } : new List<CompanyIa>() };
                 }
 
                 return new PluginRespuesta { Success = true, Data = empresas };
