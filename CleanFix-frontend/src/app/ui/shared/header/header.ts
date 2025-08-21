@@ -17,7 +17,12 @@ export class Header {
   }
 
   isHome(): boolean {
-    return this.router.url === '/' || this.router.url.startsWith('/home')
+    return (
+      this.router.url === '/' ||
+      this.router.url === '/#hero' ||
+      this.router.url === '/#services' ||
+      this.router.url === '/#footer'
+    )
   }
 
   toggleMenu() {
