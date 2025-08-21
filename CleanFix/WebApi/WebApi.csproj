@@ -40,7 +40,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
     <ProjectReference Include="..\CleanFix.Plugins\CleanFix.Plugins.csproj" />
-    <ProjectReference Include="..\CleanFixConsola\CleanFixConsola.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 

@@ -30,7 +30,8 @@ class Program
     {
         //Cifrado de configuración para Azure OpenAI y la base de datos
         var config = new ConfigurationBuilder()
-            .AddJsonFile("appsettingsIaBot.json")
+            .AddJsonFile("appsettingsIaBot.json", optional: true)
+            .AddUserSecrets<Program>() // Agregado para leer secretos de usuario
             .Build();
 
         string endpoint = config["AzureOpenAI:Endpoint"];
