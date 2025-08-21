@@ -11,5 +11,33 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
             .IsRequired()
             .HasMaxLength(200)
             .HasComment("Nombre de la empresa");
+
+        builder.Property(c => c.Address)
+            .IsRequired()
+            .HasMaxLength(300)
+            .HasComment("Dirección de la empresa");
+
+        builder.Property(c => c.Number)
+            .IsRequired()
+            .HasMaxLength(20)
+            .HasComment("Teléfono de la empresa");
+
+        builder.Property(c => c.Email)
+            .IsRequired()
+            .HasMaxLength(100)
+            .HasComment("Correo electrónico de la empresa");
+
+        builder.Property(c => c.Type)
+            .IsRequired()
+            .HasComment("Tipo de empresa");
+
+        builder.Property(c => c.Price)
+            .IsRequired()
+            .HasPrecision(18, 2)
+            .HasComment("Precio asociado a la empresa");
+
+        builder.Property(c => c.WorkTime)
+            .IsRequired()
+            .HasComment("Tiempo de trabajo en horas");
     }
 }
