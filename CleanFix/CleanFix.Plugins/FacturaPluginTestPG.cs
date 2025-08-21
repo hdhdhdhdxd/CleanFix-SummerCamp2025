@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CleanFix.Plugins;
+using WebApi.CoreBot.Models;
 using Microsoft.SemanticKernel;
 
 namespace CleanFix.Plugins
@@ -17,37 +17,13 @@ namespace CleanFix.Plugins
         {
             decimal costoEmpresa = empresa.Price;
             decimal ivaEmpresa = costoEmpresa * IVA;
-
             decimal costoMateriales = materialesIa.Sum(m => m.Cost);
             decimal ivaMateriales = costoMateriales * IVA;
-
             decimal total = costoEmpresa + ivaEmpresa + costoMateriales + ivaMateriales;
 
-            StringBuilder sb = new();
-            sb.AppendLine();
-            sb.AppendLine(" Empresa proveedora:");
-            sb.AppendLine($" - Nombre: {empresa.Name}");
-            sb.AppendLine();
-            sb.AppendLine(" Materiales incluidos:");
-            sb.AppendLine(" | ID | Nombre             | Costo    | IVA (21%) | Total    |");
-            sb.AppendLine(" |----|--------------------|----------|-----------|----------|");
-
-            foreach (var m in materialesIa)
-            {
-                decimal ivaMat = m.Cost * IVA;
-                decimal totalMat = m.Cost + ivaMat;
-                sb.AppendLine($" | {m.Id}  | {m.Name}    | €{m.Cost:F2} | €{ivaMat:F2}    | €{totalMat:F2} |");
-            }
-
-            sb.AppendLine();
-            sb.AppendLine(" -----------------------------------------");
-            sb.AppendLine($" Total materiales: €{costoMateriales:F2}");
-            sb.AppendLine($" IVA materiales (21%): €{ivaMateriales:F2}");
-            sb.AppendLine($" Costo empresa: €{costoEmpresa:F2}");
-            sb.AppendLine($" IVA empresa (21%): €{ivaEmpresa:F2}");
-            sb.AppendLine($" *TOTAL FACTURA:*   *€{total:F2}*");
-            sb.AppendLine(" -----------------------------------------");
-
+            var sb = new StringBuilder();
+            sb.AppendLine($"Empresa: {empresa.Name}");
+            sb.AppendLine($"Total factura: €{total:F2}");
             return sb.ToString();
         }
 
@@ -58,33 +34,32 @@ namespace CleanFix.Plugins
             decimal ivaMateriales = materialesIa.Sum(m => m.Cost) * IVA;
             decimal ivaTotal = ivaEmpresa + ivaMateriales;
 
-            return $" IVA empresa: €{ivaEmpresa:F2}\n IVA materiales: €{ivaMateriales:F2}\n IVA total: €{ivaTotal:F2}";
+            return $"IVA total: €{ivaTotal:F2}";
         }
 
-        // ✅ Método requerido por la interfaz IPlugin
-        public Task<string> EjecutarAsync(string mensaje)
+        public async Task<PluginRespuesta> EjecutarAsync(string mensaje)
         {
-            // Simulación de datos de prueba
             var empresa = new CompanyIa { Name = "Empresa Test", Price = 1000 };
             var materiales = new List<MaterialIa>
-            {
-                new MaterialIa { Id = 1, Name = "Material A", Cost = 200 },
-                new MaterialIa { Id = 2, Name = "Material B", Cost = 300 }
+        {
+            new MaterialIa { Id = 1, Name = "Material A", Cost = 200 },
+            new MaterialIa { Id = 2, Name = "Material B", Cost = 300 }
             };
 
-            // Lógica básica para decidir qué función ejecutar
-            if (mensaje.Contains("IVA", StringComparison.OrdinalIgnoreCase))
+            string resultado = mensaje.Contains("iva", StringComparison.OrdinalIgnoreCase)
+                ? ObtenerIVA(empresa, materiales)
+                : GenerarFactura(empresa, materiales);
+
+            return await Task.FromResult(new PluginRespuesta
             {
-                var resultado = ObtenerIVA(empresa, materiales);
-                return Task.FromResult(resultado);
-            }
-            else
-            {
-                var resultado = GenerarFactura(empresa, materiales);
-                return Task.FromResult(resultado);
-            }
+                Success = true,
+                Error = null,
+                Data = resultado
+            });
         }
     }
+
+
 
     //Clases de datos para la factura
     public class Factura
@@ -102,3 +77,4 @@ namespace CleanFix.Plugins
         public DateTime Fecha { get; set; }
     }
 }
+

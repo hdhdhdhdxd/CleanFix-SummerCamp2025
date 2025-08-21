@@ -1,7 +1,11 @@
-﻿namespace WebApi.CoreBot
+﻿using System.Threading.Tasks;
+using CleanFix.Plugins;
+using WebApi.CoreBot.Models;
+
+namespace WebApi.CoreBot
 {
     public interface IBotService
     {
-        Task<string> ProcesarMensajeAsync(string mensaje);
+        Task<PluginRespuesta> ProcesarMensajeAsync(string mensaje);
     }
 }

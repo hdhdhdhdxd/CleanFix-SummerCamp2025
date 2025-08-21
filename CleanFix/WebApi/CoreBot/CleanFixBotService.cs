@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using CleanFix.Plugins;
+﻿using CleanFix.Plugins;
+using Microsoft.Extensions.Configuration;
+using WebApi.CoreBot.Models;
 
 namespace WebApi.CoreBot
 {
@@ -13,21 +13,27 @@ namespace WebApi.CoreBot
             var connectionString = config.GetConnectionString("CleanFixDB");
 
             _plugins = new Dictionary<string, IPlugin>
-        {
-            { "factura", new FacturaPluginTestPG() },
-            { "db", new DBPluginTestPG(connectionString) }
-        };
+            {
+                { "factura", new FacturaPluginTestPG() },
+                { "db", new DBPluginTestPG(connectionString) }
+            };
         }
 
-        public async Task<string> ProcesarMensajeAsync(string mensaje)
+        public async Task<PluginRespuesta> ProcesarMensajeAsync(string mensaje)
         {
             var intencion = ClasificarIntencion(mensaje);
+
             if (_plugins.TryGetValue(intencion, out var plugin))
             {
                 return await plugin.EjecutarAsync(mensaje);
             }
 
-            return "No entendí tu mensaje 🤖";
+            return new PluginRespuesta
+            {
+                Success = false,
+                Error = "🤖 No entendí tu mensaje. Prueba con 'empresas', 'materiales' o 'factura'.",
+                Data = null
+            };
         }
 
         private string ClasificarIntencion(string mensaje)
@@ -35,7 +41,7 @@ namespace WebApi.CoreBot
             mensaje = mensaje.ToLower();
 
             if (mensaje.Contains("factura")) return "factura";
-            if (mensaje.Contains("base de datos") || mensaje.Contains("empresa") || mensaje.Contains("material") || mensaje.Contains("materiales") || mensaje.Contains("empresas")) return "db";
+            if (mensaje.Contains("base de datos") || mensaje.Contains("empresa") || mensaje.Contains("material")) return "db";
 
             return "desconocido";
         }
