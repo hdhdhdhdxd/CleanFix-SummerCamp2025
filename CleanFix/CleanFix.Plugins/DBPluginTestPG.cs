@@ -19,7 +19,7 @@ namespace CleanFix.Plugins
             _connectionString = connectionString;
         }
 
-        [KernelFunction, Description("Obtiene todas las empresas desde la base de datos, las convierte a objeto")]
+        [KernelFunction, Description("Obtiene todas las empresas desde la base de datos")]
         public EmpresaResponse GetAllEmpresas()
         {
             var companiesIa = new List<CompanyIa>();
@@ -55,7 +55,7 @@ namespace CleanFix.Plugins
             return new EmpresaResponse { Success = true, Data = companiesIa };
         }
 
-        [KernelFunction, Description("Obtiene todos los materiales desde la base de datos, las convierte a objeto")]
+        [KernelFunction, Description("Obtiene todos los materiales desde la base de datos")]
         public MaterialResponse GetAllMaterials()
         {
             var materialesIa = new List<MaterialIa>();
@@ -88,20 +88,35 @@ namespace CleanFix.Plugins
             return new MaterialResponse { Success = true, Data = materialesIa };
         }
 
-        // ✅ Implementación obligatoria de IPlugin
+        // ✅ Método principal que interpreta el mensaje y responde
         public async Task<string> EjecutarAsync(string mensaje)
         {
-            // Puedes usar Task.Run para envolver el método sincrónico
-            var response = await Task.Run(() => GetAllEmpresas());
+            mensaje = mensaje.ToLower();
 
-            if (!response.Success)
-                return $"❌ Error al obtener empresas: {response.Error}";
+            if (mensaje.Contains("empresa"))
+            {
+                var response = await Task.Run(() => GetAllEmpresas());
+                if (!response.Success)
+                    return $"❌ Error al obtener empresas: {response.Error}";
 
-            return JsonConvert.SerializeObject(response.Data, Formatting.Indented);
+                return JsonConvert.SerializeObject(response.Data, Formatting.Indented);
+            }
+
+            if (mensaje.Contains("material"))
+            {
+                var response = await Task.Run(() => GetAllMaterials());
+                if (!response.Success)
+                    return $"❌ Error al obtener materiales: {response.Error}";
+
+                return JsonConvert.SerializeObject(response.Data, Formatting.Indented);
+            }
+
+            return "🤖 No entendí tu mensaje. Prueba con 'empresas' o 'materiales'.";
         }
     }
 
-    // ✅ Clases auxiliares
+
+// ✅ Clases auxiliares
 
     public class EmpresaResponse
     {
