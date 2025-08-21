@@ -1,28 +1,28 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebApi.Servicios;
+using WebApi.CoreBot;
+using WebApi.Models;
 
 namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/chatboxia")]
-    public class ChatBoxIAController : ControllerBase
+    public class ChatBoxIaController : ControllerBase
     {
-        private readonly BotService _botService;
+        private readonly IBotService _botService;
 
-        public ChatBoxIAController(BotService botService)
+        public ChatBoxIaController(IBotService botService)
         {
             _botService = botService;
         }
 
         [HttpPost]
-        public IActionResult Post([FromBody] string mensaje)
+        public async Task<ActionResult<MensajeResponse>> Post([FromBody] MensajeRequest request)
         {
-            if (string.IsNullOrWhiteSpace(mensaje))
-                return BadRequest("El mensaje no puede estar vacío.");
+            if (string.IsNullOrWhiteSpace(request.Texto))
+                return BadRequest("Texto vacío");
 
-            var respuesta = _botService.ProcesarMensaje(mensaje);
-            return Ok(new { respuesta });
+            var respuesta = await _botService.ProcesarMensajeAsync(request.Texto);
+            return Ok(new MensajeResponse { Respuesta = respuesta });
         }
     }
 }
-

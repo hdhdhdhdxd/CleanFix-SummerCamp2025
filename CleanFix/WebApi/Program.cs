@@ -1,19 +1,22 @@
 using Bogus;
 using CleanFixConsola.PluginsIATest;
+using CleanFixConsola.PluginsIATest;
+
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.SemanticKernel;
 using WebApi.BaseDatos;
-using CleanFixConsola.PluginsIATest;
-using WebApi.Servicios;
+using WebApi.CoreBot;
+using WebApi.CoreBot;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddInfrastructureServices();
 builder.AddApplicationServices();
-// Registro de servicios
-builder.Services.AddScoped<IClasificadorIntencion, ClasificadorIntencion>();
-builder.Services.AddScoped<BotService>();
+
+// Servicios bot
 builder.Services.AddControllers();
+builder.Services.AddScoped<IBotService, CleanFixBotService>();
 
 // Configuración de CORS para permitir localhost:4200
 builder.Services.AddCors(options =>
@@ -153,6 +156,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+//bot
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+
 app.Run();
-
-
