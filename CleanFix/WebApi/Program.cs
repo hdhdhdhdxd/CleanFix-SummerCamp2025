@@ -1,6 +1,4 @@
 using Bogus;
-using CleanFixConsola.PluginsIATest;
-using CleanFixConsola.PluginsIATest;
 
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
