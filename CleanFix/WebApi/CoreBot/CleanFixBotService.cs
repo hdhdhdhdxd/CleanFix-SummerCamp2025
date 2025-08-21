@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using CleanFix.Plugins;
+﻿using CleanFix.Plugins;
 
 namespace WebApi.CoreBot
 {
     public class CleanFixBotService : IBotService
     {
         private readonly Dictionary<string, IPlugin> _plugins;
+        private readonly IClasificadorIntencion _clasificador;
 
         public CleanFixBotService(IConfiguration config)
         {
@@ -15,34 +13,41 @@ namespace WebApi.CoreBot
 
             _plugins = new Dictionary<string, IPlugin>
             {
+                { "factura", new FacturaPluginTestPG() },
                 { "db", new DBPluginTestPG(connectionString) }
             };
+
+            _clasificador = new ClasificadorIntencion(); // ✅ instanciamos el clasificador
         }
 
         public async Task<PluginRespuesta> ProcesarMensajeAsync(string mensaje)
         {
-            var intencion = ClasificarIntencion(mensaje);
+            var intencion = _clasificador.Clasificar(mensaje);
 
-            if (_plugins.TryGetValue(intencion, out var plugin))
+            switch (intencion)
             {
-                return await plugin.EjecutarAsync(mensaje);
+                case IntencionUsuario.GenerarFactura:
+                    return await _plugins["factura"].EjecutarAsync(mensaje);
+
+                case IntencionUsuario.ConsultarDatos:
+                    return await _plugins["db"].EjecutarAsync(mensaje);
+
+                case IntencionUsuario.Salir:
+                    return new PluginRespuesta
+                    {
+                        Success = true,
+                        Error = null,
+                        Data = "👋 Hasta luego. Gracias por usar CleanFixBot."
+                    };
+
+                default:
+                    return new PluginRespuesta
+                    {
+                        Success = false,
+                        Error = "🤖 No entendí tu mensaje. Prueba con 'factura', 'materiales' o 'empresas'.",
+                        Data = null
+                    };
             }
-
-            return new PluginRespuesta
-            {
-                Success = false,
-                Error = "🤖 No entendí tu mensaje. Prueba con 'empresas'.",
-                Data = null
-            };
-        }
-
-        private string ClasificarIntencion(string mensaje)
-        {
-            mensaje = mensaje.ToLower();
-
-            if (mensaje.Contains("empresa")) return "db";
-
-            return "desconocido";
         }
     }
 }

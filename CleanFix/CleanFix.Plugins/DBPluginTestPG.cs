@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
-using Bogus;
 using CleanFix.Plugins;
 using Microsoft.SemanticKernel;
 
@@ -90,52 +90,90 @@ namespace CleanFix.Plugins
         {
             mensaje = mensaje.ToLower();
 
-            if (mensaje.Contains("empresa"))
+            if (mensaje.StartsWith("empresas"))
             {
-                var empresas = GenerarEmpresasFalsas();
+                var response = await Task.Run(() => GetAllEmpresas());
+                var empresas = response.Data as List<CompanyIa>;
+                if (!response.Success || empresas == null)
+                    return new PluginRespuesta { Success = false, Error = response.Error ?? "Error al obtener empresas." };
 
-                return new PluginRespuesta
+                // Filtros
+                if (mensaje.Contains("tipo="))
                 {
-                    Success = true,
-                    Error = null,
-                    Data = empresas // ✅ devolvemos el objeto directamente
-                };
+                    var tipoStr = mensaje.Split("tipo=")[1].Split(' ')[0];
+                    if (int.TryParse(tipoStr, out int tipo))
+                        empresas = empresas.FindAll(e => e.Type == tipo);
+                }
+
+                if (mensaje.Contains("precio>"))
+                {
+                    var precioStr = mensaje.Split("precio>")[1].Split(' ')[0];
+                    if (decimal.TryParse(precioStr, out decimal precio))
+                        empresas = empresas.FindAll(e => e.Price > precio);
+                }
+
+                if (mensaje.Contains("más barata"))
+                {
+                    var empresaMasBarata = empresas.OrderBy(e => e.Price).FirstOrDefault();
+                    return new PluginRespuesta { Success = true, Data = new List<CompanyIa> { empresaMasBarata } };
+                }
+
+                if (mensaje.Contains("más cara"))
+                {
+                    var empresaMasCara = empresas.OrderByDescending(e => e.Price).FirstOrDefault();
+                    return new PluginRespuesta { Success = true, Data = new List<CompanyIa> { empresaMasCara } };
+                }
+
+                return new PluginRespuesta { Success = true, Data = empresas };
+            }
+
+            if (mensaje.StartsWith("materiales"))
+            {
+                var response = await Task.Run(() => GetAllMaterials());
+                var materiales = response.Data as List<MaterialIa>;
+                if (!response.Success || materiales == null)
+                    return new PluginRespuesta { Success = false, Error = response.Error ?? "Error al obtener materiales." };
+
+                // Filtros
+                if (mensaje.Contains("costo<"))
+                {
+                    var costoStr = mensaje.Split("costo<")[1].Split(' ')[0];
+                    if (decimal.TryParse(costoStr, out decimal costo))
+                        materiales = materiales.FindAll(m => m.Cost < costo);
+                }
+
+                if (mensaje.Contains("disponibles"))
+                {
+                    materiales = materiales.FindAll(m => m.Available);
+                }
+
+                if (mensaje.Contains("más barato"))
+                {
+                    var materialMasBarato = materiales.OrderBy(m => m.Cost).FirstOrDefault();
+                    return new PluginRespuesta { Success = true, Data = new List<MaterialIa> { materialMasBarato } };
+                }
+
+                if (mensaje.Contains("más caro"))
+                {
+                    var materialMasCaro = materiales.OrderByDescending(m => m.Cost).FirstOrDefault();
+                    return new PluginRespuesta { Success = true, Data = new List<MaterialIa> { materialMasCaro } };
+                }
+
+                return new PluginRespuesta { Success = true, Data = materiales };
             }
 
             return new PluginRespuesta
             {
                 Success = false,
-                Error = "🤖 No entendí tu mensaje. Prueba con 'empresas'.",
+                Error = "🤖 No entendí tu mensaje. Prueba con 'empresas tipo=2' o 'materiales costo<300'.",
                 Data = null
             };
         }
-
-        private List<object> GenerarEmpresasFalsas()
-        {
-            var faker = new Faker();
-
-            var empresas = new List<object>();
-
-            for (int i = 1; i <= 10; i++)
-            {
-                empresas.Add(new
-                {
-                    Id = i,
-                    Name = $"Empresa {i}",
-                    Address = faker.Address.FullAddress(),
-                    Number = faker.Phone.PhoneNumber(),
-                    Email = faker.Internet.Email(),
-                    Type = faker.Random.Int(0, 6),
-                    Price = faker.Finance.Amount(200, 500),
-                    WorkTime = faker.Random.Int(50, 500)
-                });
-            }
-
-            return empresas;
-        }
     }
 
-    
+
+
+
 
 
 
