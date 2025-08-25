@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CleanFix.Plugins;
 using Microsoft.SemanticKernel;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace CleanFix.Plugins
 {
@@ -22,15 +23,12 @@ namespace CleanFix.Plugins
         public EmpresaResponse GetAllEmpresas()
         {
             var companiesIa = new List<CompanyIa>();
-
             try
             {
                 using var connection = new SqlConnection(_connectionString);
                 connection.Open();
-
                 var command = new SqlCommand("SELECT Id, Name, Address, Number, Email, [type], Price, WorkTime FROM dbo.Companies", connection);
                 using var reader = command.ExecuteReader();
-
                 while (reader.Read())
                 {
                     companiesIa.Add(new CompanyIa
@@ -48,9 +46,10 @@ namespace CleanFix.Plugins
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"[DBPluginTestPG] Error al obtener empresas: {ex.Message}");
                 return new EmpresaResponse { Success = false, Error = ex.Message };
             }
-
+            Debug.WriteLine($"[DBPluginTestPG] Empresas obtenidas: {companiesIa.Count}");
             return new EmpresaResponse { Success = true, Data = companiesIa };
         }
 
@@ -58,15 +57,12 @@ namespace CleanFix.Plugins
         public MaterialResponse GetAllMaterials()
         {
             var materialesIa = new List<MaterialIa>();
-
             try
             {
                 using var connection = new SqlConnection(_connectionString);
                 connection.Open();
-
                 var command = new SqlCommand("SELECT Id, Name, Cost, Issue FROM dbo.Materials", connection);
                 using var reader = command.ExecuteReader();
-
                 while (reader.Read())
                 {
                     materialesIa.Add(new MaterialIa
@@ -81,9 +77,10 @@ namespace CleanFix.Plugins
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"[DBPluginTestPG] Error al obtener materiales: {ex.Message}");
                 return new MaterialResponse { Success = false, Error = ex.Message };
             }
-
+            Debug.WriteLine($"[DBPluginTestPG] Materiales obtenidos: {materialesIa.Count}");
             return new MaterialResponse { Success = true, Data = materialesIa };
         }
 

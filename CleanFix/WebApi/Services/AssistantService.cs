@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using CleanFix.Plugins;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace WebApi.Services
 {
@@ -47,6 +48,20 @@ Si la pregunta no tiene relación con los datos, responde que no puedes ayudar.
             var empresasResponse = dbPlugin.GetAllEmpresas();
             var materialesResponse = dbPlugin.GetAllMaterials();
 
+            // LOG para depuración
+            Debug.WriteLine($"[AssistantService] Empresas count: {empresasResponse.Data?.Count ?? 0}");
+            Debug.WriteLine($"[AssistantService] Materiales count: {materialesResponse.Data?.Count ?? 0}");
+
+            // Si no hay datos, lanza excepción para ver el error en la API
+            if (empresasResponse.Data == null || empresasResponse.Data.Count == 0)
+            {
+                Debug.WriteLine("[AssistantService] ¡ATENCIÓN! No se encontraron empresas en la base de datos.");
+            }
+            if (materialesResponse.Data == null || materialesResponse.Data.Count == 0)
+            {
+                Debug.WriteLine("[AssistantService] ¡ATENCIÓN! No se encontraron materiales en la base de datos.");
+            }
+
             _empresasJson = JsonSerializer.Serialize(empresasResponse.Data ?? new List<CompanyIa>());
             _materialesJson = JsonSerializer.Serialize(materialesResponse.Data ?? new List<MaterialIa>());
 
@@ -55,6 +70,11 @@ Si la pregunta no tiene relación con los datos, responde que no puedes ayudar.
 
         public async Task<string> ProcesarMensajeAsync(string mensaje)
         {
+            // LOG para depuración
+            Debug.WriteLine($"[AssistantService] Pregunta recibida: {mensaje}");
+            Debug.WriteLine($"[AssistantService] Empresas JSON: {_empresasJson}");
+            Debug.WriteLine($"[AssistantService] Materiales JSON: {_materialesJson}");
+
             var promptFunction = _kernel.CreateFunctionFromPrompt(_promptTemplate);
 
             var kernelArgs = new KernelArguments
@@ -65,7 +85,9 @@ Si la pregunta no tiene relación con los datos, responde que no puedes ayudar.
             };
 
             var responseData = await promptFunction.InvokeAsync(_kernel, kernelArgs);
-            return responseData.GetValue<string>();
+            var respuesta = responseData.GetValue<string>();
+            Debug.WriteLine($"[AssistantService] Respuesta LLM: {respuesta}");
+            return respuesta;
         }
     }
 }
