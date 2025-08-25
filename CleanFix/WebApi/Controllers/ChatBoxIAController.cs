@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebApi.CoreBot;
 using WebApi.Models;
+using WebApi.Services;
 using System.Threading.Tasks;
 
 namespace WebApi.Controllers
@@ -9,11 +9,11 @@ namespace WebApi.Controllers
     [Route("api/[controller]")]
     public class ChatBoxIAController : ControllerBase
     {
-        private readonly IBotService _botService;
+        private readonly IAssistantService _assistantService;
 
-        public ChatBoxIAController(IBotService botService)
+        public ChatBoxIAController(IAssistantService assistantService)
         {
-            _botService = botService;
+            _assistantService = assistantService;
         }
 
         [HttpPost]
@@ -28,12 +28,12 @@ namespace WebApi.Controllers
                     Data = null
                 });
             }
-            var respuesta = await _botService.ProcesarMensajeAsync(request.Mensaje);
+            var respuesta = await _assistantService.ProcesarMensajeAsync(request.Mensaje);
             return Ok(new MensajeResponse
             {
-                Success = respuesta.Success,
-                Error = respuesta.Error,
-                Data = respuesta.Data
+                Success = true,
+                Error = null,
+                Data = respuesta
             });
         }
     }

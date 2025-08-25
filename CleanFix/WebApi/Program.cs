@@ -17,6 +17,9 @@ builder.Services.AddControllers();
 // Usar CleanFixBotService como implementación de IBotService
 builder.Services.AddScoped<IBotService, CleanFixBotService>();
 
+// Registrar AssistantService para IA LLM
+builder.Services.AddScoped<WebApi.Services.IAssistantService, WebApi.Services.AssistantService>();
+
 // Configuración de CORS para permitir localhost:4200
 builder.Services.AddCors(options =>
 {
