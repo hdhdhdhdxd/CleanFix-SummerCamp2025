@@ -5,7 +5,7 @@ namespace Application.Incidences.Queries.GetIncidence;
 public class GetIncidenceDto
 {
     public int Id { get; set; }
-    public IssueType Type { get; set; }
+    public int IssueTypeId { get; set; }
     public DateTime Date { get; set; }
     public string Status { get; set; }
     public string Description { get; set; }

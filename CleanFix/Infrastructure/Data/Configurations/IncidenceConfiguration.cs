@@ -7,9 +7,9 @@ public class IncidenceConfiguration : IEntityTypeConfiguration<Incidence>
 {
     public void Configure(EntityTypeBuilder<Incidence> builder)
     {
-        builder.Property(i => i.Type)
+        builder.Property(i => i.IssueTypeId)
             .IsRequired()
-            .HasComment("Tipo de incidencia");
+            .HasComment("Id del tipo de incidencia");
 
         builder.Property(i => i.Date)
             .IsRequired()

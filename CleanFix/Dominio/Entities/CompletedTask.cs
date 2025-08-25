@@ -11,7 +11,7 @@ public class CompletedTask : IEntity
     public DateTime Date { get; set; }
     public double Price { get; set; }
     public double Duration { get; set; }
-    public IssueType Type { get; set; }
+    public int IssueTypeId { get; set; }
     public List<Material> Materials { get; set; }
     public bool IsRequest { get; set; }
     public User User { get; set; }

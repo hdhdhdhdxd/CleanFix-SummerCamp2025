@@ -8,5 +8,5 @@ public class Material : IEntity
     public string Name { get; set; }
     public decimal Cost { get; set; }
     public bool Available { get; set; }
-    public IssueType Issue { get; set; }
+    public int IssueTypeId { get; set; }
 }

@@ -29,8 +29,8 @@ public class SolicitationConfiguration : IEntityTypeConfiguration<Solicitation>
             .HasPrecision(18, 2)
             .HasComment("Costo de mantenimiento asociado a la solicitud");
 
-        builder.Property(s => s.Type)
+        builder.Property(s => s.IssueTypeId)
             .IsRequired()
-            .HasComment("Tipo de incidencia asociada a la solicitud");
+            .HasComment("Id del tipo de incidencia asociada a la solicitud");
     }
 }

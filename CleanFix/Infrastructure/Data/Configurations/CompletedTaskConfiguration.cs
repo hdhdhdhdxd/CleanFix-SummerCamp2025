@@ -29,9 +29,9 @@ public class CompletedTaskConfiguration : IEntityTypeConfiguration<CompletedTask
             .IsRequired()
             .HasComment("Duración de la tarea en horas");
 
-        builder.Property(t => t.Type)
+        builder.Property(t => t.IssueTypeId)
             .IsRequired()
-            .HasComment("Tipo de incidencia de la tarea");
+            .HasComment("Id del tipo de incidencia de la tarea");
 
         builder.Property(t => t.IsRequest)
             .IsRequired()

@@ -27,9 +27,9 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
             .HasMaxLength(100)
             .HasComment("Correo electrónico de la empresa");
 
-        builder.Property(c => c.Type)
+        builder.Property(c => c.IssueTypeId)
             .IsRequired()
-            .HasComment("Tipo de empresa");
+            .HasComment("Id del tipo de incidencia");
 
         builder.Property(c => c.Price)
             .IsRequired()

@@ -25,6 +25,7 @@ public class DatabaseContext : DbContext, IDatabaseContext
     public DbSet<CompletedTask> CompletedTasks { get; set; }
     public DbSet<Solicitation> Solicitations { get; set; }
     public DbSet<Incidence> Incidences { get; set; }
+    public DbSet<IssueType> IssueTypes { get; set; } // Agregado DbSet para IssueType
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

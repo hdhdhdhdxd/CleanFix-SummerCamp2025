@@ -21,8 +21,8 @@ public class MaterialConfiguration : IEntityTypeConfiguration<Material>
             .IsRequired()
             .HasComment("Disponibilidad del material");
 
-        builder.Property(m => m.Issue)
+        builder.Property(m => m.IssueTypeId)
             .IsRequired()
-            .HasComment("Tipo de incidencia asociada al material");
+            .HasComment("Id del tipo de incidencia asociada al material");
     }
 }
