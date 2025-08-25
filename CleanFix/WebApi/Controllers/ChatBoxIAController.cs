@@ -1,25 +1,40 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebApi.CoreBot;
+using WebApi.Models;
+using WebApi.Services;
 using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
     [ApiController]
-    [Route("api/chatboxia")]
-    public class BotController : ControllerBase
+    [Route("api/[controller]")]
+    public class ChatBoxIAController : ControllerBase
     {
-        private readonly IBotService _botService;
+        private readonly IAssistantService _assistantService;
 
-        public BotController(IBotService botService)
+        public ChatBoxIAController(IAssistantService assistantService)
         {
-            _botService = botService;
+            _assistantService = assistantService;
         }
 
-        [HttpPost("mensaje")]
-        public async Task<IActionResult> ProcesarMensaje([FromBody] string mensaje)
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody] MensajeRequest request)
         {
-            var respuesta = await _botService.ProcesarMensajeAsync(mensaje);
-            return Ok(respuesta); // ✅ ASP.NET Core lo serializa como JSON automáticamente
+            if (string.IsNullOrWhiteSpace(request?.Mensaje))
+            {
+                return BadRequest(new MensajeResponse
+                {
+                    Success = false,
+                    Error = "El campo 'mensaje' es requerido.",
+                    Data = null
+                });
+            }
+            var respuesta = await _assistantService.ProcesarMensajeAsync(request.Mensaje);
+            return Ok(new MensajeResponse
+            {
+                Success = true,
+                Error = null,
+                Data = respuesta
+            });
         }
     }
 }

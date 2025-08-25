@@ -1,5 +1,5 @@
 using Bogus;
-
+using CleanFix.Plugins;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.SemanticKernel;
@@ -14,7 +14,11 @@ builder.AddApplicationServices();
 
 // Servicios bot
 builder.Services.AddControllers();
+// Usar CleanFixBotService como implementación de IBotService
 builder.Services.AddScoped<IBotService, CleanFixBotService>();
+
+// Registrar AssistantService para IA LLM
+builder.Services.AddScoped<WebApi.Services.IAssistantService, WebApi.Services.AssistantService>();
 
 // Configuración de CORS para permitir localhost:4200
 builder.Services.AddCors(options =>
@@ -26,7 +30,6 @@ builder.Services.AddCors(options =>
 });
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -161,20 +164,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-//
 app.UseHttpsRedirection();
-
-// Usar la política CORS antes de Authorization
 app.UseCors("AllowAngularLocalhost");
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-//bot
-
-app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-
 app.Run();
