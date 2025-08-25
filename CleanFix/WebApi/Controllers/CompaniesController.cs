@@ -1,8 +1,4 @@
-﻿using Application.Apartments.Queries.GetPaginatedApartment;
-using Application.Companies.Commands.CreateCompany;
-using Application.Companies.Commands.DeleteCompany;
-using Application.Companies.Commands.UpdateCompany;
-using Application.Companies.Queries.GetCompanies;
+﻿using Application.Companies.Queries.GetCompanies;
 using Application.Companies.Queries.GetCompany;
 using Application.Companies.Queries.GetPaginatedCompanies;
 using MediatR;
@@ -46,49 +42,6 @@ namespace WebApi.Controllers
             if (result == null)
                 return NotFound();
             return Ok(result);
-        }
-
-        // PUT: api/Companies/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCompany(int id, [FromBody] UpdateCompanyDto companyDto)
-        {
-            if (companyDto.Id != 0 && companyDto.Id != id)
-                return BadRequest("El id de la ruta y el del cuerpo no coinciden.");
-            companyDto.Id = id;
-            var command = new UpdateCompanyCommand
-            {
-                Company = companyDto
-            };
-            await _sender.Send(command);
-            return NoContent();
-        }
-
-        // POST: api/Companies
-        [HttpPost]
-        public async Task<ActionResult<GetCompaniesDto>> PostCompany([FromBody] CreateCompanyDto companyDto)
-        {
-            var command = new CreateCompanyCommand
-            {
-                Company = companyDto
-            };
-            var newCompanyId = await _sender.Send(command);
-            var createdCompany = await _sender.Send(new GetCompanyQuery(newCompanyId));
-            return CreatedAtAction(
-                nameof(GetCompany),
-                new { id = newCompanyId },
-                createdCompany
-            );
-        }
-
-        // DELETE: api/Companies/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCompany(int id)
-        {
-            var command = new DeleteCompanyCommand(id);
-            var result = await _sender.Send(command);
-            if (!result)
-                return NotFound();
-            return NoContent();
         }
     }
 }

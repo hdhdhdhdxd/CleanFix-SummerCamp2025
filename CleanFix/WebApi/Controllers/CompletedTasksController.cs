@@ -1,9 +1,7 @@
-using Application.CompletedTasks.Queries.GetPaginatedCompletedTasks;
-using Application.CompletedTasks.Queries.GetCompletedTasks;
-using Application.CompletedTasks.Queries.GetCompletedTask;
 using Application.CompletedTasks.Commands.CreateCompletedTask;
-using Application.CompletedTasks.Commands.UpdateCompletedTask;
-using Application.CompletedTasks.Commands.DeleteCompletedTask;
+using Application.CompletedTasks.Queries.GetCompletedTask;
+using Application.CompletedTasks.Queries.GetCompletedTasks;
+using Application.CompletedTasks.Queries.GetPaginatedCompletedTasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -57,29 +55,6 @@ namespace WebApi.Controllers
                 new { id = newCompletedTaskId },
                 newCompletedTaskId
             );
-        }
-
-        // PUT: api/completedtasks/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCompletedTask(int id, [FromBody] UpdateCompletedTaskDto completedTaskDto)
-        {
-            if (completedTaskDto.Id != default && completedTaskDto.Id != id)
-                return BadRequest("El id de la ruta y el del cuerpo no coinciden.");
-            completedTaskDto.Id = id;
-            var command = new UpdateCompletedTaskCommand { CompletedTask = completedTaskDto };
-            await _sender.Send(command);
-            return NoContent();
-        }
-
-        // DELETE: api/completedtasks/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCompletedTask(int id)
-        {
-            var command = new DeleteCompletedTaskCommand(id);
-            var result = await _sender.Send(command);
-            if (!result)
-                return NotFound();
-            return NoContent();
         }
     }
 }

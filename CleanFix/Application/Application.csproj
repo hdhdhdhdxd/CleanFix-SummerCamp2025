@@ -16,4 +16,8 @@
     <ProjectReference Include="..\Dominio\Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Materials\Commands\" />
+  </ItemGroup>
+
 </Project>
