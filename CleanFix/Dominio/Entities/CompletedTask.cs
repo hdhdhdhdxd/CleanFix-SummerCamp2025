@@ -13,6 +13,7 @@ public class CompletedTask : IEntity
     public DateTime CompletionDate { get; set; }
     public double Price { get; set; }
     public int IssueTypeId { get; set; }
+    public IssueType IssueType { get; set; } // Agregada propiedad de navegación
     public List<Material> Materials { get; set; }
     public bool IsSolicitation { get; set; }
     public User User { get; set; }

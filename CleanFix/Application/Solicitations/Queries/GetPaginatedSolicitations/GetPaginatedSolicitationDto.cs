@@ -7,12 +7,17 @@ public class GetPaginatedSolicitationDto
     public int Id { get; set; }
     public DateTime Date { get; set; }
     public string? Status { get; set; }
-    public IssueType Type { get; set; }
+    public string IssueType { get; set; }
+    public string Address { get; set; }
     private class Mapping : Profile
     {
         public Mapping()
         {
-            CreateMap<Solicitation, GetPaginatedSolicitationDto>();
+            CreateMap<Solicitation, GetPaginatedSolicitationDto>()
+                .ForMember(
+                    dest => dest.IssueType,
+                    opt => opt.MapFrom(src => src.IssueType.Name)
+                );
         }
     }
 }
