@@ -16,7 +16,6 @@ namespace CleanFix.Plugins
         private readonly string _connectionString;
         private readonly ILogger<DBPluginTestPG> _logger;
 
-        // Permitir inyección de logger, pero mantener compatibilidad con consola
         public DBPluginTestPG(string connectionString, ILogger<DBPluginTestPG> logger = null)
         {
             _connectionString = connectionString;
@@ -49,7 +48,7 @@ namespace CleanFix.Plugins
                 using var connection = new SqlConnection(_connectionString);
                 connection.Open();
                 LogInfo("[DBPluginTestPG] Conexión abierta correctamente para empresas.");
-                var command = new SqlCommand("SELECT Id, Name, Address, Number, Email, IssueTypeId, Price, WorkTime FROM dbo.Companies", connection);
+                var command = new SqlCommand("SELECT Id, Name, Address, Number, Email, [type], Price, WorkTime FROM dbo.Companies", connection);
                 using var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
@@ -60,7 +59,7 @@ namespace CleanFix.Plugins
                         Address = reader.IsDBNull(2) ? null : reader.GetString(2),
                         Number = reader.IsDBNull(3) ? null : reader.GetString(3),
                         Email = reader.IsDBNull(4) ? null : reader.GetString(4),
-                        IssueTypeId = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
+                        Type = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
                         Price = reader.IsDBNull(6) ? 0 : reader.GetDecimal(6),
                         WorkTime = reader.IsDBNull(7) ? 0 : reader.GetInt32(7)
                     });
@@ -85,7 +84,7 @@ namespace CleanFix.Plugins
                 using var connection = new SqlConnection(_connectionString);
                 connection.Open();
                 LogInfo("[DBPluginTestPG] Conexión abierta correctamente para materiales.");
-                var command = new SqlCommand("SELECT Id, Name, Cost, IssueTypeId FROM dbo.Materials", connection);
+                var command = new SqlCommand("SELECT Id, Name, Cost, Issue FROM dbo.Materials", connection);
                 using var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
@@ -94,7 +93,7 @@ namespace CleanFix.Plugins
                         Id = reader.GetInt32(0),
                         Name = reader.IsDBNull(1) ? null : reader.GetString(1),
                         Cost = reader.IsDBNull(2) ? 0 : reader.GetDecimal(2),
-                        IssueTypeId = reader.IsDBNull(3) ? 0 : reader.GetInt32(3),
+                        Issue = reader.IsDBNull(3) ? 0 : reader.GetInt32(3),
                         Available = true
                     });
                 }
@@ -123,7 +122,7 @@ namespace CleanFix.Plugins
 
             int? tipoEmpresa = ConsultaParser.ExtraerTipo(mensaje, "empresa");
             if (tipoEmpresa.HasValue)
-                empresas = empresas.Where(e => e.IssueTypeId == tipoEmpresa.Value).ToList();
+                empresas = empresas.Where(e => e.Type == tipoEmpresa.Value).ToList();
 
             if (mensaje.Contains("precio>"))
             {
@@ -159,7 +158,7 @@ namespace CleanFix.Plugins
 
                 int? tipoMaterial = ConsultaParser.ExtraerTipo(mensaje, "material");
                 if (tipoMaterial.HasValue)
-                    materiales = materiales.Where(m => m.IssueTypeId == tipoMaterial.Value).ToList();
+                    materiales = materiales.Where(m => m.Issue == tipoMaterial.Value).ToList();
 
                 if (mensaje.Contains("costo<"))
                 {
@@ -196,8 +195,6 @@ namespace CleanFix.Plugins
         }
     }
 
-    // ✅ Clases auxiliares
-
     public class EmpresaResponse
     {
         public bool Success { get; set; }
@@ -219,7 +216,7 @@ namespace CleanFix.Plugins
         public string Address { get; set; }
         public string Number { get; set; }
         public string Email { get; set; }
-        public int IssueTypeId { get; set; }
+        public int Type { get; set; }
         public decimal Price { get; set; }
         public int WorkTime { get; set; }
     }
@@ -229,7 +226,7 @@ namespace CleanFix.Plugins
         public int Id { get; set; }
         public string Name { get; set; }
         public decimal Cost { get; set; }
-        public int IssueTypeId { get; set; }
+        public int Issue { get; set; }
         public bool Available { get; set; }
     }
 }
