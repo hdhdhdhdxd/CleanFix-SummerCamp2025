@@ -6,7 +6,7 @@ import { ActivatedRoute } from '@angular/router'
 import { Location } from '@angular/common'
 import { SearchBar } from '../search-bar/search-bar'
 import { Pagination } from '../pagination/pagination'
-import { PaginationDto } from '@/core/domain/models/PaginationDto'
+import { PaginatedData } from '@/core/domain/models/PaginatedData'
 
 @Component({
   selector: 'app-incidences',
@@ -67,7 +67,7 @@ export class Incidences implements OnInit {
     })
   }
 
-  private updateValues(pagination: PaginationDto<Incidence>) {
+  private updateValues(pagination: PaginatedData<Incidence>) {
     this.incidences.set(pagination.items)
     this.pageNumber.set(pagination.pageNumber)
     this.totalPages.set(pagination.totalPages)

@@ -1,6 +1,6 @@
 import { incidenceService } from '@/core/application/incidenceService'
 import { Incidence } from '@/core/domain/models/Incedence'
-import { PaginationDto } from '@/core/domain/models/PaginationDto'
+import { PaginatedData } from '@/core/domain/models/PaginatedData'
 import { Injectable } from '@angular/core'
 import { from, Observable } from 'rxjs'
 
@@ -8,7 +8,7 @@ import { from, Observable } from 'rxjs'
   providedIn: 'root',
 })
 export class IncidenceService {
-  getPaginated(pageNumber: number, pageSize: number): Observable<PaginationDto<Incidence>> {
+  getPaginated(pageNumber: number, pageSize: number): Observable<PaginatedData<Incidence>> {
     return from(incidenceService.getPaginated(pageNumber, pageSize))
   }
 }

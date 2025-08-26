@@ -1,5 +1,5 @@
 import { solicitationService } from '@/core/application/solicitationService'
-import { PaginationDto } from '@/core/domain/models/PaginationDto'
+import { PaginatedData } from '@/core/domain/models/PaginatedData'
 import { Solicitation } from '@/core/domain/models/Solicitation'
 import { Injectable } from '@angular/core'
 import { from, Observable } from 'rxjs'
@@ -8,7 +8,7 @@ import { from, Observable } from 'rxjs'
   providedIn: 'root',
 })
 export class SolicitationService {
-  getPaginated(pageNumber: number, pageSize: number): Observable<PaginationDto<Solicitation>> {
+  getPaginated(pageNumber: number, pageSize: number): Observable<PaginatedData<Solicitation>> {
     return from(solicitationService.getPaginated(pageNumber, pageSize))
   }
 }

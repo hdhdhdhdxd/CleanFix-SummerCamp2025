@@ -1,12 +1,13 @@
 import { Company } from '@/core/domain/models/Company'
 import { CompanyDto, IssueType } from './CompanyDto'
 import { environment } from 'src/environments/environment'
-import { PaginationDto } from '@/core/domain/models/PaginationDto'
+import { PaginatedData } from '@/core/domain/models/PaginatedData'
+import { PaginatedDataDto } from '../../interfaces/PaginatedDataDto'
 
 const getPaginated = async (
   pageNumber: number,
   pageSize: number,
-): Promise<PaginationDto<Company>> => {
+): Promise<PaginatedData<Company>> => {
   const response = await fetch(
     environment.baseUrl + `companies/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
   )
@@ -14,10 +15,9 @@ const getPaginated = async (
     throw new Error('Error al obtener las empresas')
   }
 
-  const responseJson = await response.json()
+  const responseJson: PaginatedDataDto<CompanyDto> = await response.json()
 
   return {
-    ...responseJson,
     items: responseJson.items.map((companyDto: CompanyDto) => ({
       id: companyDto.id,
       name: companyDto.name,
@@ -28,6 +28,11 @@ const getPaginated = async (
       price: companyDto.price,
       workTime: companyDto.workTime,
     })),
+    pageNumber: responseJson.pageNumber,
+    totalPages: responseJson.totalPages,
+    totalCount: responseJson.totalCount,
+    hasPreviousPage: responseJson.hasPreviousPage,
+    hasNextPage: responseJson.hasNextPage,
   }
 }
 

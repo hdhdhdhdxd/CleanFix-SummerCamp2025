@@ -1,8 +1,9 @@
-export interface PaginationDto<T> {
+export interface PaginatedDataDto<T> {
   items: T[]
-  pageNumber: number
-  totalPages: number
   totalCount: number
+  pageNumber: number
+  pageSize: number
+  totalPages: number
   hasPreviousPage: boolean
   hasNextPage: boolean
 }

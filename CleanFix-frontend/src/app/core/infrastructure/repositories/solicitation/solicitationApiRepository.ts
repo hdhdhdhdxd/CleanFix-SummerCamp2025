@@ -1,13 +1,14 @@
 import { Solicitation } from '@/core/domain/models/Solicitation'
 import { SolicitationRepository } from '@/core/domain/repositories/SolicitationRepository'
 import { environment } from 'src/environments/environment'
-import { PaginationDto } from '../../../domain/models/PaginationDto'
+import { PaginatedData } from '../../../domain/models/PaginatedData'
+import { PaginatedDataDto } from '../../interfaces/PaginatedDataDto'
 import { SolicitationDto } from './SolicitationDto'
 
 const getPaginated = async (
   pageNumber: number,
   pageSize: number,
-): Promise<PaginationDto<Solicitation>> => {
+): Promise<PaginatedData<Solicitation>> => {
   const response = await fetch(
     environment.baseUrl + `solicitations/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
   )
@@ -15,10 +16,9 @@ const getPaginated = async (
     throw new Error('Error al obtener las empresas')
   }
 
-  const responseJson: PaginationDto<SolicitationDto> = await response.json()
+  const responseJson: PaginatedDataDto<SolicitationDto> = await response.json()
 
   return {
-    ...responseJson,
     items: responseJson.items.map((solicitation: SolicitationDto) => ({
       id: solicitation.id,
       address: solicitation.address,
@@ -28,6 +28,11 @@ const getPaginated = async (
       date: new Date(solicitation.date),
       status: solicitation.status,
     })),
+    pageNumber: responseJson.pageNumber,
+    totalPages: responseJson.totalPages,
+    totalCount: responseJson.totalCount,
+    hasPreviousPage: responseJson.hasPreviousPage,
+    hasNextPage: responseJson.hasNextPage,
   }
 }
 

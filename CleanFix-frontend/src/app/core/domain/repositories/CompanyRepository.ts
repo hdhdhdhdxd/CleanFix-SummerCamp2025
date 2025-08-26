@@ -1,6 +1,6 @@
 import { Company } from '../models/Company'
-import { PaginationDto } from '../models/PaginationDto'
+import { PaginatedData } from '../models/PaginatedData'
 
 export interface CompanyRepository {
-  getPaginated(pageNumber: number, pageSize: number): Promise<PaginationDto<Company>>
+  getPaginated(pageNumber: number, pageSize: number): Promise<PaginatedData<Company>>
 }

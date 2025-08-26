@@ -7,7 +7,7 @@ import { Pagination } from '../pagination/pagination'
 import { SearchBar } from '../search-bar/search-bar'
 import { SolicitationDialog } from '../solicitation-dialog/solicitation-dialog'
 import { Table, TableColumn } from '../table/table'
-import { PaginationDto } from '@/core/domain/models/PaginationDto'
+import { PaginatedData } from '@/core/domain/models/PaginatedData'
 
 @Component({
   selector: 'app-solicitations',
@@ -70,7 +70,7 @@ export class Solicitations implements OnInit {
     })
   }
 
-  private updateValues(pagination: PaginationDto<Solicitation>) {
+  private updateValues(pagination: PaginatedData<Solicitation>) {
     this.solicitations.set(pagination.items)
     this.pageNumber.set(pagination.pageNumber)
     this.totalPages.set(pagination.totalPages)
