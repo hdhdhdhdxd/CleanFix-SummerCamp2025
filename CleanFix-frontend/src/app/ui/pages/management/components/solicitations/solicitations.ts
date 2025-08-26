@@ -1,6 +1,6 @@
 import { Solicitation } from '@/core/domain/models/Solicitation'
 import { SolicitationService } from '@/ui/services/solicitation/solicitation-service'
-import { Component, computed, inject, OnInit, signal } from '@angular/core'
+import { Component, inject, OnInit, signal } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Location } from '@angular/common'
 import { Pagination } from '../pagination/pagination'
@@ -19,6 +19,7 @@ export class Solicitations implements OnInit {
   private location = inject(Location)
   private solicitationService = inject(SolicitationService)
 
+  solicitations = signal<Solicitation[]>([])
   totalPages = signal<number>(0)
   totalCount = signal<number>(0)
   hasPreviousPage = signal<boolean>(false)
@@ -26,10 +27,6 @@ export class Solicitations implements OnInit {
 
   pageSize = signal<number>(10)
   pageNumber = signal<number>(1)
-
-  solicitations$ = computed(() => {
-    return this.solicitationService.getAll(this.pageNumber(), this.pageSize())
-  })
 
   selectedSolicitation: Solicitation | null = null
   showDialog = false
@@ -55,6 +52,7 @@ export class Solicitations implements OnInit {
     if (!currentParams['pageSize'] && !currentParams['pageNumber']) {
       this.updateUrl()
     }
+    this.loadSolicitations(this.pageNumber(), this.pageSize())
   }
 
   private updateUrl(): void {
@@ -66,22 +64,32 @@ export class Solicitations implements OnInit {
     this.location.replaceState(url)
   }
 
-  handleTableResponse($event: PaginationDto<Solicitation>) {
-    this.totalPages.set($event.totalPages)
-    this.totalCount.set($event.totalCount)
-    this.hasPreviousPage.set($event.hasPreviousPage)
-    this.hasNextPage.set($event.hasNextPage)
+  private loadSolicitations(page: number, pageSize: number) {
+    this.solicitationService.getAll(page, pageSize).subscribe((result) => {
+      this.updateValues(result)
+    })
+  }
+
+  private updateValues(pagination: PaginationDto<Solicitation>) {
+    this.solicitations.set(pagination.items)
+    this.pageNumber.set(pagination.pageNumber)
+    this.totalPages.set(pagination.totalPages)
+    this.totalCount.set(pagination.totalCount)
+    this.hasPreviousPage.set(pagination.hasPreviousPage)
+    this.hasNextPage.set(pagination.hasNextPage)
   }
 
   setPageNumber($event: number) {
     this.pageNumber.set($event)
     this.updateUrl()
+    this.loadSolicitations($event, this.pageSize())
   }
 
   setPageSize($event: number) {
     this.pageSize.set($event)
     this.pageNumber.set(1)
     this.updateUrl()
+    this.loadSolicitations(1, $event)
   }
 
   handleRowClick(item: Solicitation): void {

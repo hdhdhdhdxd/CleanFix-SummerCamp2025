@@ -1,9 +1,7 @@
 import { Incidence } from '@/core/domain/models/Incedence'
-import { PaginationDto } from '@/core/domain/models/PaginationDto'
 import { Solicitation } from '@/core/domain/models/Solicitation'
 import { CurrencyPipe, DatePipe, NgClass } from '@angular/common'
-import { Component, input, output, signal, effect } from '@angular/core'
-import { Observable, Subscription } from 'rxjs'
+import { Component, input, output } from '@angular/core'
 
 export interface TableColumn<T> {
   key: keyof T
@@ -17,35 +15,12 @@ export interface TableColumn<T> {
   templateUrl: './table.html',
 })
 export class Table<T extends Solicitation | Incidence> {
-  data$ = input.required<Observable<PaginationDto<T>>>()
+  items = input<T[]>([])
   tableColumns = input.required<TableColumn<T>[]>()
   rowClick = output<T>()
-  response = output<PaginationDto<T>>()
-
-  items = signal<T[]>([])
-  private subscription: Subscription | undefined
-
-  constructor() {
-    effect(() => {
-      this.subscription?.unsubscribe()
-      this.subscription = this.data$().subscribe({
-        next: (data) => {
-          this.response.emit(data)
-          this.items.set(data.items)
-        },
-        error: (error) => {
-          console.error('Error fetching data:', error)
-        },
-      })
-    })
-  }
 
   handleRowClick(item: T): void {
     this.rowClick.emit(item)
-  }
-
-  get observableData() {
-    return this.data$()
   }
 
   getColumns(): TableColumn<T>[] {

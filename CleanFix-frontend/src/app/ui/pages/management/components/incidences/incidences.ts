@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core'
+import { Component, inject, OnInit, signal } from '@angular/core'
 import { Table, TableColumn } from '../table/table'
 import { Incidence } from '@/core/domain/models/Incedence'
 import { IncidenceService } from '@/ui/services/incidence/incidence-service'
@@ -18,6 +18,7 @@ export class Incidences implements OnInit {
   private location = inject(Location)
   private incidenceService = inject(IncidenceService)
 
+  incidences = signal<Incidence[]>([])
   totalPages = signal<number>(0)
   totalCount = signal<number>(0)
   hasPreviousPage = signal<boolean>(false)
@@ -25,10 +26,6 @@ export class Incidences implements OnInit {
 
   pageSize = signal<number>(10)
   pageNumber = signal<number>(1)
-
-  incidences$ = computed(() => {
-    return this.incidenceService.getAll(this.pageNumber(), this.pageSize())
-  })
 
   columns: TableColumn<Incidence>[] = [
     { key: 'id', label: 'ID', type: 'number' },
@@ -52,6 +49,7 @@ export class Incidences implements OnInit {
     if (!currentParams['pageSize'] && !currentParams['pageNumber']) {
       this.updateUrl()
     }
+    this.loadIncidences(this.pageNumber(), this.pageSize())
   }
 
   private updateUrl(): void {
@@ -63,21 +61,31 @@ export class Incidences implements OnInit {
     this.location.replaceState(url)
   }
 
-  handleTableResponse($event: PaginationDto<Incidence>) {
-    this.totalPages.set($event.totalPages)
-    this.totalCount.set($event.totalCount)
-    this.hasPreviousPage.set($event.hasPreviousPage)
-    this.hasNextPage.set($event.hasNextPage)
+  private loadIncidences(page: number, pageSize: number) {
+    this.incidenceService.getAll(page, pageSize).subscribe((result) => {
+      this.updateValues(result)
+    })
+  }
+
+  private updateValues(pagination: PaginationDto<Incidence>) {
+    this.incidences.set(pagination.items)
+    this.pageNumber.set(pagination.pageNumber)
+    this.totalPages.set(pagination.totalPages)
+    this.totalCount.set(pagination.totalCount)
+    this.hasPreviousPage.set(pagination.hasPreviousPage)
+    this.hasNextPage.set(pagination.hasNextPage)
   }
 
   setPageNumber($event: number) {
     this.pageNumber.set($event)
     this.updateUrl()
+    this.loadIncidences($event, this.pageSize())
   }
 
   setPageSize($event: number) {
     this.pageSize.set($event)
     this.pageNumber.set(1)
     this.updateUrl()
+    this.loadIncidences(1, $event)
   }
 }

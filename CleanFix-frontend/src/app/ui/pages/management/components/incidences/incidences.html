@@ -5,22 +5,20 @@
 
   <div class="mx-7 mb-5 flex min-h-0 flex-grow flex-col">
     <div class="min-h-0 flex-grow">
-      <app-table
-        [data$]="incidences$()"
-        [tableColumns]="columns"
-        (response)="handleTableResponse($event)"
-      />
+      <app-table [items]="incidences()" [tableColumns]="columns" />
     </div>
     <div>
       <app-pagination
-        [pageSize]="pageSize()"
-        [pageNumber]="pageNumber()"
-        [totalPages]="totalPages()"
-        [totalCount]="totalCount()"
-        [hasPreviousPage]="hasPreviousPage()"
-        [hasNextPage]="hasNextPage()"
-        (pageSizeChange)="setPageSize($event)"
+        [props]="{
+          pageNumber: pageNumber(),
+          pageSize: pageSize(),
+          totalPages: totalPages(),
+          totalCount: totalCount(),
+          hasPreviousPage: hasPreviousPage(),
+          hasNextPage: hasNextPage(),
+        }"
         (pageNumberChange)="setPageNumber($event)"
+        (pageSizeChange)="setPageSize($event)"
       />
     </div>
   </div>

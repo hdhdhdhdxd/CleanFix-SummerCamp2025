@@ -1,17 +1,21 @@
 import { Component, input, output } from '@angular/core'
 
+export interface PaginationProps {
+  pageNumber: number
+  pageSize: number
+  totalPages: number
+  totalCount: number
+  hasPreviousPage: boolean
+  hasNextPage: boolean
+}
+
 @Component({
   selector: 'app-pagination',
   imports: [],
   templateUrl: './pagination.html',
 })
 export class Pagination {
-  pageSize = input<number>()
-  pageNumber = input<number>()
-  totalPages = input<number>()
-  totalCount = input<number>()
-  hasPreviousPage = input<boolean>()
-  hasNextPage = input<boolean>()
+  props = input.required<PaginationProps>()
 
   pageSizeChange = output<number>()
   pageNumberChange = output<number>()
