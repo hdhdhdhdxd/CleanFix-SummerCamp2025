@@ -10,12 +10,13 @@ public class GetSolicitationDto
     public string Address { get; set; }
     public string? Status { get; set; }
     public double MaintenanceCost { get; set; }
-    public IssueType Type { get; set; }
+    public string IssueType { get; set; } // Nuevo campo para el nombre
     private class Mapping : Profile
     {
         public Mapping()
         {
-            CreateMap<Solicitation, GetSolicitationDto>();
+            CreateMap<Solicitation, GetSolicitationDto>()
+                .ForMember(dest => dest.IssueType, opt => opt.MapFrom(src => src.IssueType.Name != null));
         }
     }
 }

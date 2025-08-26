@@ -1,8 +1,12 @@
 ﻿using CleanFix.Plugins;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace WebApi.CoreBot
 {
+    /// <summary>
+    /// Servicio principal del bot CleanFixBot. Gestiona la interpretación de mensajes y la delegación a plugins.
+    /// </summary>
     public class CleanFixBotService : IBotService
     {
         private readonly Dictionary<string, IPlugin> _plugins;
@@ -21,6 +25,9 @@ namespace WebApi.CoreBot
             _clasificador = new ClasificadorIntencion();
         }
 
+        /// <summary>
+        /// Procesa el mensaje recibido, interpreta la intención y delega la consulta al plugin adecuado.
+        /// </summary>
         public async Task<PluginRespuesta> ProcesarMensajeAsync(string mensaje)
         {
             var intencion = _clasificador.Clasificar(mensaje);
@@ -28,12 +35,12 @@ namespace WebApi.CoreBot
             // Si la intención es consultar datos, parsea la consulta natural
             if (intencion == IntencionUsuario.ConsultarDatos)
             {
-                // Analiza el mensaje natural y construye la consulta para el plugin
                 int? tipoEmpresa = ConsultaParser.ExtraerTipo(mensaje, "empresa");
                 int? tipoMaterial = ConsultaParser.ExtraerTipo(mensaje, "material");
                 bool masBarato = ConsultaParser.SolicitaMasBarato(mensaje);
                 bool masCaro = ConsultaParser.SolicitaMasCaro(mensaje);
                 bool disponibles = ConsultaParser.SolicitaDisponibles(mensaje);
+                bool todosMateriales = ConsultaParser.SolicitaTodosMateriales(mensaje);
 
                 string consulta = "";
                 if (mensaje.Contains("empresa"))
@@ -50,6 +57,7 @@ namespace WebApi.CoreBot
                     if (masBarato) consulta += " más barato";
                     if (masCaro) consulta += " más caro";
                     if (disponibles) consulta += " disponibles";
+                    if (todosMateriales) consulta += " todos";
                 }
                 else
                 {

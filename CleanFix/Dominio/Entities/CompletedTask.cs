@@ -12,10 +12,9 @@ public class CompletedTask : IEntity
     public DateTime CreationDate { get; set; } // Cambié el nombre de la propiedad a CreationDate
     public DateTime CompletionDate { get; set; }
     public double Price { get; set; }
-    public double Duration { get; set; }
     public int IssueTypeId { get; set; }
     public List<Material> Materials { get; set; }
-    public bool IsRequest { get; set; }
+    public bool IsSolicitation { get; set; }
     public User User { get; set; }
     public int Surface { get; set; } // Superficie del apartamento
     [Timestamp]

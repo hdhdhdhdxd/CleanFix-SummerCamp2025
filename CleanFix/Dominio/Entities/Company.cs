@@ -9,6 +9,7 @@ public class Company : IEntity
     public string Address { get; set; }
     public string Number { get; set; }
     public string Email { get; set; }
+    public int IssueTypeId { get; set; }
     public IssueType IssueType { get; set; }
     public decimal Price { get; set; }
     public int WorkTime { get; set; }

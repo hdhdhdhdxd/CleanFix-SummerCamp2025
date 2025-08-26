@@ -23,6 +23,11 @@ public class MaterialConfiguration : IEntityTypeConfiguration<Material>
 
         builder.Property(m => m.IssueTypeId)
             .IsRequired()
-            .HasComment("Id del tipo de incidencia asociada al material");
+            .HasComment("Id del tipo de incidencia");
+
+        builder.HasOne(m => m.IssueType)
+            .WithMany()
+            .HasForeignKey(m => m.IssueTypeId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

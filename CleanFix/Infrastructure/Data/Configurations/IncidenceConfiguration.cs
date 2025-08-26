@@ -7,10 +7,6 @@ public class IncidenceConfiguration : IEntityTypeConfiguration<Incidence>
 {
     public void Configure(EntityTypeBuilder<Incidence> builder)
     {
-        builder.Property(i => i.IssueTypeId)
-            .IsRequired()
-            .HasComment("Id del tipo de incidencia");
-
         builder.Property(i => i.Date)
             .IsRequired()
             .HasComment("Fecha de la incidencia");
@@ -36,5 +32,14 @@ public class IncidenceConfiguration : IEntityTypeConfiguration<Incidence>
         builder.Property(i => i.Priority)
             .IsRequired()
             .HasComment("Prioridad de la incidencia");
+
+        builder.Property(i => i.IssueTypeId)
+            .IsRequired()
+            .HasComment("Id del tipo de incidencia");
+
+        builder.HasOne(i => i.IssueType)
+            .WithMany()
+            .HasForeignKey(i => i.IssueTypeId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
