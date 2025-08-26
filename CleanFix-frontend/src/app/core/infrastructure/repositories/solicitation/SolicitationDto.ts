@@ -1,9 +1,7 @@
 export interface SolicitationDto {
   id: number
   address: string
-  description: string
-  type: string
-  maintenanceCost: number
-  date: Date
+  date: string
   status: string
+  issueType: string
 }

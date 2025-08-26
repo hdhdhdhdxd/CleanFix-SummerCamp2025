@@ -1,9 +1,10 @@
 export interface Solicitation {
   id: number
   address: string
-  description: string
-  type: string
-  maintenanceCost: number
   date: Date
   status: string
+  issueType: string
+  description?: string
+  type?: string
+  maintenanceCost?: number
 }

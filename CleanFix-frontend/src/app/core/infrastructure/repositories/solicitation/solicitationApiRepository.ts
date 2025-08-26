@@ -22,11 +22,9 @@ const getPaginated = async (
     items: responseJson.items.map((solicitation: SolicitationDto) => ({
       id: solicitation.id,
       address: solicitation.address,
-      description: solicitation.description,
-      type: solicitation.type,
-      maintenanceCost: solicitation.maintenanceCost,
       date: new Date(solicitation.date),
       status: solicitation.status,
+      issueType: solicitation.issueType,
     })),
     pageNumber: responseJson.pageNumber,
     totalPages: responseJson.totalPages,
