@@ -1,5 +1,8 @@
-﻿using MediatR;
+﻿using Application.Materials.Queries.GetRandomMaterialsByIssueType;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
@@ -12,6 +15,13 @@ namespace WebApi.Controllers
         public MaterialsController(ISender sender)
         {
             _sender = sender;
+        }
+
+        [HttpGet("random")]
+        public async Task<ActionResult<List<GetRandomMaterialDto>>> GetRandomMaterials([FromQuery] int issueTypeId)
+        {
+            var result = await _sender.Send(new GetRandomMaterialsByIssueTypeQuery(issueTypeId));
+            return Ok(result);
         }
     }
 }
