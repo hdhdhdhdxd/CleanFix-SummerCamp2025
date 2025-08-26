@@ -2,6 +2,7 @@ using Application.Common.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Incidences.Commands.UpdateIncidence;
 
@@ -26,9 +27,14 @@ public class UpdateIncidenceCommandHandler : IRequestHandler<UpdateIncidenceComm
     public async Task Handle(UpdateIncidenceCommand request, CancellationToken cancellationToken)
     {
         var entity = _mapper.Map<Incidence>(request.Incidence);
-        
-        _incidenceRepository.Update(entity);
-        
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        try
+        {
+            _incidenceRepository.Update(entity);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            throw new Exception("Conflicto de concurrencia: el registro fue modificado por otro usuario. Por favor, recargue y vuelva a intentar.");
+        }
     }
 }
