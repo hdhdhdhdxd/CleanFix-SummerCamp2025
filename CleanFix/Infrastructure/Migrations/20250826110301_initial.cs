@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class inital : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -150,9 +150,8 @@ namespace Infrastructure.Migrations
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false, comment: "Fecha de la tarea completada"),
                     CompletionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Price = table.Column<double>(type: "float(18)", precision: 18, scale: 2, nullable: false, comment: "Precio de la tarea completada"),
-                    Duration = table.Column<double>(type: "float", nullable: false, comment: "Duración de la tarea en horas"),
                     IssueTypeId = table.Column<int>(type: "int", nullable: false, comment: "Id del tipo de incidencia de la tarea"),
-                    IsRequest = table.Column<bool>(type: "bit", nullable: false, comment: "Indica si la tarea fue solicitada"),
+                    IsSolicitation = table.Column<bool>(type: "bit", nullable: false, comment: "Indica si la tarea fue solicitada"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     Surface = table.Column<int>(type: "int", nullable: false, comment: "Superficie del apartamento"),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
@@ -164,6 +163,12 @@ namespace Infrastructure.Migrations
                         name: "FK_CompletedTasks_Companies_CompanyId",
                         column: x => x.CompanyId,
                         principalTable: "Companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CompletedTasks_IssueTypes_IssueTypeId",
+                        column: x => x.IssueTypeId,
+                        principalTable: "IssueTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -211,6 +216,11 @@ namespace Infrastructure.Migrations
                 name: "IX_CompletedTasks_CompanyId",
                 table: "CompletedTasks",
                 column: "CompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CompletedTasks_IssueTypeId",
+                table: "CompletedTasks",
+                column: "IssueTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CompletedTasks_UserId",
