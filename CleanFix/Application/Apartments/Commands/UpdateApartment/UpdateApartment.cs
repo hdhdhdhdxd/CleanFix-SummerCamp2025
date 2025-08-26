@@ -2,6 +2,7 @@
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Apartments.Commands.UpdateApartment;
 
@@ -26,9 +27,14 @@ public class UpdateApartmentCommandHandler : IRequestHandler<UpdateApartmentComm
     public async Task Handle(UpdateApartmentCommand request, CancellationToken cancellationToken)
     {
         var apartment = _mapper.Map<Apartment>(request.Apartment);
-
-        _apartmentRepository.Update(apartment);
-        
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        try
+        {
+            _apartmentRepository.Update(apartment);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            throw new Exception("Conflicto de concurrencia: el registro fue modificado por otro usuario. Por favor, recargue y vuelva a intentar.");
+        }
     }
 }

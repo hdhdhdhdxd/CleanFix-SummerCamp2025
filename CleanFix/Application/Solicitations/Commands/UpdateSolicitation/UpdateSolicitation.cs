@@ -2,6 +2,7 @@ using Application.Common.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Solicitations.Commands.UpdateSolicitation;
 
@@ -26,9 +27,15 @@ public class UpdateSolicitationCommandHandler : IRequestHandler<UpdateSolicitati
     public async Task Handle(UpdateSolicitationCommand request, CancellationToken cancellationToken)
     {
         var entity = _mapper.Map<Solicitation>(request.Solicitation);
-        
-        _solicitationRepository.Update(entity);
-        
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        try
+        {
+            _solicitationRepository.Update(entity);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            // Manejo de conflicto de concurrencia
+            throw new Exception("Conflicto de concurrencia: el registro fue modificado por otro usuario. Por favor, recargue y vuelva a intentar.");
+        }
     }
 }
