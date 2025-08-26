@@ -147,13 +147,12 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.Company, f => companies[f.Random.Int(0, companies.Count - 1)])
             .RuleFor(e => e.CreationDate, f => f.Date.Recent())
             .RuleFor(e => e.Price, f => f.Random.Float(50, 1000))
-            .RuleFor(e => e.Duration, f => f.Random.Float(1, 10))
             .RuleFor(e => e.Address, f => f.Address.FullAddress())
             .RuleFor(e => e.IssueTypeId, f => f.Random.Int(1, 6))
             .RuleFor(e => e.Materials, f => materials.OrderBy(x => f.Random.Int()).Take(f.Random.Int(1, 5)).ToList())
             .RuleFor(e => e.User, f => users[f.Random.Int(0, users.Count - 1)])
             .RuleFor(e => e.Surface, f => f.Random.Int(50, 200))
-            .RuleFor(e => e.IsRequest, f => f.Random.Bool());
+            .RuleFor(e => e.IsSolicitation, f => f.Random.Bool());
         var completedTasks = completedTaskFaker.Generate(10);
         db.CompletedTasks.AddRange(completedTasks);
         db.SaveChanges();
