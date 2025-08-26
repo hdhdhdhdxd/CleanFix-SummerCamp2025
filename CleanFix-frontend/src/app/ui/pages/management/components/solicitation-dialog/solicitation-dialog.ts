@@ -1,91 +1,57 @@
+import { Company } from '@/core/domain/models/Company'
 import { Solicitation } from '@/core/domain/models/Solicitation'
-import { CurrencyPipe, DatePipe } from '@angular/common'
-import { AfterViewInit, Component, ElementRef, input, output, ViewChild } from '@angular/core'
+import { CompanyService } from '@/ui/services/company/company-service'
+import { CurrencyPipe, DatePipe, CommonModule } from '@angular/common'
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  inject,
+  input,
+  output,
+  signal,
+  ViewChild,
+} from '@angular/core'
 
 @Component({
   selector: 'app-solicitation-dialog',
-  imports: [CurrencyPipe, DatePipe],
+  imports: [CommonModule, CurrencyPipe, DatePipe],
   templateUrl: './solicitation-dialog.html',
-  styles: [
-    `
-      dialog {
-        transition:
-          transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-          opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-          backdrop-filter 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-          display 0.4s allow-discrete;
-
-        transform: scale(0.7) translateY(50px);
-        opacity: 0;
-      }
-
-      dialog[open] {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-
-        @starting-style {
-          transform: scale(0.7) translateY(50px);
-          opacity: 0;
-        }
-      }
-
-      dialog::backdrop {
-        transition:
-          backdrop-filter 0.3s cubic-bezier(0.16, 1, 0.3, 1),
-          background-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-
-        backdrop-filter: blur(8px);
-        background-color: rgba(0, 0, 0, 0.4);
-      }
-
-      dialog[open]::backdrop {
-        @starting-style {
-          backdrop-filter: blur(0px);
-          background-color: rgba(0, 0, 0, 0);
-        }
-      }
-
-      .dialog-content {
-        transition:
-          transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-          opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        animation: slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-      }
-
-      @keyframes slideInUp {
-        0% {
-          transform: translateY(100px) scale(0.9);
-          opacity: 0;
-        }
-        100% {
-          transform: translateY(0) scale(1);
-          opacity: 1;
-        }
-      }
-
-      @keyframes slideOutDown {
-        0% {
-          transform: translateY(0) scale(1);
-          opacity: 1;
-        }
-        100% {
-          transform: translateY(50px) scale(0.95);
-          opacity: 0;
-        }
-      }
-
-      .dialog-content.closing {
-        animation: slideOutDown 0.3s cubic-bezier(0.4, 0, 1, 1) forwards;
-      }
-    `,
-  ],
+  styleUrls: ['./solicitation-dialog.css'],
 })
 export class SolicitationDialog implements AfterViewInit {
-  @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>
-  @ViewChild('dialogContent') dialogContent!: ElementRef<HTMLElement>
+  private readonly companyService = inject(CompanyService)
+
+  companies = signal<Company[]>([])
+  private _loadingCompanies = signal<boolean>(false)
+  private _companiesLoaded = false
 
   selectedSolicitation = input.required<Solicitation>()
   closeDialog = output<void>()
+
+  get loadingCompanies() {
+    return this._loadingCompanies()
+  }
+
+  loadCompanies(): void {
+    if (this._companiesLoaded || this._loadingCompanies()) {
+      return
+    }
+    this._loadingCompanies.set(true)
+    this.companyService.getAll().subscribe({
+      next: (companies) => {
+        this.companies.set(companies)
+        this._loadingCompanies.set(false)
+        this._companiesLoaded = true
+      },
+      error: () => {
+        this._loadingCompanies.set(false)
+      },
+    })
+  }
+
+  @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>
+  @ViewChild('dialogContent') dialogContent!: ElementRef<HTMLElement>
 
   ngAfterViewInit(): void {
     this.openDialog()

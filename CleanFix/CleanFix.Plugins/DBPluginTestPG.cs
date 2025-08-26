@@ -7,16 +7,36 @@ using CleanFix.Plugins;
 using Microsoft.SemanticKernel;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace CleanFix.Plugins
 {
     public class DBPluginTestPG : IPlugin
     {
         private readonly string _connectionString;
+        private readonly ILogger<DBPluginTestPG> _logger;
 
-        public DBPluginTestPG(string connectionString)
+        // Permitir inyección de logger, pero mantener compatibilidad con consola
+        public DBPluginTestPG(string connectionString, ILogger<DBPluginTestPG> logger = null)
         {
             _connectionString = connectionString;
+            _logger = logger;
+            LogInfo($"[DBPluginTestPG] Cadena de conexión recibida: {_connectionString}");
+        }
+
+        private void LogInfo(string message)
+        {
+            if (_logger != null)
+                _logger.LogInformation(message);
+            else
+                Console.WriteLine(message);
+        }
+        private void LogError(string message)
+        {
+            if (_logger != null)
+                _logger.LogError(message);
+            else
+                Console.WriteLine(message);
         }
 
         [KernelFunction]
@@ -25,9 +45,11 @@ namespace CleanFix.Plugins
             var companiesIa = new List<CompanyIa>();
             try
             {
+                LogInfo("[DBPluginTestPG] Intentando abrir conexión para empresas...");
                 using var connection = new SqlConnection(_connectionString);
                 connection.Open();
-                var command = new SqlCommand("SELECT Id, Name, Address, Number, Email, [type], Price, WorkTime FROM dbo.Companies", connection);
+                LogInfo("[DBPluginTestPG] Conexión abierta correctamente para empresas.");
+                var command = new SqlCommand("SELECT Id, Name, Address, Number, Email, IssueTypeId, Price, WorkTime FROM dbo.Companies", connection);
                 using var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
@@ -38,7 +60,7 @@ namespace CleanFix.Plugins
                         Address = reader.IsDBNull(2) ? null : reader.GetString(2),
                         Number = reader.IsDBNull(3) ? null : reader.GetString(3),
                         Email = reader.IsDBNull(4) ? null : reader.GetString(4),
-                        Type = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
+                        IssueTypeId = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
                         Price = reader.IsDBNull(6) ? 0 : reader.GetDecimal(6),
                         WorkTime = reader.IsDBNull(7) ? 0 : reader.GetInt32(7)
                     });
@@ -46,10 +68,10 @@ namespace CleanFix.Plugins
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[DBPluginTestPG] Error al obtener empresas: {ex.Message}");
+                LogError($"[DBPluginTestPG] Error al obtener empresas: {ex.Message}");
                 return new EmpresaResponse { Success = false, Error = ex.Message };
             }
-            Debug.WriteLine($"[DBPluginTestPG] Empresas obtenidas: {companiesIa.Count}");
+            LogInfo($"[DBPluginTestPG] Empresas obtenidas: {companiesIa.Count}");
             return new EmpresaResponse { Success = true, Data = companiesIa };
         }
 
@@ -59,9 +81,11 @@ namespace CleanFix.Plugins
             var materialesIa = new List<MaterialIa>();
             try
             {
+                LogInfo("[DBPluginTestPG] Intentando abrir conexión para materiales...");
                 using var connection = new SqlConnection(_connectionString);
                 connection.Open();
-                var command = new SqlCommand("SELECT Id, Name, Cost, Issue FROM dbo.Materials", connection);
+                LogInfo("[DBPluginTestPG] Conexión abierta correctamente para materiales.");
+                var command = new SqlCommand("SELECT Id, Name, Cost, IssueTypeId FROM dbo.Materials", connection);
                 using var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
@@ -70,37 +94,37 @@ namespace CleanFix.Plugins
                         Id = reader.GetInt32(0),
                         Name = reader.IsDBNull(1) ? null : reader.GetString(1),
                         Cost = reader.IsDBNull(2) ? 0 : reader.GetDecimal(2),
-                        Issue = reader.IsDBNull(3) ? 0 : reader.GetInt32(3),
+                        IssueTypeId = reader.IsDBNull(3) ? 0 : reader.GetInt32(3),
                         Available = true
                     });
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[DBPluginTestPG] Error al obtener materiales: {ex.Message}");
+                LogError($"[DBPluginTestPG] Error al obtener materiales: {ex.Message}");
                 return new MaterialResponse { Success = false, Error = ex.Message };
             }
-            Debug.WriteLine($"[DBPluginTestPG] Materiales obtenidos: {materialesIa.Count}");
+            LogInfo($"[DBPluginTestPG] Materiales obtenidos: {materialesIa.Count}");
             return new MaterialResponse { Success = true, Data = materialesIa };
         }
 
         public async Task<PluginRespuesta> EjecutarAsync(string mensaje)
         {
             mensaje = mensaje.ToLower();
+            LogInfo($"[DBPluginTestPG] EjecutarAsync llamado con mensaje: {mensaje}");
 
-            // Obtener todas las empresas y materiales (como en la consola)
             var empresasResponse = await Task.Run(() => GetAllEmpresas());
             var empresas = empresasResponse.Data as List<CompanyIa>;
             if (!empresasResponse.Success || empresas == null)
+            {
+                LogError($"[DBPluginTestPG] Error en empresas: {empresasResponse.Error}");
                 return new PluginRespuesta { Success = false, Error = empresasResponse.Error ?? "Error al obtener empresas." };
+            }
 
-            // --- FILTRADO NATURAL COMO EN LA CONSOLA ---
-            // Extraer tipo
             int? tipoEmpresa = ConsultaParser.ExtraerTipo(mensaje, "empresa");
             if (tipoEmpresa.HasValue)
-                empresas = empresas.Where(e => e.Type == tipoEmpresa.Value).ToList();
+                empresas = empresas.Where(e => e.IssueTypeId == tipoEmpresa.Value).ToList();
 
-            // Filtro por precio
             if (mensaje.Contains("precio>"))
             {
                 var precioStr = mensaje.Split("precio>")[1].Split(' ')[0];
@@ -108,36 +132,34 @@ namespace CleanFix.Plugins
                     empresas = empresas.Where(e => e.Price > precio).ToList();
             }
 
-            // Más barata
             if (mensaje.Contains("más barata"))
             {
                 var empresaMasBarata = empresas.OrderBy(e => e.Price).FirstOrDefault();
                 return new PluginRespuesta { Success = true, Data = empresaMasBarata != null ? new List<CompanyIa> { empresaMasBarata } : new List<CompanyIa>() };
             }
 
-            // Más cara
             if (mensaje.Contains("más cara"))
             {
                 var empresaMasCara = empresas.OrderByDescending(e => e.Price).FirstOrDefault();
                 return new PluginRespuesta { Success = true, Data = empresaMasCara != null ? new List<CompanyIa> { empresaMasCara } : new List<CompanyIa>() };
             }
 
-            // Si el mensaje pide empresas
             if (mensaje.StartsWith("empresas"))
                 return new PluginRespuesta { Success = true, Data = empresas };
 
-            // --- MATERIALES (igual que empresas) ---
             if (mensaje.StartsWith("materiales"))
             {
                 var materialesResponse = await Task.Run(() => GetAllMaterials());
                 var materiales = materialesResponse.Data as List<MaterialIa>;
                 if (!materialesResponse.Success || materiales == null)
+                {
+                    LogError($"[DBPluginTestPG] Error en materiales: {materialesResponse.Error}");
                     return new PluginRespuesta { Success = false, Error = materialesResponse.Error ?? "Error al obtener materiales." };
+                }
 
-                // Filtros
                 int? tipoMaterial = ConsultaParser.ExtraerTipo(mensaje, "material");
                 if (tipoMaterial.HasValue)
-                    materiales = materiales.Where(m => m.Issue == tipoMaterial.Value).ToList();
+                    materiales = materiales.Where(m => m.IssueTypeId == tipoMaterial.Value).ToList();
 
                 if (mensaje.Contains("costo<"))
                 {
@@ -164,6 +186,7 @@ namespace CleanFix.Plugins
                 return new PluginRespuesta { Success = true, Data = materiales };
             }
 
+            LogError("[DBPluginTestPG] Consulta no reconocida.");
             return new PluginRespuesta
             {
                 Success = false,
@@ -172,13 +195,6 @@ namespace CleanFix.Plugins
             };
         }
     }
-
-
-
-
-
-
-
 
     // ✅ Clases auxiliares
 
@@ -203,7 +219,7 @@ namespace CleanFix.Plugins
         public string Address { get; set; }
         public string Number { get; set; }
         public string Email { get; set; }
-        public int Type { get; set; }
+        public int IssueTypeId { get; set; }
         public decimal Price { get; set; }
         public int WorkTime { get; set; }
     }
@@ -213,7 +229,7 @@ namespace CleanFix.Plugins
         public int Id { get; set; }
         public string Name { get; set; }
         public decimal Cost { get; set; }
-        public int Issue { get; set; }
+        public int IssueTypeId { get; set; }
         public bool Available { get; set; }
     }
 }
