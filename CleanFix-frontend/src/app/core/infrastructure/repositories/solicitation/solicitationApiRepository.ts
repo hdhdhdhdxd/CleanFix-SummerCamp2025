@@ -4,7 +4,7 @@ import { environment } from 'src/environments/environment'
 import { PaginationDto } from '../../../domain/models/PaginationDto'
 import { SolicitationDto } from './SolicitationDto'
 
-const getAll = async (
+const getPaginated = async (
   pageNumber: number,
   pageSize: number,
 ): Promise<PaginationDto<Solicitation>> => {
@@ -32,5 +32,5 @@ const getAll = async (
 }
 
 export const solicitationApiRepository: SolicitationRepository = {
-  getAll,
+  getPaginated: getPaginated,
 }

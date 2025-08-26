@@ -65,7 +65,7 @@ export class Solicitations implements OnInit {
   }
 
   private loadSolicitations(page: number, pageSize: number) {
-    this.solicitationService.getAll(page, pageSize).subscribe((result) => {
+    this.solicitationService.getPaginated(page, pageSize).subscribe((result) => {
       this.updateValues(result)
     })
   }

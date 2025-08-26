@@ -4,7 +4,10 @@ import { environment } from 'src/environments/environment'
 import { IncidenceDto } from './IncidenceDto'
 import { IncidenceRepository } from '@/core/domain/repositories/IncidenceRepository'
 
-const getAll = async (pageNumber: number, pageSize: number): Promise<PaginationDto<Incidence>> => {
+const getPaginated = async (
+  pageNumber: number,
+  pageSize: number,
+): Promise<PaginationDto<Incidence>> => {
   const response = await fetch(
     environment.baseUrl + `incidences/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
   )
@@ -30,5 +33,5 @@ const getAll = async (pageNumber: number, pageSize: number): Promise<PaginationD
 }
 
 export const incidenceApiRepository: IncidenceRepository = {
-  getAll,
+  getPaginated: getPaginated,
 }

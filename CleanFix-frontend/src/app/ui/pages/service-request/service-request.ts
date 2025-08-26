@@ -1,13 +1,13 @@
 import { CompanyService } from '@/ui/services/company/company-service'
-import { AsyncPipe } from '@angular/common'
+import { AsyncPipe, NgFor, NgIf } from '@angular/common'
 import { Component, inject } from '@angular/core'
 
 @Component({
   selector: 'app-service-request',
-  imports: [AsyncPipe],
+  imports: [AsyncPipe, NgFor, NgIf],
   templateUrl: './service-request.html',
 })
 export class ServiceRequest {
   companyService = inject(CompanyService)
-  companies = this.companyService.getAll()
+  pagination = this.companyService.getPaginated(1, 10)
 }

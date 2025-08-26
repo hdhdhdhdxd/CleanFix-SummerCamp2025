@@ -1,5 +1,6 @@
 import { companyService } from '@/core/application/companyService'
 import { Company } from '@/core/domain/models/Company'
+import { PaginationDto } from '@/core/domain/models/PaginationDto'
 import { Injectable } from '@angular/core'
 import { from, Observable } from 'rxjs'
 
@@ -7,7 +8,7 @@ import { from, Observable } from 'rxjs'
   providedIn: 'root',
 })
 export class CompanyService {
-  getAll(): Observable<Company[]> {
-    return from(companyService.getAll())
+  getPaginated(pageNumber: number, pageSize: number): Observable<PaginationDto<Company>> {
+    return from(companyService.getPaginated(pageNumber, pageSize))
   }
 }

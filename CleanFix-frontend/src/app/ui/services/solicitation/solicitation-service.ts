@@ -8,7 +8,7 @@ import { from, Observable } from 'rxjs'
   providedIn: 'root',
 })
 export class SolicitationService {
-  getAll(pageNumber: number, pageSize: number): Observable<PaginationDto<Solicitation>> {
-    return from(solicitationService.getAll(pageNumber, pageSize))
+  getPaginated(pageNumber: number, pageSize: number): Observable<PaginationDto<Solicitation>> {
+    return from(solicitationService.getPaginated(pageNumber, pageSize))
   }
 }

@@ -8,7 +8,7 @@ import { from, Observable } from 'rxjs'
   providedIn: 'root',
 })
 export class IncidenceService {
-  getAll(pageNumber: number, pageSize: number): Observable<PaginationDto<Incidence>> {
-    return from(incidenceService.getAll(pageNumber, pageSize))
+  getPaginated(pageNumber: number, pageSize: number): Observable<PaginationDto<Incidence>> {
+    return from(incidenceService.getPaginated(pageNumber, pageSize))
   }
 }

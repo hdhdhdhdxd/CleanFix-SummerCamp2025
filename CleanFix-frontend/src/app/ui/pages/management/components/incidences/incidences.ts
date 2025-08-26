@@ -62,7 +62,7 @@ export class Incidences implements OnInit {
   }
 
   private loadIncidences(page: number, pageSize: number) {
-    this.incidenceService.getAll(page, pageSize).subscribe((result) => {
+    this.incidenceService.getPaginated(page, pageSize).subscribe((result) => {
       this.updateValues(result)
     })
   }

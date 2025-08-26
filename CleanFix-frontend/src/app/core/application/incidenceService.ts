@@ -6,11 +6,11 @@ const init = (repository: IncidenceRepository) => {
   incidenceRepository = repository
 }
 
-const getAll = async (pageNumber: number, pageSize: number) => {
-  return incidenceRepository.getAll(pageNumber, pageSize)
+const getPaginated = async (pageNumber: number, pageSize: number) => {
+  return incidenceRepository.getPaginated(pageNumber, pageSize)
 }
 
 export const incidenceService = {
   init,
-  getAll,
+  getPaginated,
 }

@@ -38,9 +38,9 @@ export class SolicitationDialog implements AfterViewInit {
       return
     }
     this._loadingCompanies.set(true)
-    this.companyService.getAll().subscribe({
-      next: (companies) => {
-        this.companies.set(companies)
+    this.companyService.getPaginated(1, 10).subscribe({
+      next: (pagination) => {
+        this.companies.set(pagination.items)
         this._loadingCompanies.set(false)
         this._companiesLoaded = true
       },
