@@ -39,5 +39,10 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
         builder.Property(c => c.WorkTime)
             .IsRequired()
             .HasComment("Tiempo de trabajo en horas");
+
+        builder.HasOne(c => c.IssueType)
+            .WithMany()
+            .HasForeignKey(c => c.IssueTypeId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
