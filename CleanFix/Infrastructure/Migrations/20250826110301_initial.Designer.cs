@@ -12,8 +12,8 @@ using WebApi.BaseDatos;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250826090847_inital")]
-    partial class inital
+    [Migration("20250826110301_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -149,11 +149,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime2")
                         .HasComment("Fecha de la tarea completada");
 
-                    b.Property<double>("Duration")
-                        .HasColumnType("float")
-                        .HasComment("Duración de la tarea en horas");
-
-                    b.Property<bool>("IsRequest")
+                    b.Property<bool>("IsSolicitation")
                         .HasColumnType("bit")
                         .HasComment("Indica si la tarea fue solicitada");
 
@@ -182,6 +178,8 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
+
+                    b.HasIndex("IssueTypeId");
 
                     b.HasIndex("UserId");
 
@@ -389,6 +387,12 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Domain.Entities.IssueType", "IssueType")
+                        .WithMany()
+                        .HasForeignKey("IssueTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.User", "User")
                         .WithMany("Applications")
                         .HasForeignKey("UserId")
@@ -396,6 +400,8 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Company");
+
+                    b.Navigation("IssueType");
 
                     b.Navigation("User");
                 });
