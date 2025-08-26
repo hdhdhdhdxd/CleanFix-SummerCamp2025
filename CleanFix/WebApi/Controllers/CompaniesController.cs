@@ -1,5 +1,4 @@
-﻿using Application.Companies.Queries.GetCompanies;
-using Application.Companies.Queries.GetCompany;
+﻿using Application.Companies.Queries.GetCompany;
 using Application.Companies.Queries.GetPaginatedCompanies;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -23,14 +22,6 @@ namespace WebApi.Controllers
         {
             var result = await _sender.Send(new GetPaginatedCompaniesQuery(pageNumber, pageSize));
 
-            return Ok(result);
-        }
-
-        // GET: api/Companies
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetCompaniesDto>>> GetCompanies()
-        {
-            var result = await _sender.Send(new GetCompaniesQuery());
             return Ok(result);
         }
 

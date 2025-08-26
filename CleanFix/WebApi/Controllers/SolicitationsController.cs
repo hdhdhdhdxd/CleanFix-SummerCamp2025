@@ -1,9 +1,8 @@
-using Application.Solicitations.Queries.GetPaginatedSolicitations;
-using Application.Solicitations.Queries.GetSolicitations;
-using Application.Solicitations.Queries.GetSolicitation;
 using Application.Solicitations.Commands.CreateSolicitation;
-using Application.Solicitations.Commands.UpdateSolicitation;
 using Application.Solicitations.Commands.DeleteSolicitation;
+using Application.Solicitations.Commands.UpdateSolicitation;
+using Application.Solicitations.Queries.GetPaginatedSolicitations;
+using Application.Solicitations.Queries.GetSolicitation;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,14 +24,6 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IEnumerable<GetPaginatedSolicitationDto>>> GetPaginatedSolicitations([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var result = await _sender.Send(new GetPaginatedSolicitationsQuery(pageNumber, pageSize));
-            return Ok(result);
-        }
-
-        // GET: api/solicitations
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetSolicitationsDto>>> GetSolicitations()
-        {
-            var result = await _sender.Send(new GetSolicitationsQuery());
             return Ok(result);
         }
 

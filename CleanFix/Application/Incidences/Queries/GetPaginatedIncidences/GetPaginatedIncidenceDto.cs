@@ -1,5 +1,3 @@
-using System;
-using Application.Incidences.Queries.GetIncidences;
 using AutoMapper;
 using Domain.Entities;
 
