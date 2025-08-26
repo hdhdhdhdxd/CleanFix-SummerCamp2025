@@ -25,12 +25,12 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
     public async Task<int> Handle(CreateCompletedTaskCommand request, CancellationToken cancellationToken)
     {
         var completedTask = _mapper.Map<CompletedTask>(request.CompletedTask);
+        completedTask.CreationDate = DateTime.UtcNow; // Asignar fecha de creación
 
         if (completedTask.Id == 0)
             completedTask.Id = 0;
 
         _completedTaskRepository.Add(completedTask);
-
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return completedTask.Id;

@@ -25,13 +25,11 @@ public class CreateSolicitationCommandHandler : IRequestHandler<CreateSolicitati
     public async Task<int> Handle(CreateSolicitationCommand request, CancellationToken cancellationToken)
     {
         var entity = _mapper.Map<Solicitation>(request.Solicitation);
+        entity.Date = DateTime.UtcNow; // Asignar fecha de creación
         if (entity.Id == 0)
             entity.Id = 0;
-        
         _solicitationRepository.Add(entity);
-        
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
         return entity.Id;
     }
 }

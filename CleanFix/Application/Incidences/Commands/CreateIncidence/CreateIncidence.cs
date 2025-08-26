@@ -25,13 +25,11 @@ public class CreateIncidenceCommandHandler : IRequestHandler<CreateIncidenceComm
     public async Task<int> Handle(CreateIncidenceCommand request, CancellationToken cancellationToken)
     {
         var entity = _mapper.Map<Incidence>(request.Incidence);
+        entity.Date = DateTime.UtcNow; // Asignar fecha de creación
         if (entity.Id == 0)
             entity.Id = 0;
-            
         _incidenceRepository.Add(entity);
-        
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        
         return entity.Id;
     }
 }
