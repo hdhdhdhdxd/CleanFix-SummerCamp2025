@@ -48,9 +48,7 @@ Si la pregunta no tiene relación con los datos, responde que no puedes ayudar.
             var empresasResponse = dbPlugin.GetAllEmpresas();
             var materialesResponse = dbPlugin.GetAllMaterials();
 
-            // LOG para depuración
-            Debug.WriteLine($"[AssistantService] Empresas count: {empresasResponse.Data?.Count ?? 0}");
-            Debug.WriteLine($"[AssistantService] Materiales count: {materialesResponse.Data?.Count ?? 0}");
+           
 
             // Si no hay datos, lanza excepción para ver el error en la API
             if (empresasResponse.Data == null || empresasResponse.Data.Count == 0)
