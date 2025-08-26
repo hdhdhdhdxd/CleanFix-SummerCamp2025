@@ -18,7 +18,7 @@ namespace Application.Materials.Queries.GetRandomMaterialsByIssueType
 
         public async Task<List<GetRandomMaterialDto>> Handle(GetRandomMaterialsByIssueTypeQuery request, CancellationToken cancellationToken)
         {
-            var materials = _materialRepository.GetAll();
+            var materials = _materialRepository.GetQueryable();
             var filtered = materials.Where(m => m.IssueTypeId == request.IssueTypeId && m.Available).ToList();
             var random = filtered.OrderBy(x => Guid.NewGuid()).Take(request.Count).ToList();
             return random.Select(m => new GetRandomMaterialDto
