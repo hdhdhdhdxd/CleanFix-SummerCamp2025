@@ -8,10 +8,10 @@
 >
   <div
     #dialogContent
-    class="dialog-content flex h-full w-full flex-col bg-white sm:h-auto sm:max-h-[85vh] sm:w-auto sm:max-w-2xl sm:min-w-[500px] sm:rounded-xl sm:shadow-2xl"
+    class="dialog-content flex h-full w-full flex-col bg-brand-0 sm:h-auto sm:max-h-[85vh] sm:w-auto sm:max-w-2xl sm:min-w-[500px] sm:rounded-xl sm:shadow-2xl"
   >
     <header
-      class="flex shrink-0 items-center justify-between bg-brand-500 px-4 py-3 text-white sm:px-6 sm:py-4"
+      class="flex shrink-0 items-center justify-between bg-primary-500 px-4 py-3 text-brand-0 sm:px-6 sm:py-4"
     >
       <h1 class="text-lg font-semibold sm:text-xl">Detalles de la Solicitud</h1>
       <form method="dialog" id="solicitation-dialog-form">
@@ -77,16 +77,38 @@
             {{ selectedSolicitation().date | date: 'dd/MM/yyyy HH:mm' }}
           </p>
         </div>
+
+        <div class="mt-6 flex flex-col sm:col-span-2">
+          <span class="mb-1 text-sm font-medium text-brand-600">Empresa</span>
+          <div class="flex items-center gap-2">
+            <select
+              class="w-full rounded border border-brand-200 px-3 py-2 text-brand-800 focus:ring-2 focus:ring-brand-500 focus:outline-none"
+              (focus)="loadCompanies()"
+            >
+              <option value="" disabled selected>Selecciona una empresa</option>
+              @if (loadingCompanies) {
+                <option disabled>Cargando empresas...</option>
+              }
+              @for (company of companies(); track $index) {
+                <option [value]="company.id">
+                  {{ company.name }}
+                </option>
+              }
+            </select>
+            @if (loadingCompanies) {
+              <span class="ml-2 animate-pulse text-xs text-brand-500">Cargando empresas...</span>
+            }
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Footer -->
     <footer
       class="flex shrink-0 justify-end gap-3 border-t border-brand-200 bg-brand-50 px-4 py-3 sm:px-6 sm:py-4"
     >
       <button
         form="solicitation-dialog-form"
-        class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-600 sm:text-base"
+        class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-brand-0 transition-colors hover:bg-brand-600 sm:text-base"
       >
         Cerrar
       </button>
