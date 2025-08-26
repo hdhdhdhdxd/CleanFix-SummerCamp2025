@@ -1,5 +1,4 @@
 ﻿using Application.Materials.Queries.GetMaterial;
-using Application.Materials.Queries.GetMaterials;
 using Application.Materials.Queries.GetPaginatedMaterials;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -22,14 +21,6 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IEnumerable<GetPaginatedMaterialDto>>> GetPaginatedMaterials([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var result = await _sender.Send(new GetPaginatedMaterialsQuery(pageNumber, pageSize));
-            return Ok(result);
-        }
-
-        // GET: api/Materials
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetMaterialsDto>>> GetMaterials()
-        {
-            var result = await _sender.Send(new GetMaterialsQuery());
             return Ok(result);
         }
 

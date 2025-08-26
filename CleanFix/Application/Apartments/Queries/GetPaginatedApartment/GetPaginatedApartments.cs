@@ -1,5 +1,4 @@
-﻿using Application.Apartments.Queries.GetApartments;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Infrastructure.Common.Mappings;

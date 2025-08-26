@@ -1,9 +1,8 @@
-using Application.Incidences.Queries.GetPaginatedIncidences;
-using Application.Incidences.Queries.GetIncidences;
-using Application.Incidences.Queries.GetIncidence;
 using Application.Incidences.Commands.CreateIncidence;
-using Application.Incidences.Commands.UpdateIncidence;
 using Application.Incidences.Commands.DeleteIncidence;
+using Application.Incidences.Commands.UpdateIncidence;
+using Application.Incidences.Queries.GetIncidence;
+using Application.Incidences.Queries.GetPaginatedIncidences;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,14 +24,6 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IEnumerable<GetPaginatedIncidenceDto>>> GetPaginatedIncidences([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var result = await _sender.Send(new GetPaginatedIncidencesQuery(pageNumber, pageSize));
-            return Ok(result);
-        }
-
-        // GET: api/Incidences
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetIncidencesDto>>> GetIncidences()
-        {
-            var result = await _sender.Send(new GetIncidencesQuery());
             return Ok(result);
         }
 

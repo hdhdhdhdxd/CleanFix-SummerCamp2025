@@ -2,7 +2,6 @@
 using Application.Apartments.Commands.DeleteApartment;
 using Application.Apartments.Commands.UpdateApartment;
 using Application.Apartments.Queries.GetApartment;
-using Application.Apartments.Queries.GetApartments;
 using Application.Apartments.Queries.GetPaginatedApartment;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -26,16 +25,6 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IEnumerable<GetPaginatedApartmentDto>>> GetPaginatedApartments([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var result = await _sender.Send(new GetPaginatedApartmentsQuery(pageNumber, pageSize));
-
-            return Ok(result);
-        }
-        
-
-        // GET: api/Apartments
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetApartmentsDto>>> GetApartments()
-        {
-            var result = await _sender.Send(new GetApartmentsQuery());
 
             return Ok(result);
         }
@@ -75,7 +64,7 @@ namespace WebApi.Controllers
         // POST: api/Apartments
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<GetApartmentsDto>> PostApartment([FromBody] CreateApartmentDto apartmentDto)
+        public async Task<ActionResult<GetPaginatedApartmentDto>> PostApartment([FromBody] CreateApartmentDto apartmentDto)
         {
             var command = new CreateApartmentCommand
             {

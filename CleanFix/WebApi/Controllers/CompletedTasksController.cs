@@ -1,6 +1,5 @@
 using Application.CompletedTasks.Commands.CreateCompletedTask;
 using Application.CompletedTasks.Queries.GetCompletedTask;
-using Application.CompletedTasks.Queries.GetCompletedTasks;
 using Application.CompletedTasks.Queries.GetPaginatedCompletedTasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -23,14 +22,6 @@ namespace WebApi.Controllers
         public async Task<ActionResult<IEnumerable<GetPaginatedCompletedTaskDto>>> GetPaginatedCompletedTasks([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var result = await _sender.Send(new GetPaginatedCompletedTasksQuery(pageNumber, pageSize));
-            return Ok(result);
-        }
-
-        // GET: api/completedtasks
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetCompletedTasksDto>>> GetCompletedTasks()
-        {
-            var result = await _sender.Send(new GetCompletedTasksQuery());
             return Ok(result);
         }
 
