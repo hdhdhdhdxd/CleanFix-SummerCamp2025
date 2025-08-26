@@ -3,4 +3,5 @@ import { Solicitation } from '../models/Solicitation'
 
 export interface SolicitationRepository {
   getPaginated(pageNumber: number, pageSize: number): Promise<PaginatedData<Solicitation>>
+  getById(id: number): Promise<Solicitation>
 }

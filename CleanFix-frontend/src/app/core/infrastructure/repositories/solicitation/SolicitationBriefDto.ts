@@ -1,4 +1,4 @@
-export interface SolicitationDto {
+export interface SolicitationBriefDto {
   id: number
   address: string
   date: string
