@@ -15,13 +15,13 @@ public class GetPaginatedCompanyDto
     public string Name { get; set; }
     public string Number { get; set; }
     public string Email { get; set; }
-    public string Type { get; set; }
+    public string IssueType { get; set; } // Renombrado y tipado como string
     private class Mapping : Profile
     {
         public Mapping()
         {
             CreateMap<Company, GetPaginatedCompanyDto>()
-                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.IssueType != null ? src.IssueType.Name : null));
+                .ForMember(dest => dest.IssueType, opt => opt.MapFrom(src => src.IssueType != null ? src.IssueType.Name : null));
         }
     }
 }
