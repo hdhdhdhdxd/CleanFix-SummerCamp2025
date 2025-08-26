@@ -16,7 +16,7 @@ public class CompletedTaskConfiguration : IEntityTypeConfiguration<CompletedTask
             .IsRequired()
             .HasComment("Id del apartamento asociado");
 
-        builder.Property(t => t.Date)
+        builder.Property(t => t.CreationDate)
             .IsRequired()
             .HasComment("Fecha de la tarea completada");
 

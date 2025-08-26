@@ -8,7 +8,8 @@ public class CompletedTask : IEntity
     public string Address { get; set; }
     public int ApartmentId { get; set; }
     public Company Company { get; set; }
-    public DateTime Date { get; set; }
+    public DateTime CreationDate { get; set; } // Cambié el nombre de la propiedad a CreationDate
+    public DateTime CompletionDate { get; set; }
     public double Price { get; set; }
     public double Duration { get; set; }
     public int IssueTypeId { get; set; }

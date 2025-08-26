@@ -14,4 +14,5 @@ public class Apartment : IEntity
     public double Surface { get; set; } // Superficie del apartamento
     public int RoomNumber { get; set; } // Número de habitaciones
     public int BathroomNumber { get; set; } // Número de baños
+    public DateTime CreationDate { get; set; }
 }

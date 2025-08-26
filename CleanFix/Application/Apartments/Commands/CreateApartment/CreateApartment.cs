@@ -25,6 +25,7 @@ public class CreateApartmentCommandHandler : IRequestHandler<CreateApartmentComm
     public async Task<int> Handle(CreateApartmentCommand request, CancellationToken cancellationToken)
     {
         var apartment = _mapper.Map<Apartment>(request.Apartment);
+        apartment.CreationDate = DateTime.UtcNow;
 
         _apartmentRepository.Add(apartment);
 
