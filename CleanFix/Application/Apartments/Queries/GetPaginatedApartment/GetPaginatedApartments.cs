@@ -22,7 +22,7 @@ public class GetPaginatedApartmentsQueryHandler : IRequestHandler<GetPaginatedAp
 
     public async Task<PaginatedList<GetPaginatedApartmentDto>> Handle(GetPaginatedApartmentsQuery request, CancellationToken cancellationToken)
     {
-        var apartments = await _apartmentRepository.GetAll()
+        var apartments = await _apartmentRepository.GetQueryable()
             .AsNoTracking()
             .ProjectTo<GetPaginatedApartmentDto>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageNumber, request.PageSize);

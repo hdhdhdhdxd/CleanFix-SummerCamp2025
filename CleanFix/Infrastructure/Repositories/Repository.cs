@@ -16,7 +16,12 @@ public class Repository<T>
         _database = database;
     }
 
-    public IQueryable<T> GetAll()
+    public Task<List<T>> GetAllAsync()
+    {
+        return _database.Set<T>().AsNoTracking().ToListAsync();
+    }
+
+    public IQueryable<T> GetQueryable()
     {
         return _database.Set<T>();
     }

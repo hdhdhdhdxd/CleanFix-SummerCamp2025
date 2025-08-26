@@ -28,9 +28,9 @@ public class GetPaginatedCompaniesQueryHandler : IRequestHandler<GetPaginatedCom
 
     public async Task<PaginatedList<GetPaginatedCompanyDto>> Handle(GetPaginatedCompaniesQuery request, CancellationToken cancellationToken)
     {
-        var companies = await _companyRepository.GetAll()
-            .Include(c => c.IssueType)
+        var companies = await _companyRepository.GetQueryable()
             .AsNoTracking()
+            .Include(c => c.IssueType)
             .ProjectTo<GetPaginatedCompanyDto>(_mapper.ConfigurationProvider).PaginatedListAsync(request.PageNumber, request.PageSize);
        
 

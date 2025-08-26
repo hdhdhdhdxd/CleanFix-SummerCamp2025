@@ -22,7 +22,7 @@ public class GetPaginatedCompletedTasksQueryHandler : IRequestHandler<GetPaginat
 
     public async Task<PaginatedList<GetPaginatedCompletedTaskDto>> Handle(GetPaginatedCompletedTasksQuery request, CancellationToken cancellationToken)
     {
-        var completedTasks = await _completedTaskRepository.GetAll()
+        var completedTasks = await _completedTaskRepository.GetQueryable()
             .AsNoTracking()
             .ProjectTo<GetPaginatedCompletedTaskDto>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageNumber, request.PageSize);

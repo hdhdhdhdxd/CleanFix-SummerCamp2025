@@ -1,6 +1,7 @@
 using Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Incidences.Queries.GetIncidence;
 public record GetIncidenceQuery(int Id) : IRequest<GetIncidenceDto>;
@@ -18,8 +19,13 @@ public class GetIncidenceQueryHandler : IRequestHandler<GetIncidenceQuery, GetIn
 
     public async Task<GetIncidenceDto> Handle(GetIncidenceQuery request, CancellationToken cancellationToken)
     {
-        var entity = await _incidenceRepository.GetByIdAsync(request.Id);
+        var entity = await _incidenceRepository.GetQueryable()
+            .AsNoTracking()
+            .Include(s => s.IssueType)
+            .FirstOrDefaultAsync(p => p.Id == request.Id);
+
         var result = _mapper.Map<GetIncidenceDto>(entity);
+
         return result;
     }
 }

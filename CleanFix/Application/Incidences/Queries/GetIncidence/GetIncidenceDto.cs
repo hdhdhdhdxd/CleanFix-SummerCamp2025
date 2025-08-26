@@ -5,7 +5,7 @@ namespace Application.Incidences.Queries.GetIncidence;
 public class GetIncidenceDto
 {
     public int Id { get; set; }
-    public string IssueType { get; set; } // Nuevo campo para el nombre
+    public IssueType IssueType { get; set; } // Nuevo campo para el nombre
     public DateTime Date { get; set; }
     public string Status { get; set; }
     public string Description { get; set; }
@@ -15,8 +15,7 @@ public class GetIncidenceDto
     {
         public Mapping()
         {
-            CreateMap<Incidence, GetIncidenceDto>()
-                .ForMember(dest => dest.IssueType, opt => opt.MapFrom(src => src.IssueType.Name != null));
+            CreateMap<Incidence, GetIncidenceDto>();
         }
     }
 }
