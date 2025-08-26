@@ -12,8 +12,8 @@ using WebApi.BaseDatos;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250825113723_initial")]
-    partial class initial
+    [Migration("20250826090847_inital")]
+    partial class inital
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,6 +43,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasComment("Número de baños");
 
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("FloorNumber")
                         .HasColumnType("int")
                         .HasComment("Piso del apartamento");
@@ -50,6 +53,12 @@ namespace Infrastructure.Migrations
                     b.Property<int>("RoomNumber")
                         .HasColumnType("int")
                         .HasComment("Número de habitaciones");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<double>("Surface")
                         .HasColumnType("float")
@@ -107,6 +116,8 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("IssueTypeId");
+
                     b.ToTable("Companies");
                 });
 
@@ -131,7 +142,10 @@ namespace Infrastructure.Migrations
                     b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime>("CompletionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2")
                         .HasComment("Fecha de la tarea completada");
 
@@ -151,6 +165,12 @@ namespace Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("float(18)")
                         .HasComment("Precio de la tarea completada");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<int>("Surface")
                         .HasColumnType("int")
@@ -198,6 +218,12 @@ namespace Infrastructure.Migrations
                         .HasColumnType("int")
                         .HasComment("Prioridad de la incidencia");
 
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -209,6 +235,8 @@ namespace Infrastructure.Migrations
                         .HasComment("Superficie del apartamento");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IssueTypeId");
 
                     b.ToTable("Incidences");
                 });
@@ -254,7 +282,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<int>("IssueTypeId")
                         .HasColumnType("int")
-                        .HasComment("Id del tipo de incidencia asociada al material");
+                        .HasComment("Id del tipo de incidencia");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -265,6 +293,8 @@ namespace Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CompletedTaskId");
+
+                    b.HasIndex("IssueTypeId");
 
                     b.ToTable("Materials");
                 });
@@ -294,12 +324,18 @@ namespace Infrastructure.Migrations
 
                     b.Property<int>("IssueTypeId")
                         .HasColumnType("int")
-                        .HasComment("Id del tipo de incidencia asociada a la solicitud");
+                        .HasComment("Id del tipo de incidencia");
 
                     b.Property<double>("MaintenanceCost")
                         .HasPrecision(18, 2)
                         .HasColumnType("float(18)")
                         .HasComment("Costo de mantenimiento asociado a la solicitud");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
 
                     b.Property<string>("Status")
                         .HasMaxLength(50)
@@ -307,6 +343,8 @@ namespace Infrastructure.Migrations
                         .HasComment("Estado de la solicitud");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IssueTypeId");
 
                     b.ToTable("Solicitations");
                 });
@@ -332,6 +370,17 @@ namespace Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Company", b =>
+                {
+                    b.HasOne("Domain.Entities.IssueType", "IssueType")
+                        .WithMany()
+                        .HasForeignKey("IssueTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("IssueType");
+                });
+
             modelBuilder.Entity("Domain.Entities.CompletedTask", b =>
                 {
                     b.HasOne("Domain.Entities.Company", "Company")
@@ -351,11 +400,41 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Incidence", b =>
+                {
+                    b.HasOne("Domain.Entities.IssueType", "IssueType")
+                        .WithMany()
+                        .HasForeignKey("IssueTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("IssueType");
+                });
+
             modelBuilder.Entity("Domain.Entities.Material", b =>
                 {
                     b.HasOne("Domain.Entities.CompletedTask", null)
                         .WithMany("Materials")
                         .HasForeignKey("CompletedTaskId");
+
+                    b.HasOne("Domain.Entities.IssueType", "IssueType")
+                        .WithMany()
+                        .HasForeignKey("IssueTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("IssueType");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Solicitation", b =>
+                {
+                    b.HasOne("Domain.Entities.IssueType", "IssueType")
+                        .WithMany()
+                        .HasForeignKey("IssueTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("IssueType");
                 });
 
             modelBuilder.Entity("Domain.Entities.User", b =>

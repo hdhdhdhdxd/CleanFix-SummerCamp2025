@@ -15,14 +15,14 @@ public class SolicitationConfiguration : IEntityTypeConfiguration<Solicitation>
             .IsRequired()
             .HasComment("Fecha de la solicitud");
 
+        builder.Property(s => s.Status)
+            .HasMaxLength(50)
+            .HasComment("Estado de la solicitud");
+
         builder.Property(s => s.Address)
             .IsRequired()
             .HasMaxLength(300)
             .HasComment("Dirección donde se solicita el servicio");
-
-        builder.Property(s => s.Status)
-            .HasMaxLength(50)
-            .HasComment("Estado de la solicitud");
 
         builder.Property(s => s.MaintenanceCost)
             .IsRequired()
@@ -31,6 +31,11 @@ public class SolicitationConfiguration : IEntityTypeConfiguration<Solicitation>
 
         builder.Property(s => s.IssueTypeId)
             .IsRequired()
-            .HasComment("Id del tipo de incidencia asociada a la solicitud");
+            .HasComment("Id del tipo de incidencia");
+
+        builder.HasOne(s => s.IssueType)
+            .WithMany()
+            .HasForeignKey(s => s.IssueTypeId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

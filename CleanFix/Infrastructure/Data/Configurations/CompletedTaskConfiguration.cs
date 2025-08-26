@@ -25,15 +25,11 @@ public class CompletedTaskConfiguration : IEntityTypeConfiguration<CompletedTask
             .HasPrecision(18, 2)
             .HasComment("Precio de la tarea completada");
 
-        builder.Property(t => t.Duration)
-            .IsRequired()
-            .HasComment("Duración de la tarea en horas");
-
         builder.Property(t => t.IssueTypeId)
             .IsRequired()
             .HasComment("Id del tipo de incidencia de la tarea");
 
-        builder.Property(t => t.IsRequest)
+        builder.Property(t => t.IsSolicitation)
             .IsRequired()
             .HasComment("Indica si la tarea fue solicitada");
 
