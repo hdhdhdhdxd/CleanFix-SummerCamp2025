@@ -1,4 +1,5 @@
 using Domain.Common.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Entities;
 
@@ -11,4 +12,6 @@ public class Solicitation : IEntity
     public string? Status { get; set; } // Estado de la solicitud (e.g., pendiente, en proceso, completada)
     public double MaintenanceCost { get; set; } // Costo de mantenimiento asociado a la solicitud
     public int IssueTypeId { get; set; } // Id del tipo de incidencia asociada a la solicitud
+    [Timestamp]
+    public byte[] RowVersion { get; set; } // Propiedad para controlar la concurrencia
 }

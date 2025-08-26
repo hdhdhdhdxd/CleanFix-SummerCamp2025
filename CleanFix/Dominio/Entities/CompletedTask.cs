@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Domain.Common.Interfaces;
 
 namespace Domain.Entities;
@@ -17,4 +18,6 @@ public class CompletedTask : IEntity
     public bool IsRequest { get; set; }
     public User User { get; set; }
     public int Surface { get; set; } // Superficie del apartamento
+    [Timestamp]
+    public byte[] RowVersion { get; set; }
 }

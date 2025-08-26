@@ -1,4 +1,5 @@
-﻿using Domain.Common.Interfaces;
+﻿using System.ComponentModel.DataAnnotations;
+using Domain.Common.Interfaces;
 
 namespace Domain.Entities;
 
@@ -12,6 +13,8 @@ public class Incidence : IEntity
     public int ApartmentId { get; set; } // Apartamento asociado a la incidencia
     public int Surface { get; set; } // Superficie del apartamento
     public Priority Priority { get; set; } // Prioridad de la incidencia (e.g., "Baja", "Media", "Alta", "Crítica")
+    [Timestamp]
+    public byte[] RowVersion { get; set; } // Propiedad para controlar la concurrencia
 }
 
 public enum Priority
