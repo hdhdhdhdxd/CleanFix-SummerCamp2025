@@ -2,6 +2,9 @@ using System.Text.RegularExpressions;
 using Microsoft.SemanticKernel;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System;
+using System.Globalization;
+using System.Linq;
 
 namespace CleanFix.Plugins
 {
@@ -25,30 +28,76 @@ namespace CleanFix.Plugins
         }
     }
 
+    /// <summary>
+    /// Utilidades para analizar y extraer intenciones y parámetros de las consultas del usuario.
+    /// </summary>
     public static class ConsultaParser
     {
+        /// <summary>
+        /// Extrae el tipo (número) de empresa o material desde el texto del usuario.
+        /// </summary>
         public static int? ExtraerTipo(string input, string entidad)
         {
-            // Busca patrones como "empresa tipo 2", "empresa tipo=2", "material del tipo 3", etc.
-            var match = Regex.Match(input, $@"{entidad}\s*(?:del\s*tipo|de\s*tipo|tipo)?\s*[=:]?\s*(\d+)", RegexOptions.IgnoreCase);
+            var match = Regex.Match(input, $@"{entidad}\s*(?:del\s*tipo|de\s*tipo|tipo)?\s*(\d+)", RegexOptions.IgnoreCase);
             if (match.Success && int.TryParse(match.Groups[1].Value, out int tipo))
                 return tipo;
             return null;
         }
 
+        /// <summary>
+        /// Detecta si el usuario solicita el material más barato.
+        /// </summary>
         public static bool SolicitaMasBarato(string input)
         {
-            return Regex.IsMatch(input, @"más barato|mas barato", RegexOptions.IgnoreCase);
+            var patrones = new[]
+            {
+                @"material\s+(de\s+tipo|del\s+tipo|tipo)?\s*\d+\s+(más barato|mas barato)",
+                @"el\s+material\s+(más barato|mas barato)",
+                @"producto\s+(más barato|mas barato)",
+                @"insumo\s+(más barato|mas barato)",
+                @"el\s+(más barato|mas barato)"
+            };
+            return patrones.Any(p => Regex.IsMatch(input, p, RegexOptions.IgnoreCase));
         }
 
+        /// <summary>
+        /// Detecta si el usuario solicita el material más caro.
+        /// </summary>
         public static bool SolicitaMasCaro(string input)
         {
-            return Regex.IsMatch(input, @"más caro|mas caro|más cara|mas cara", RegexOptions.IgnoreCase);
+            var patrones = new[]
+            {
+                @"material\s+(de\s+tipo|del\s+tipo|tipo)?\s*\d+\s+(más caro|mas caro|más cara|mas cara)",
+                @"el\s+material\s+(más caro|mas caro|más cara|mas cara)",
+                @"producto\s+(más caro|mas caro|más cara|mas cara)",
+                @"insumo\s+(más caro|mas caro|más cara|mas cara)",
+                @"el\s+(más caro|mas caro|más cara|mas cara)"
+            };
+            return patrones.Any(p => Regex.IsMatch(input, p, RegexOptions.IgnoreCase));
         }
 
+        /// <summary>
+        /// Detecta si el usuario solicita todos los materiales disponibles.
+        /// </summary>
+        public static bool SolicitaTodosMateriales(string input)
+        {
+            var frases = new[]
+            {
+                "todos los materiales",
+                "materiales disponibles",
+                "todo lo que haya",
+                "todos los productos",
+                "todo lo disponible"
+            };
+            return frases.Any(f => input.Contains(f, StringComparison.OrdinalIgnoreCase));
+        }
+
+        /// <summary>
+        /// Detecta si el usuario solicita materiales disponibles.
+        /// </summary>
         public static bool SolicitaDisponibles(string input)
         {
-            return Regex.IsMatch(input, @"disponibles|todo lo disponible", RegexOptions.IgnoreCase);
+            return input.Contains("disponibles", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

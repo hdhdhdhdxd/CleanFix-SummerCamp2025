@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.SemanticKernel;
 using Microsoft.Extensions.Logging;
+using CleanFix.Plugins;
 
 namespace CleanFix.Plugins
 {
@@ -134,6 +135,9 @@ namespace CleanFix.Plugins
                 return new PluginRespuesta { Success = false, Error = empresasResponse.Error ?? "Error al obtener empresas." };
             }
 
+            // Filtros y patrones para empresas
+            // ...puedes añadir aquí patrones si lo necesitas...
+
             if (mensaje.Contains("más barata"))
             {
                 var empresaMasBarata = empresas.OrderBy(e => e.Price).FirstOrDefault();
@@ -160,13 +164,17 @@ namespace CleanFix.Plugins
                     return new PluginRespuesta { Success = false, Error = materialesResponse.Error ?? "Error al obtener materiales." };
                 }
 
-                if (mensaje.Contains("más barato"))
+                // Uso de patrones y frases del parser
+                if (ConsultaParser.SolicitaTodosMateriales(mensaje))
+                    materiales = materiales.Where(m => m.Available).ToList();
+
+                if (ConsultaParser.SolicitaMaterialMasBarato(mensaje))
                 {
                     var materialMasBarato = materiales.OrderBy(m => m.Cost).FirstOrDefault();
                     return new PluginRespuesta { Success = true, Data = materialMasBarato != null ? new List<MaterialIa> { materialMasBarato } : new List<MaterialIa>() };
                 }
 
-                if (mensaje.Contains("más caro"))
+                if (ConsultaParser.SolicitaMaterialMasCaro(mensaje))
                 {
                     var materialMasCaro = materiales.OrderByDescending(m => m.Cost).FirstOrDefault();
                     return new PluginRespuesta { Success = true, Data = materialMasCaro != null ? new List<MaterialIa> { materialMasCaro } : new List<MaterialIa>() };
@@ -228,6 +236,7 @@ namespace CleanFix.Plugins
         public bool Available { get; set; }
     }
 }
+
 
 
 
