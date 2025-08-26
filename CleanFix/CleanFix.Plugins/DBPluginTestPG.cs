@@ -168,13 +168,13 @@ namespace CleanFix.Plugins
                 if (ConsultaParser.SolicitaTodosMateriales(mensaje))
                     materiales = materiales.Where(m => m.Available).ToList();
 
-                if (ConsultaParser.SolicitaMaterialMasBarato(mensaje))
+                if (ConsultaParser.SolicitaMasBarato(mensaje))
                 {
                     var materialMasBarato = materiales.OrderBy(m => m.Cost).FirstOrDefault();
                     return new PluginRespuesta { Success = true, Data = materialMasBarato != null ? new List<MaterialIa> { materialMasBarato } : new List<MaterialIa>() };
                 }
 
-                if (ConsultaParser.SolicitaMaterialMasCaro(mensaje))
+                if (ConsultaParser.SolicitaMasCaro(mensaje))
                 {
                     var materialMasCaro = materiales.OrderByDescending(m => m.Cost).FirstOrDefault();
                     return new PluginRespuesta { Success = true, Data = materialMasCaro != null ? new List<MaterialIa> { materialMasCaro } : new List<MaterialIa>() };
@@ -236,6 +236,8 @@ namespace CleanFix.Plugins
         public bool Available { get; set; }
     }
 }
+
+
 
 
 

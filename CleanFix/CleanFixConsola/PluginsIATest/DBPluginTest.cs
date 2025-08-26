@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Domain.Entities;
-using Microsoft.Data.SqlClient;
+using System.Data.SqlClient;
 using Microsoft.SemanticKernel;
 
 namespace CleanFixConsola.PluginsIATest
 {
+    /// <summary>
+    /// Plugin de acceso a base de datos para CleanFixBot en consola. Permite consultar empresas y materiales.
+    /// </summary>
     public class DBPluginTest
     {
         // Almacena la cadena de conexión a la base de datos
@@ -22,49 +20,40 @@ namespace CleanFixConsola.PluginsIATest
             _connectionString = connectionString;
         }
 
-        // Función expuesta al kernel que obtiene todas las empresas desde la base de datos
+        // Función expuesta al kernel que obtiene todas las empresas desde la base de datos (sin Id ni Issue)
         [KernelFunction, Description("Obtiene todas las empresas desde la base de datos, las convierte a objeto")]
-        public object GetAllEmpresas()
+        public EmpresaResponse GetAllEmpresas()
         {
             var companiesIa = new List<CompanyIa>();
 
             try
             {
-                // Abre conexión con la base de datos
                 using var connection = new SqlConnection(_connectionString);
                 connection.Open();
-
-                // Ejecuta consulta SQL para obtener los datos de las empresas
-                var command = new SqlCommand("SELECT Id, Name, Address, Number, Email, [type], Price, WorkTime FROM dbo.Companies", connection);
+                var command = new SqlCommand("SELECT Name, Address, Number, Email, Price, WorkTime FROM dbo.Companies", connection);
                 using var reader = command.ExecuteReader();
-
-                // Recorre los resultados y los convierte en objetos CompanyIa
                 while (reader.Read())
                 {
                     companiesIa.Add(new CompanyIa
                     {
-                        Id = reader.GetInt32(0),
-                        Name = reader.IsDBNull(1) ? null : reader.GetString(1),
-                        Address = reader.IsDBNull(2) ? null : reader.GetString(2),
-                        Number = reader.IsDBNull(3) ? null : reader.GetString(3),
-                        Email = reader.IsDBNull(4) ? null : reader.GetString(4),
-                        Type = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
-                        Price = reader.IsDBNull(6) ? 0 : reader.GetDecimal(6),
-                        WorkTime = reader.IsDBNull(7) ? 0 : reader.GetInt32(7)
+                        Name = reader.IsDBNull(0) ? null : reader.GetString(0),
+                        Address = reader.IsDBNull(1) ? null : reader.GetString(1),
+                        Number = reader.IsDBNull(2) ? null : reader.GetString(2),
+                        Email = reader.IsDBNull(3) ? null : reader.GetString(3),
+                        Price = reader.IsDBNull(4) ? 0 : reader.GetDecimal(4),
+                        WorkTime = reader.IsDBNull(5) ? 0 : reader.GetInt32(5)
                     });
                 }
             }
             catch (Exception ex)
             {
-                // En caso de error, devuelve una respuesta con el mensaje de excepción
                 return new EmpresaResponse { Success = false, Error = ex.Message };
             }
 
-            // Devuelve la lista de empresas con éxito
             return new EmpresaResponse { Success = true, Data = companiesIa };
         }
 
-        // Función expuesta al kernel que obtiene todos los materiales desde la base de datos
+        // Función expuesta al kernel que obtiene todos los materiales desde la base de datos (sin Id ni Issue)
         [KernelFunction, Description("Obtiene todos los materiales desde la base de datos, las convierte a objeto")]
         public MaterialResponse GetAllMaterials()
         {
@@ -72,30 +61,22 @@ namespace CleanFixConsola.PluginsIATest
 
             try
             {
-                // Abre conexión con la base de datos
                 using var connection = new SqlConnection(_connectionString);
                 connection.Open();
-
-                // Ejecuta consulta SQL para obtener los datos de los materiales
-                var command = new SqlCommand("SELECT Id, Name, Cost, Issue FROM dbo.Materials", connection);
+                var command = new SqlCommand("SELECT Name, Cost FROM dbo.Materials", connection);
                 using var reader = command.ExecuteReader();
-
-                // Recorre los resultados y los convierte en objetos MaterialIa
                 while (reader.Read())
                 {
                     materialesIa.Add(new MaterialIa
                     {
-                        Id = reader.GetInt32(0),
-                        Name = reader.IsDBNull(1) ? null : reader.GetString(1),
-                        Cost = reader.IsDBNull(2) ? 0 : reader.GetDecimal(2),
-                        Issue = reader.IsDBNull(3) ? 0 : reader.GetInt32(3),
-                        Available = true // Se marca como disponible por defecto
+                        Name = reader.IsDBNull(0) ? null : reader.GetString(0),
+                        Cost = reader.IsDBNull(1) ? 0 : reader.GetDecimal(1),
+                        Available = true
                     });
                 }
             }
             catch (Exception ex)
             {
-                // En caso de error, devuelve una respuesta con el mensaje de excepción
                 return new MaterialResponse
                 {
                     Success = false,
@@ -103,7 +84,6 @@ namespace CleanFixConsola.PluginsIATest
                 };
             }
 
-            // Devuelve la lista de materiales con éxito
             return new MaterialResponse
             {
                 Success = true,
@@ -112,30 +92,47 @@ namespace CleanFixConsola.PluginsIATest
         }
     }
 
-    //Clases con los datos de respuesta
-
+    /// <summary>
+    /// Modelo de empresa para el bot (sin Id ni Issue).
+    /// </summary>
     public class CompanyIa
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
         public string Number { get; set; }
-
         public string Email { get; set; }
-        public int Type { get; set; }
         public decimal Price { get; set; }
         public int WorkTime { get; set; }
     }
+
+    /// <summary>
+    /// Modelo de material para el bot (sin Id ni Issue).
+    /// </summary>
     public class MaterialIa
     {
-        public int Id { get; set; }
-
         public string Name { get; set; }
         public decimal Cost { get; set; }
+        public bool Available { get; set; }
+    }
 
-        public bool Available { get; set; } = true; // Assuming materials are available by default
-        public int Issue { get; set; }
-        public int SolicitationId { get; set; }
+    /// <summary>
+    /// Respuesta de consulta de empresas para el bot.
+    /// </summary>
+    public class EmpresaResponse
+    {
+        public bool Success { get; set; }
+        public List<CompanyIa> Data { get; set; }
+        public string Error { get; set; }
+    }
+
+    /// <summary>
+    /// Respuesta de consulta de materiales para el bot.
+    /// </summary>
+    public class MaterialResponse
+    {
+        public bool Success { get; set; }
+        public List<MaterialIa> Data { get; set; }
+        public string Error { get; set; }
     }
 }
 
