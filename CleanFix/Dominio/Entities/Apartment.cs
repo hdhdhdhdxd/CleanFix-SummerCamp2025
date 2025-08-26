@@ -15,4 +15,6 @@ public class Apartment : IEntity
     public int RoomNumber { get; set; } // Número de habitaciones
     public int BathroomNumber { get; set; } // Número de baños
     public DateTime CreationDate { get; set; }
+    [Timestamp]
+    public byte[] RowVersion { get; set; }
 }
