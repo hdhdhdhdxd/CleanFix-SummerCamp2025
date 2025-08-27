@@ -65,7 +65,7 @@ namespace WebApi.Controllers
                 if (materiales.Count == 0)
                     return BadRequest(new FacturaResponse { Success = false, Error = "No se encontraron materiales." });
 
-                // Generar factura detallada
+                // Generar factura estructurada
                 decimal iva = 0.21m;
                 decimal costeEmpresa = empresa.Price;
                 decimal costeMateriales = materiales.Sum(m => m.Cost);
@@ -73,15 +73,14 @@ namespace WebApi.Controllers
                 decimal ivaMateriales = costeMateriales * iva;
                 decimal total = costeEmpresa + ivaEmpresa + costeMateriales + ivaMateriales;
 
-                var sb = new System.Text.StringBuilder();
-                sb.AppendLine($"Empresa: {empresa.Name}: COSTE€{costeEmpresa:F2}");
-                foreach (var m in materiales)
+                var factura = new FacturaDetalleDto
                 {
-                    sb.AppendLine($"Material: {m.Name}: COSTE€{m.Cost:F2}");
-                }
-                sb.AppendLine($"Total factura con IVA: €{total:F2}");
+                    Empresa = new FacturaEmpresaDto { Nombre = empresa.Name, Coste = costeEmpresa },
+                    Materiales = materiales.Select(m => new FacturaMaterialDto { Nombre = m.Name, Coste = m.Cost }).ToList(),
+                    TotalConIVA = total
+                };
 
-                return Ok(new FacturaResponse { Success = true, Factura = sb.ToString() });
+                return Ok(new FacturaResponse { Success = true, Factura = factura });
             }
             catch (Exception ex)
             {
