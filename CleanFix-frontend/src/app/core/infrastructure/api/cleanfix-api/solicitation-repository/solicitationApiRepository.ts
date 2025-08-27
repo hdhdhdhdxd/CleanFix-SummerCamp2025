@@ -5,6 +5,7 @@ import { SolicitationBriefDto } from './SolicitationBriefDto'
 import { PaginatedData } from '@/core/domain/models/PaginatedData'
 import { PaginatedDataDto } from '../interfaces/PaginatedDataDto'
 import { SolicitationBrief } from '@/core/domain/models/SolicitationBrief'
+import { SolicitationDto } from './SolicitationDto'
 
 const getPaginated = async (
   pageNumber: number,
@@ -41,7 +42,7 @@ const getById = async (id: number): Promise<Solicitation> => {
     throw new Error('Error al obtener la solicitud')
   }
 
-  const responseJson: Solicitation = await response.json()
+  const responseJson: SolicitationDto = await response.json()
 
   return {
     id: responseJson.id,
@@ -50,8 +51,9 @@ const getById = async (id: number): Promise<Solicitation> => {
     status: responseJson.status,
     issueType: responseJson.issueType,
     description: responseJson.description,
-    type: responseJson.type,
     maintenanceCost: responseJson.maintenanceCost,
+    buildingCode: responseJson.buildingCode,
+    apartmentCount: responseJson.apartmentCount,
   }
 }
 

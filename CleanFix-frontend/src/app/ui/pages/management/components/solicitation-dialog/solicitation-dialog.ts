@@ -9,7 +9,11 @@ import {
   output,
   signal,
   ViewChild,
+  inject,
+  computed,
 } from '@angular/core'
+import { MaterialService } from '@/ui/services/material/material-service'
+import { Material } from '@/core/domain/models/Material'
 
 @Component({
   selector: 'app-solicitation-dialog',
@@ -18,9 +22,13 @@ import {
   styleUrls: ['./solicitation-dialog.css'],
 })
 export class SolicitationDialog implements AfterViewInit {
+  private materialService = inject(MaterialService)
+
   selectedSolicitation = input.required<Solicitation>()
   companies = input.required<Company[]>()
   selectedCompanyId = signal<number | null>(null)
+  materials = signal<Material[]>([])
+  apartmentCount = signal<number | null>(null)
 
   get selectedCompany() {
     const id = this.selectedCompanyId()
@@ -30,6 +38,15 @@ export class SolicitationDialog implements AfterViewInit {
   onCompanyChange(event: Event): void {
     const value = (event.target as HTMLSelectElement).value
     this.selectedCompanyId.set(value ? +value : null)
+    this.loadRandomMaterials()
+    this.loadApartmentCount()
+  }
+
+  loadRandomMaterials() {
+    const issueTypeId = this.selectedSolicitation().issueType.id
+    this.materialService.getRandomThree(issueTypeId).subscribe((materials) => {
+      this.materials.set(materials)
+    })
   }
   closeDialog = output<void>()
 
@@ -60,5 +77,19 @@ export class SolicitationDialog implements AfterViewInit {
     if (event.target === this.dialog.nativeElement) {
       this.closeModal()
     }
+  }
+
+  loadApartmentCount() {
+    this.apartmentCount.set(30)
+  }
+
+  getTotalMaterialCost = computed(() => {
+    const count = this.apartmentCount() || 0
+    const maintenance = this.selectedSolicitation().maintenanceCost || 0
+    return this.materials().reduce((acc, m) => acc + m.cost * count * maintenance, 0)
+  })
+
+  get totalUnitMaterialCost(): number {
+    return this.materials().reduce((acc, m) => acc + m.cost, 0)
   }
 }

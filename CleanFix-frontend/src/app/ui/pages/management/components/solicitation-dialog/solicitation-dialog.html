@@ -84,11 +84,79 @@
           </div>
         </div>
         @if (selectedCompany) {
-          <div class="mt-4 rounded border bg-brand-50 p-3">
-            <div><span class="font-medium">Nombre:</span> {{ selectedCompany.name }}</div>
-            <div><span class="font-medium">Email:</span> {{ selectedCompany.email }}</div>
-            <div><span class="font-medium">Teléfono:</span> {{ selectedCompany.number }}</div>
-            <div><span class="font-medium">Página Web:</span> {{ selectedCompany.issueType }}</div>
+          <div
+            class="col-span-2 mt-4 flex flex-col gap-2 rounded-lg border border-brand-200 bg-brand-50 p-4"
+          >
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-brand-700">Nombre:</span>
+              <span class="text-brand-900">{{ selectedCompany.name }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-brand-700">Email:</span>
+              <span class="text-brand-900">{{ selectedCompany.email }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-brand-700">Teléfono:</span>
+              <span class="text-brand-900">{{ selectedCompany.number }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-brand-700">Tipo de incidencia:</span>
+              <span class="text-brand-900">{{ selectedCompany.issueType }}</span>
+            </div>
+          </div>
+        }
+        @if (selectedCompany && apartmentCount() !== null) {
+          <div class="mt-6 flex flex-col sm:col-span-2">
+            <span class="mb-1 text-sm font-medium text-brand-600">Coste de la empresa</span>
+            <div class="rounded bg-brand-50 px-4 py-2 text-xs text-brand-800">
+              <span>
+                Coste empresa × Nº departamentos:<br />
+                ({{
+                  selectedSolicitation().maintenanceCost | currency: 'EUR' : 'symbol' : '1.2-2'
+                }}
+                × {{ apartmentCount() }}) =
+                <b>{{
+                  selectedSolicitation().maintenanceCost * apartmentCount()!
+                    | currency: 'EUR' : 'symbol' : '1.2-2'
+                }}</b>
+              </span>
+            </div>
+          </div>
+        }
+        @if (materials().length && apartmentCount() !== null) {
+          <div class="mt-4 flex flex-col sm:col-span-2">
+            <span class="mb-1 text-sm font-medium text-brand-600">Materiales asignados</span>
+            <ul class="space-y-2">
+              @for (material of materials(); track $index) {
+                <li class="rounded border border-brand-200 bg-brand-50 px-3 py-2">
+                  <div class="font-semibold">{{ material.name }}</div>
+                  <div class="text-xs text-brand-700">
+                    Costo unitario: {{ material.cost | currency: 'EUR' : 'symbol' : '1.2-2' }}
+                  </div>
+                  <div
+                    class="text-xs"
+                    [ngClass]="{
+                      'text-success-500': material.available,
+                      'text-warning-500': !material.available,
+                    }"
+                  >
+                    {{ material.available ? 'Disponible' : 'No disponible' }}
+                  </div>
+                  <div class="mt-1 text-xs font-medium text-brand-800">
+                    Total para {{ apartmentCount() }} departamentos:
+                    <span class="font-bold">{{
+                      material.cost * apartmentCount()! | currency: 'EUR' : 'symbol' : '1.2-2'
+                    }}</span>
+                  </div>
+                </li>
+              }
+            </ul>
+            <div class="mt-4 rounded bg-brand-100 px-4 py-2 text-right font-bold text-brand-900">
+              Total del trabajo:
+              <span>
+                {{ getTotalMaterialCost() | currency: 'EUR' : 'symbol' : '1.2-2' }}
+              </span>
+            </div>
           </div>
         }
       </div>
@@ -98,8 +166,13 @@
       class="flex shrink-0 justify-end gap-3 border-t border-brand-200 bg-brand-50 px-4 py-3 sm:px-6 sm:py-4"
     >
       <button
-        form="solicitation-dialog-form"
-        class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-brand-0 transition-colors hover:bg-brand-600 sm:text-base"
+        class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-brand-0 transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:bg-brand-200 disabled:text-brand-400 sm:text-base"
+        [disabled]="!selectedCompany || !materials().length"
+        [attr.title]="
+          !selectedCompany || !materials().length
+            ? 'Selecciona una empresa y materiales para continuar'
+            : null
+        "
       >
         Iniciar Trabajo
       </button>

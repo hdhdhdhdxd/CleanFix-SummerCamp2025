@@ -7,6 +7,7 @@ export interface Solicitation {
   status: string
   issueType: IssueType
   description: string
-  type: string
   maintenanceCost: number
+  buildingCode: string
+  apartmentCount: number
 }
