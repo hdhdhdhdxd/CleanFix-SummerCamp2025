@@ -16,7 +16,22 @@ namespace WebApi.Services
 
         public AssistantService(IConfiguration config)
         {
+            // Recupera los datos de configuración
+            string endpoint = config["AzureOpenAI:Endpoint"];
+            string apiKey = config["AzureOpenAI:ApiKey"];
+            string connectionString = config["Database:ConnectionString"];
+            decimal iva = decimal.Parse(config["Bot:IVA"]);
+            string moneda = config["Bot:Moneda"];
+            // Nuevo: deploymentName
+            string deploymentName = config["AzureOpenAI:Deployment"] ?? "gpt-4.1";
+
             var builder = Kernel.CreateBuilder();
+            // REGISTRO DE SERVICIO AZURE OPENAI
+            builder.AddAzureOpenAIChatCompletion(
+                deploymentName: deploymentName,
+                endpoint: endpoint,
+                apiKey: apiKey
+            );
             _promptTemplate = @"Eres un asistente inteligente que responde preguntas sobre empresas y materiales.\n\nTienes la siguiente información de empresas (companies) en formato JSON: {{$empresas}} Cada empresa tiene propiedades como: Id, Name, Type (tipo), Price.\n\nTambién tienes la siguiente información de materiales (materials) en formato JSON: {{$materiales}} Cada material tiene propiedades como: Id, Name, Issue (tipo), Available (disponible).\n\nUsa esta información para responder la pregunta del usuario: {{$pregunta}} Responde de forma clara y útil.\n\nSi la pregunta no tiene relación con los datos, responde que no puedes ayudar.";
 
             // Inicializa plugins y kernel
