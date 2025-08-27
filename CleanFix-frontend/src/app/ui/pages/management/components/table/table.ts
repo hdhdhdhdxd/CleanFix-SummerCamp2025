@@ -1,5 +1,5 @@
 import { Incidence } from '@/core/domain/models/Incedence'
-import { Solicitation } from '@/core/domain/models/Solicitation'
+import { SolicitationBrief } from '@/core/domain/models/SolicitationBrief'
 import { CurrencyPipe, DatePipe, NgClass } from '@angular/common'
 import { Component, input, output } from '@angular/core'
 
@@ -14,7 +14,7 @@ export interface TableColumn<T> {
   imports: [CurrencyPipe, DatePipe, NgClass],
   templateUrl: './table.html',
 })
-export class Table<T extends Solicitation | Incidence> {
+export class Table<T extends SolicitationBrief | Incidence> {
   items = input<T[]>([])
   tableColumns = input.required<TableColumn<T>[]>()
   rowClick = output<T>()
