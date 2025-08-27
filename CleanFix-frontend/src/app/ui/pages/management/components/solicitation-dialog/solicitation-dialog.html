@@ -33,10 +33,15 @@
 
     <div class="scrollbar-hide flex-1 overflow-y-auto p-4 sm:p-6">
       <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-        <div class="flex flex-col">
-          <span class="text-sm font-medium text-brand-600">ID</span>
-          <p class="text-base font-semibold text-brand-800 sm:text-lg">
-            {{ selectedSolicitation().id }}
+        <div class="flex flex-col sm:col-span-2">
+          <span class="text-sm font-medium text-brand-600">Dirección</span>
+          <p class="text-base text-brand-800 sm:text-lg">{{ selectedSolicitation().address }}</p>
+        </div>
+
+        <div class="flex flex-col sm:col-span-2">
+          <span class="text-sm font-medium text-brand-600">Fecha</span>
+          <p class="text-base text-brand-800 sm:text-lg">
+            {{ selectedSolicitation().date | date: 'dd/MM/yyyy HH:mm' }}
           </p>
         </div>
 
@@ -47,9 +52,11 @@
           </p>
         </div>
 
-        <div class="flex flex-col sm:col-span-2">
-          <span class="text-sm font-medium text-brand-600">Dirección</span>
-          <p class="text-base text-brand-800 sm:text-lg">{{ selectedSolicitation().address }}</p>
+        <div class="flex flex-col">
+          <span class="text-sm font-medium text-brand-600">Tipo</span>
+          <p class="text-base font-semibold text-brand-800 sm:text-lg">
+            {{ selectedSolicitation().issueType.name }}
+          </p>
         </div>
 
         <div class="flex flex-col sm:col-span-2">
@@ -59,47 +66,31 @@
           </p>
         </div>
 
-        <div class="flex flex-col">
-          <span class="text-sm font-medium text-brand-600">Tipo</span>
-          <p class="text-base text-brand-800 sm:text-lg">{{ selectedSolicitation().type }}</p>
-        </div>
-
-        <div class="flex flex-col">
-          <span class="text-sm font-medium text-brand-600">Coste</span>
-          <p class="text-base font-semibold text-brand-800 sm:text-lg">
-            {{ selectedSolicitation().maintenanceCost | currency: 'EUR' : 'symbol' : '1.2-2' }}
-          </p>
-        </div>
-
-        <div class="flex flex-col sm:col-span-2">
-          <span class="text-sm font-medium text-brand-600">Fecha</span>
-          <p class="text-base text-brand-800 sm:text-lg">
-            {{ selectedSolicitation().date | date: 'dd/MM/yyyy HH:mm' }}
-          </p>
-        </div>
-
         <div class="mt-6 flex flex-col sm:col-span-2">
           <span class="mb-1 text-sm font-medium text-brand-600">Empresa</span>
           <div class="flex items-center gap-2">
             <select
               class="w-full rounded border border-brand-200 px-3 py-2 text-brand-800 focus:ring-2 focus:ring-brand-500 focus:outline-none"
-              (focus)="loadCompanies()"
+              (change)="onCompanyChange($event)"
+              [value]="selectedCompanyId() ?? ''"
             >
               <option value="" disabled selected>Selecciona una empresa</option>
-              @if (loadingCompanies) {
-                <option disabled>Cargando empresas...</option>
-              }
               @for (company of companies(); track $index) {
                 <option [value]="company.id">
                   {{ company.name }}
                 </option>
               }
             </select>
-            @if (loadingCompanies) {
-              <span class="ml-2 animate-pulse text-xs text-brand-500">Cargando empresas...</span>
-            }
           </div>
         </div>
+        @if (selectedCompany) {
+          <div class="mt-4 rounded border bg-brand-50 p-3">
+            <div><span class="font-medium">Nombre:</span> {{ selectedCompany.name }}</div>
+            <div><span class="font-medium">Email:</span> {{ selectedCompany.email }}</div>
+            <div><span class="font-medium">Teléfono:</span> {{ selectedCompany.number }}</div>
+            <div><span class="font-medium">Página Web:</span> {{ selectedCompany.issueType }}</div>
+          </div>
+        }
       </div>
     </div>
 
@@ -110,7 +101,7 @@
         form="solicitation-dialog-form"
         class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-brand-0 transition-colors hover:bg-brand-600 sm:text-base"
       >
-        Cerrar
+        Iniciar Trabajo
       </button>
     </footer>
   </div>

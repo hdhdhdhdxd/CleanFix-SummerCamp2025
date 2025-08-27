@@ -1,4 +1,3 @@
-import { Solicitation } from '@/core/domain/models/Solicitation'
 import { SolicitationService } from '@/ui/services/solicitation/solicitation-service'
 import { Component, inject, OnInit, signal } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
@@ -8,6 +7,10 @@ import { SearchBar } from '../search-bar/search-bar'
 import { SolicitationDialog } from '../solicitation-dialog/solicitation-dialog'
 import { Table, TableColumn } from '../table/table'
 import { PaginatedData } from '@/core/domain/models/PaginatedData'
+import { SolicitationBrief } from '@/core/domain/models/SolicitationBrief'
+import { Solicitation } from '@/core/domain/models/Solicitation'
+import { Company } from '@/core/domain/models/Company'
+import { CompanyService } from '@/ui/services/company/company-service'
 
 @Component({
   selector: 'app-solicitations',
@@ -18,8 +21,9 @@ export class Solicitations implements OnInit {
   private route = inject(ActivatedRoute)
   private location = inject(Location)
   private solicitationService = inject(SolicitationService)
+  private companyService = inject(CompanyService)
 
-  solicitations = signal<Solicitation[]>([])
+  solicitations = signal<SolicitationBrief[]>([])
   totalPages = signal<number>(0)
   totalCount = signal<number>(0)
   hasPreviousPage = signal<boolean>(false)
@@ -29,15 +33,13 @@ export class Solicitations implements OnInit {
   pageNumber = signal<number>(1)
 
   selectedSolicitation: Solicitation | null = null
-  showDialog = false
+  companies = signal<Company[]>([])
+  showDialog = signal<boolean>(false)
 
-  columns: TableColumn<Solicitation>[] = [
-    { key: 'id', label: 'ID', type: 'number' },
+  columns: TableColumn<SolicitationBrief>[] = [
     { key: 'address', label: 'Dirección', type: 'text' },
-    { key: 'description', label: 'Descripción', type: 'text' },
-    { key: 'type', label: 'Tipo', type: 'text' },
-    { key: 'maintenanceCost', label: 'Coste', type: 'currency' },
     { key: 'date', label: 'Fecha', type: 'date' },
+    { key: 'issueType', label: 'Tipo', type: 'text' },
     { key: 'status', label: 'Estado', type: 'status' },
   ]
 
@@ -70,7 +72,7 @@ export class Solicitations implements OnInit {
     })
   }
 
-  private updateValues(pagination: PaginatedData<Solicitation>) {
+  private updateValues(pagination: PaginatedData<SolicitationBrief>) {
     this.solicitations.set(pagination.items)
     this.pageNumber.set(pagination.pageNumber)
     this.totalPages.set(pagination.totalPages)
@@ -92,13 +94,32 @@ export class Solicitations implements OnInit {
     this.loadSolicitations(1, $event)
   }
 
-  handleRowClick(item: Solicitation): void {
-    this.selectedSolicitation = item
-    this.showDialog = true
+  handleRowClick(item: SolicitationBrief): void {
+    this.getSolicitationById(item.id)
   }
 
   handleCloseDialog(): void {
-    this.showDialog = false
     this.selectedSolicitation = null
+    this.showDialog.set(false)
+  }
+
+  private getSolicitationById(id: number): void {
+    this.solicitationService.getById(id).subscribe((solicitation) => {
+      this.onSolicitationLoaded(solicitation)
+      this.loadCompanies()
+    })
+  }
+
+  private loadCompanies(): void {
+    this.companyService
+      .getPaginated(1, 10, this.selectedSolicitation?.issueType.id)
+      .subscribe((companies) => {
+        this.companies.set(companies.items)
+      })
+  }
+
+  private onSolicitationLoaded(solicitation: Solicitation): void {
+    this.selectedSolicitation = solicitation
+    this.showDialog.set(true)
   }
 }

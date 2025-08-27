@@ -10,7 +10,12 @@ const getPaginated = async (pageNumber: number, pageSize: number) => {
   return solicitationRepository.getPaginated(pageNumber, pageSize)
 }
 
+const getById = async (id: number) => {
+  return solicitationRepository.getById(id)
+}
+
 export const solicitationService = {
   init,
   getPaginated,
+  getById,
 }

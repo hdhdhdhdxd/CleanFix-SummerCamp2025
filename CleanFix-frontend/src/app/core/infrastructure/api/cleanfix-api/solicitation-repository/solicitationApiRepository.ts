@@ -1,14 +1,15 @@
 import { Solicitation } from '@/core/domain/models/Solicitation'
 import { SolicitationRepository } from '@/core/domain/repositories/SolicitationRepository'
 import { environment } from 'src/environments/environment'
-import { PaginatedData } from '../../../domain/models/PaginatedData'
-import { PaginatedDataDto } from '../../interfaces/PaginatedDataDto'
 import { SolicitationBriefDto } from './SolicitationBriefDto'
+import { PaginatedData } from '@/core/domain/models/PaginatedData'
+import { PaginatedDataDto } from '../interfaces/PaginatedDataDto'
+import { SolicitationBrief } from '@/core/domain/models/SolicitationBrief'
 
 const getPaginated = async (
   pageNumber: number,
   pageSize: number,
-): Promise<PaginatedData<Solicitation>> => {
+): Promise<PaginatedData<SolicitationBrief>> => {
   const response = await fetch(
     environment.baseUrl + `solicitations/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
   )
@@ -40,7 +41,7 @@ const getById = async (id: number): Promise<Solicitation> => {
     throw new Error('Error al obtener la solicitud')
   }
 
-  const responseJson: SolicitationBriefDto = await response.json()
+  const responseJson: Solicitation = await response.json()
 
   return {
     id: responseJson.id,
@@ -48,6 +49,9 @@ const getById = async (id: number): Promise<Solicitation> => {
     date: new Date(responseJson.date),
     status: responseJson.status,
     issueType: responseJson.issueType,
+    description: responseJson.description,
+    type: responseJson.type,
+    maintenanceCost: responseJson.maintenanceCost,
   }
 }
 
