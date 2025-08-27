@@ -1,9 +1,9 @@
 import { Incidence } from '@/core/domain/models/Incedence'
-import { PaginatedData } from '../../../domain/models/PaginatedData'
 import { environment } from 'src/environments/environment'
 import { IncidenceDto } from './IncidenceDto'
 import { IncidenceRepository } from '@/core/domain/repositories/IncidenceRepository'
-import { PaginatedDataDto } from '../../interfaces/PaginatedDataDto'
+import { PaginatedDataDto } from '../interfaces/PaginatedDataDto'
+import { PaginatedData } from '@/core/domain/models/PaginatedData'
 
 const getPaginated = async (
   pageNumber: number,
