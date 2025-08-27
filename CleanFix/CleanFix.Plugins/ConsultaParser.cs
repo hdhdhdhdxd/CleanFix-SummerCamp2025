@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace CleanFix.Plugins
 {
@@ -24,7 +25,7 @@ namespace CleanFix.Plugins
         {
             var function = kernel.CreateFunctionFromPrompt(prompt);
             var result = await function.InvokeAsync(kernel, new() { ["input"] = mensaje });
-            return JsonSerializer.Deserialize<EmpresaFiltro>(result.GetValue<string>() ?? "{}");
+            return JsonSerializer.Deserialize<EmpresaFiltro>(result.GetValue<string>() ?? "{}" );
         }
     }
 
@@ -42,6 +43,31 @@ namespace CleanFix.Plugins
             if (match.Success && int.TryParse(match.Groups[1].Value, out int tipo))
                 return tipo;
             return null;
+        }
+
+        /// <summary>
+        /// Extrae el nombre de la empresa desde el texto del usuario.
+        /// </summary>
+        public static string ExtraerNombreEmpresa(string input)
+        {
+            var match = Regex.Match(input, @"empresa\s+(?:llamada|con nombre|que se llama)?\s*([\w·ÈÌÛ˙¸Ò¡…Õ”⁄‹—\s]+)", RegexOptions.IgnoreCase);
+            if (match.Success)
+                return match.Groups[1].Value.Trim();
+            return null;
+        }
+
+        /// <summary>
+        /// Extrae los nombres de materiales desde el texto del usuario.
+        /// </summary>
+        public static List<string> ExtraerNombresMateriales(string input)
+        {
+            var match = Regex.Match(input, @"material(?:es)?\s+(?:llamados?|con nombre|que se llaman)?\s*([\w·ÈÌÛ˙¸Ò¡…Õ”⁄‹—\s,]+)", RegexOptions.IgnoreCase);
+            if (match.Success)
+            {
+                var nombres = match.Groups[1].Value.Split(',').Select(n => n.Trim()).Where(n => !string.IsNullOrWhiteSpace(n)).ToList();
+                return nombres;
+            }
+            return new List<string>();
         }
 
         /// <summary>

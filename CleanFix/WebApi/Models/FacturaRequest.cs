@@ -5,7 +5,7 @@ namespace WebApi.Models
 {
     public class FacturaRequest
     {
-        public CompanyIa Empresa { get; set; }
-        public List<MaterialIa> Materiales { get; set; }
+        public string EmpresaNombre { get; set; }
+        public List<string> MaterialesNombres { get; set; }
     }
 }
