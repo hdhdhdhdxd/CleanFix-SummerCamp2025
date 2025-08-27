@@ -2,6 +2,7 @@ using Application.Common.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
+using Application.Common.Utils;
 
 namespace Application.CompletedTasks.Commands.CreateCompletedTask;
 
@@ -24,6 +25,10 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
 
     public async Task<int> Handle(CreateCompletedTaskCommand request, CancellationToken cancellationToken)
     {
+        // Normalización antes de mapear y guardar
+        if (request.CompletedTask.Description != null)
+            request.CompletedTask.Description = Normalizer.NormalizarNombre(request.CompletedTask.Description);
+
         var completedTask = _mapper.Map<CompletedTask>(request.CompletedTask);
         completedTask.CreationDate = DateTime.UtcNow; // Asignar fecha de creación
 

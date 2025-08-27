@@ -3,6 +3,7 @@ using AutoMapper;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Application.Common.Utils;
 
 namespace Application.Apartments.Commands.UpdateApartment;
 
@@ -26,6 +27,10 @@ public class UpdateApartmentCommandHandler : IRequestHandler<UpdateApartmentComm
 
     public async Task Handle(UpdateApartmentCommand request, CancellationToken cancellationToken)
     {
+        // Normalización antes de mapear y actualizar
+        if (request.Apartment.Address != null)
+            request.Apartment.Address = Normalizer.NormalizarNombre(request.Apartment.Address);
+
         var apartment = _mapper.Map<Apartment>(request.Apartment);
         try
         {
