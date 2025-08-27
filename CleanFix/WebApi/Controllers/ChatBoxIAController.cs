@@ -4,6 +4,8 @@ using WebApi.Services;
 using System.Threading.Tasks;
 using CleanFix.Plugins;
 using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace WebApi.Controllers
 {
@@ -12,10 +14,12 @@ namespace WebApi.Controllers
     public class ChatBoxIAController : ControllerBase
     {
         private readonly IAssistantService _assistantService;
+        private readonly string _connectionString;
 
-        public ChatBoxIAController(IAssistantService assistantService)
+        public ChatBoxIAController(IAssistantService assistantService, IConfiguration config)
         {
             _assistantService = assistantService;
+            _connectionString = config.GetConnectionString("CleanFixDB");
         }
 
         [HttpPost]
@@ -44,8 +48,25 @@ namespace WebApi.Controllers
         {
             try
             {
+                var dbPlugin = new DBPluginTestPG(_connectionString);
+                var empresasResponse = dbPlugin.GetAllEmpresas();
+                var materialesResponse = dbPlugin.GetAllMaterials();
+
+                // Buscar empresa por nombre
+                var empresa = empresasResponse.Data?.FirstOrDefault(e =>
+                    string.Equals(e.Name, request.EmpresaNombre, StringComparison.OrdinalIgnoreCase));
+                if (empresa == null)
+                    return BadRequest(new FacturaResponse { Success = false, Error = "Empresa no encontrada." });
+
+                // Buscar materiales por nombre
+                var materiales = materialesResponse.Data?
+                    .Where(m => request.MaterialesNombres.Contains(m.Name, StringComparer.OrdinalIgnoreCase))
+                    .ToList() ?? new List<MaterialIa>();
+                if (materiales.Count == 0)
+                    return BadRequest(new FacturaResponse { Success = false, Error = "No se encontraron materiales." });
+
                 var plugin = new FacturaPluginTestPG();
-                string factura = plugin.GenerarFactura(request.Empresa, request.Materiales);
+                string factura = plugin.GenerarFactura(empresa, materiales);
                 return Ok(new FacturaResponse { Success = true, Factura = factura });
             }
             catch (Exception ex)
