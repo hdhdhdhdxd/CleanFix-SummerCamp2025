@@ -1,8 +1,8 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Mappings;
+using Application.Common.Models;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Infrastructure.Common.Mappings;
-using Infrastructure.Common.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
