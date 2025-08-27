@@ -9,7 +9,7 @@ public class GetCompanyDto
     public string Address { get; set; }
     public string Number { get; set; }
     public string Email { get; set; }
-    public IssueType Type { get; set; }
+    public IssueType IssueType { get; set; }
     public decimal Price { get; set; }
     public int WorkTime { get; set; }
     private class Mapping : Profile
