@@ -221,6 +221,7 @@ namespace CleanFix.Plugins
         public bool Available { get; set; }
         [System.Text.Json.Serialization.JsonIgnore]
         public int IssueTypeId { get; set; }
+        public int Type => IssueTypeId; // Alias público para que el bot pueda filtrar por 'tipo' en materiales
     }
 }
 
