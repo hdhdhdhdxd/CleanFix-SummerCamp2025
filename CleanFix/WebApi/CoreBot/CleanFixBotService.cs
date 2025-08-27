@@ -147,9 +147,23 @@ namespace WebApi.CoreBot
                     return new PluginRespuesta { Success = false, Error = "No se encontraron materiales con esos criterios." };
                 }
 
-                var facturaPlugin = new FacturaPluginTestPG();
-                string factura = facturaPlugin.GenerarFactura(empresa, materialesFactura);
-                return new PluginRespuesta { Success = true, Data = factura };
+                // NUEVO: Formato de factura detallado
+                decimal iva = 0.21m;
+                decimal costeEmpresa = empresa.Price;
+                decimal costeMateriales = materialesFactura.Sum(m => m.Cost);
+                decimal ivaEmpresa = costeEmpresa * iva;
+                decimal ivaMateriales = costeMateriales * iva;
+                decimal total = costeEmpresa + ivaEmpresa + costeMateriales + ivaMateriales;
+
+                var sb = new System.Text.StringBuilder();
+                sb.AppendLine($"Empresa: {empresa.Name} - Coste: {costeEmpresa:F2}€");
+                foreach (var m in materialesFactura)
+                {
+                    sb.AppendLine($"Material: {m.Name} - Coste: {m.Cost:F2}€");
+                }
+                sb.AppendLine($"Factura con IVA: {total:F2}€");
+
+                return new PluginRespuesta { Success = true, Data = sb.ToString() };
             }
 
             if (intencion == IntencionUsuario.Salir)

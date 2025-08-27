@@ -65,9 +65,23 @@ namespace WebApi.Controllers
                 if (materiales.Count == 0)
                     return BadRequest(new FacturaResponse { Success = false, Error = "No se encontraron materiales." });
 
-                var plugin = new FacturaPluginTestPG();
-                string factura = plugin.GenerarFactura(empresa, materiales);
-                return Ok(new FacturaResponse { Success = true, Factura = factura });
+                // Generar factura detallada
+                decimal iva = 0.21m;
+                decimal costeEmpresa = empresa.Price;
+                decimal costeMateriales = materiales.Sum(m => m.Cost);
+                decimal ivaEmpresa = costeEmpresa * iva;
+                decimal ivaMateriales = costeMateriales * iva;
+                decimal total = costeEmpresa + ivaEmpresa + costeMateriales + ivaMateriales;
+
+                var sb = new System.Text.StringBuilder();
+                sb.AppendLine($"Empresa: {empresa.Name}: COSTE€{costeEmpresa:F2}");
+                foreach (var m in materiales)
+                {
+                    sb.AppendLine($"Material: {m.Name}: COSTE€{m.Cost:F2}");
+                }
+                sb.AppendLine($"Total factura con IVA: €{total:F2}");
+
+                return Ok(new FacturaResponse { Success = true, Factura = sb.ToString() });
             }
             catch (Exception ex)
             {
