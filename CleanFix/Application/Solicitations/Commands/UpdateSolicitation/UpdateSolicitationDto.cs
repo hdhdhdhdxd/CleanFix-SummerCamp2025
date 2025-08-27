@@ -18,6 +18,7 @@ public class UpdateSolicitationDto
     public double MaintenanceCost { get; set; }
     [Required]
     public int IssueTypeId { get; set; } // <-- Usar el Id, no el objeto
+    public string CodigoEdificio { get; set; } // Código del edificio
     public byte[] RowVersion { get; set; } // Para concurrencia
     private class Mapping : Profile
     {

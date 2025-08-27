@@ -16,7 +16,8 @@ public class CreateSolicitationDto
     [Range(1, 10000, ErrorMessage = "El coste de mantenimiento debe estar entre 1 y 10000.")]
     public double MaintenanceCost { get; set; }
     [Required]
-    public IssueType Type { get; set; }
+    public int IssueTypeId { get; set; }
+    public string CodigoEdificio { get; set; } // Código del edificio
     private class Mapping : Profile
     {
         public Mapping()

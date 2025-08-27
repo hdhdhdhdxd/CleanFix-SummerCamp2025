@@ -10,7 +10,9 @@ public class GetSolicitationDto
     public string Address { get; set; }
     public string? Status { get; set; }
     public double MaintenanceCost { get; set; }
+    public int IssueTypeId { get; set; } // Identificador del tipo de incidencia
     public IssueType IssueType { get; set; } // Nuevo campo para el nombre
+    public string CodigoEdificio { get; set; } // Código del edificio
     public byte[] RowVersion { get; set; } // Para concurrencia
     private class Mapping : Profile
     {

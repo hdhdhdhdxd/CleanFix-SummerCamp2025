@@ -10,6 +10,7 @@ public class GetPaginatedSolicitationDto
     public string IssueType { get; set; }
     public int IssueTypeId { get; set; } // Identificador del tipo de incidencia
     public string Address { get; set; }
+    public string CodigoEdificio { get; set; } // Código del edificio
     public byte[] RowVersion { get; set; } // Para concurrencia
     private class Mapping : Profile
     {
