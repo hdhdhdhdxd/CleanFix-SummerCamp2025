@@ -5,12 +5,14 @@ namespace Application.Incidences.Queries.GetIncidence;
 public class GetIncidenceDto
 {
     public int Id { get; set; }
+    public int IssueTypeId { get; set; } // Identificador del tipo de incidencia
     public IssueType IssueType { get; set; } // Nuevo campo para el nombre
     public DateTime Date { get; set; }
     public string Status { get; set; }
     public string Description { get; set; }
     public int ApartmentId { get; set; }
     public Priority Priority { get; set; }
+    public byte[] RowVersion { get; set; } // Para concurrencia
     private class Mapping : Profile
     {
         public Mapping()

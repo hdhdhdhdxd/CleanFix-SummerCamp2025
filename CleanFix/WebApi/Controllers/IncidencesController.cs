@@ -58,8 +58,23 @@ namespace WebApi.Controllers
                 return BadRequest("El id de la ruta y el del cuerpo no coinciden.");
             incidenceDto.Id = id;
             var command = new UpdateIncidenceCommand { Incidence = incidenceDto };
-            await _sender.Send(command);
-            return NoContent();
+            try
+            {
+                await _sender.Send(command);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("Conflicto de concurrencia"))
+                {
+                    return Conflict(new ProblemDetails
+                    {
+                        Title = "Conflicto de concurrencia",
+                        Detail = "La incidencia ha sido modificada por otro usuario"
+                    });
+                }
+                throw;
+            }
         }
 
         // DELETE: api/Incidences/{id}
