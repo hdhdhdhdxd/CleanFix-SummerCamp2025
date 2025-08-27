@@ -1,4 +1,6 @@
 using Application.Common.Interfaces;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,13 +17,15 @@ public class GetRandomMaterialsByIssueTypeQuery : IRequest<List<GetRandomMateria
     }
 }
 
-public class GetRandomMaterialsByIssueTypeQueryHandler : IRequestHandler<GetRandomMaterialsByIssueTypeQuery, List<GetRandomMaterialDto>>
+public class GetRandomMaterialsByIssueType : IRequestHandler<GetRandomMaterialsByIssueTypeQuery, List<GetRandomMaterialDto>>
 {
     private readonly IMaterialRepository _materialRepository;
+    private readonly IMapper _mapper;
 
-    public GetRandomMaterialsByIssueTypeQueryHandler(IMaterialRepository materialRepository)
+    public GetRandomMaterialsByIssueType(IMaterialRepository materialRepository, IMapper mapper)
     {
         _materialRepository = materialRepository;
+        _mapper = mapper;
     }
 
     public async Task<List<GetRandomMaterialDto>> Handle(GetRandomMaterialsByIssueTypeQuery request, CancellationToken cancellationToken)
@@ -29,15 +33,10 @@ public class GetRandomMaterialsByIssueTypeQueryHandler : IRequestHandler<GetRand
         var query = _materialRepository.GetQueryable();
 
         var result = await query.Where(m => m.IssueTypeId == request.IssueTypeId && m.Available)
-                          .OrderBy(x => Guid.NewGuid()).Take(request.Count)
-                          .Select(m => new GetRandomMaterialDto
-                          {
-                              Id = m.Id,
-                              Name = m.Name,
-                              Cost = m.Cost,
-                              Available = m.Available,
-                              IssueTypeId = m.IssueTypeId
-                          }).ToListAsync();
+                          .OrderBy(x => Guid.NewGuid())
+                          .Take(request.Count)
+                          .ProjectTo<GetRandomMaterialDto>(_mapper.ConfigurationProvider)
+                          .ToListAsync();
 
         return result;
     }

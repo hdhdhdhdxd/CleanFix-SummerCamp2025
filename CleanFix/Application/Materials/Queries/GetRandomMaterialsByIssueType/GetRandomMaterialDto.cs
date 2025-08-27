@@ -1,3 +1,7 @@
+using Application.Incidences.Queries.GetPaginatedIncidences;
+using AutoMapper;
+using Domain.Entities;
+
 namespace Application.Materials.Queries.GetRandomMaterialsByIssueType
 {
     public class GetRandomMaterialDto
@@ -7,5 +11,12 @@ namespace Application.Materials.Queries.GetRandomMaterialsByIssueType
         public decimal Cost { get; set; }
         public bool Available { get; set; }
         public int IssueTypeId { get; set; }
+        private class Mapping : Profile
+        {
+            public Mapping()
+            {
+                CreateMap<Material, GetRandomMaterialDto>();
+            }
+        }
     }
 }
