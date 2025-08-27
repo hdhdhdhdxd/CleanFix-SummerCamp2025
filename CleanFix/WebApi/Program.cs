@@ -89,8 +89,8 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.Address, f => $"{f.Address}")
             .RuleFor(e => e.Number, f => f.Random.Int(100000000, 999999999).ToString())
             .RuleFor(e => e.Email, f => $"empresa{f.UniqueIndex + 1}@test.com")
-            .RuleFor(e => e.Price, f => f.Random.Int(20, 500))
-            .RuleFor(e => e.WorkTime, f => f.Random.Int(20, 500));
+            .RuleFor(e => e.Price, f => Math.Round((decimal)f.Random.Float(20, 500), 2))
+            .RuleFor(e => e.WorkTime, f => f.Random.Int(1, 30));
         var companies = companyFaker.Generate(190);
         db.Companies.AddRange(companies);
         db.SaveChanges(); 
@@ -110,7 +110,7 @@ using (var scope = app.Services.CreateScope())
         var materialFaker = new Faker<Material>()
             .RuleFor(e => e.IssueType, f => f.PickRandom(issueTypes))
             .RuleFor(e => e.Name, (f, e) => $"Material {f.UniqueIndex + 1}")
-            .RuleFor(e => e.Cost, f => (decimal)f.Random.Float(10, 1000))
+            .RuleFor(e => e.Cost, f => Math.Round((decimal)f.Random.Float(10, 100), 2))
             .RuleFor(e => e.Available, f => true);
         var materials = materialFaker.Generate(10);
         db.Materials.AddRange(materials);
