@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Common.Interfaces;
-using Application.Companies.Queries.GetPaginatedCompanies;
+﻿using Application.Common.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Infrastructure.Common.Mappings;
@@ -13,7 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Companies.Queries.GetPaginatedCompanies;
-public record GetPaginatedCompaniesQuery(int PageNumber, int PageSize) : IRequest<PaginatedList<GetPaginatedCompanyDto>>;
+public record GetPaginatedCompaniesQuery(int PageNumber, int PageSize, int? TypeIssueId) : IRequest<PaginatedList<GetPaginatedCompanyDto>>;
 
 public class GetPaginatedCompaniesQueryHandler : IRequestHandler<GetPaginatedCompaniesQuery, PaginatedList<GetPaginatedCompanyDto>>
 {
@@ -28,11 +22,17 @@ public class GetPaginatedCompaniesQueryHandler : IRequestHandler<GetPaginatedCom
 
     public async Task<PaginatedList<GetPaginatedCompanyDto>> Handle(GetPaginatedCompaniesQuery request, CancellationToken cancellationToken)
     {
-        var companies = await _companyRepository.GetQueryable()
-            .AsNoTracking()
+        var query = _companyRepository.GetQueryable().AsNoTracking();
+
+        if (request.TypeIssueId != null)
+        {
+            query = query.Where(c => c.IssueTypeId == request.TypeIssueId);
+        }
+
+        var companies = await query
             .Include(c => c.IssueType)
             .ProjectTo<GetPaginatedCompanyDto>(_mapper.ConfigurationProvider).PaginatedListAsync(request.PageNumber, request.PageSize);
-       
+
 
         return companies;
     }

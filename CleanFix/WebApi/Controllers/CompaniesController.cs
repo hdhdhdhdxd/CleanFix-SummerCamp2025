@@ -18,9 +18,9 @@ namespace WebApi.Controllers
 
         // GET: api/Companies/paginated
         [HttpGet("paginated")]
-        public async Task<ActionResult<IEnumerable<GetPaginatedCompanyDto>>> GetPaginatedCompanies([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<ActionResult<IEnumerable<GetPaginatedCompanyDto>>> GetPaginatedCompanies([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] int? typeIssueId = null)
         {
-            var result = await _sender.Send(new GetPaginatedCompaniesQuery(pageNumber, pageSize));
+            var result = await _sender.Send(new GetPaginatedCompaniesQuery(pageNumber, pageSize, typeIssueId));
 
             return Ok(result);
         }
