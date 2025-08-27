@@ -6,6 +6,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Collections.Generic;
+using Domain.Entities;
 
 namespace CleanFix.Plugins
 {
@@ -42,6 +43,19 @@ namespace CleanFix.Plugins
             var match = Regex.Match(input, $@"{entidad}\s*(?:del\s*tipo|de\s*tipo|tipo)?\s*(\d+)", RegexOptions.IgnoreCase);
             if (match.Success && int.TryParse(match.Groups[1].Value, out int tipo))
                 return tipo;
+            return null;
+        }
+
+        /// <summary>
+        /// Extrae el IssueTypeId a partir del nombre del problema (por ejemplo, "eléctrico").
+        /// </summary>
+        public static int? ExtraerIssueTypeIdPorNombre(string mensaje, List<IssueType> issueTypes)
+        {
+            foreach (var issue in issueTypes)
+            {
+                if (mensaje.Contains(issue.Name, StringComparison.OrdinalIgnoreCase))
+                    return issue.Id;
+            }
             return null;
         }
 

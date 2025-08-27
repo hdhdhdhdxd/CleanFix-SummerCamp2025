@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
 using System.Collections.Generic;
+using Domain.Entities;
+using Infrastructure.Repositories;
 
 namespace WebApi.CoreBot
 {
@@ -14,6 +16,7 @@ namespace WebApi.CoreBot
         private readonly Dictionary<string, IPlugin> _plugins;
         private readonly IClasificadorIntencion _clasificador;
         private readonly string _connectionString;
+        private readonly IssueTypeRepository _issueTypeRepository;
 
         public CleanFixBotService(IConfiguration config)
         {
@@ -26,6 +29,7 @@ namespace WebApi.CoreBot
             };
 
             _clasificador = new ClasificadorIntencion();
+            _issueTypeRepository = new IssueTypeRepository(_connectionString);
         }
 
         /// <summary>
@@ -35,11 +39,15 @@ namespace WebApi.CoreBot
         {
             var intencion = _clasificador.Clasificar(mensaje);
 
+            // Obtener todos los tipos de problema
+            var issueTypes = await _issueTypeRepository.GetAllAsync();
+            int? issueTypeIdFromName = ConsultaParser.ExtraerIssueTypeIdPorNombre(mensaje, issueTypes);
+
             // Si la intención es consultar datos, parsea la consulta natural
             if (intencion == IntencionUsuario.ConsultarDatos)
             {
-                int? tipoEmpresa = ConsultaParser.ExtraerTipo(mensaje, "empresa");
-                int? tipoMaterial = ConsultaParser.ExtraerTipo(mensaje, "material");
+                int? tipoEmpresa = issueTypeIdFromName ?? ConsultaParser.ExtraerTipo(mensaje, "empresa");
+                int? tipoMaterial = issueTypeIdFromName ?? ConsultaParser.ExtraerTipo(mensaje, "material");
                 bool masBarato = ConsultaParser.SolicitaMasBarato(mensaje);
                 bool masCaro = ConsultaParser.SolicitaMasCaro(mensaje);
                 bool disponibles = ConsultaParser.SolicitaDisponibles(mensaje);
@@ -82,7 +90,7 @@ namespace WebApi.CoreBot
                 List<string> nombresMateriales = ConsultaParser.ExtraerNombresMateriales(mensaje);
 
                 // Extraer tipo y criterios para materiales
-                int? tipoMaterial = ConsultaParser.ExtraerTipo(mensaje, "material");
+                int? tipoMaterial = issueTypeIdFromName ?? ConsultaParser.ExtraerTipo(mensaje, "material");
                 bool masBarato = ConsultaParser.SolicitaMasBarato(mensaje);
                 bool masCaro = ConsultaParser.SolicitaMasCaro(mensaje);
 
@@ -92,9 +100,12 @@ namespace WebApi.CoreBot
                     empresa = empresasResponse.Data?.FirstOrDefault(e =>
                         string.Equals(e.Name, nombreEmpresa, System.StringComparison.OrdinalIgnoreCase));
                 }
+                else if (tipoMaterial.HasValue)
+                {
+                    empresa = empresasResponse.Data?.FirstOrDefault(e => e.IssueTypeId == tipoMaterial.Value);
+                }
                 else
                 {
-                    // Si no se especifica nombre, usar la primera empresa encontrada
                     empresa = empresasResponse.Data?.FirstOrDefault();
                 }
 
@@ -107,7 +118,6 @@ namespace WebApi.CoreBot
                 }
                 else if (tipoMaterial.HasValue && masBarato)
                 {
-                    // Buscar el material más barato del tipo solicitado
                     var materialMasBarato = materialesResponse.Data?
                         .Where(m => m.Type == tipoMaterial.Value)
                         .OrderBy(m => m.Cost)
@@ -117,7 +127,6 @@ namespace WebApi.CoreBot
                 }
                 else if (tipoMaterial.HasValue && masCaro)
                 {
-                    // Buscar el material más caro del tipo solicitado
                     var materialMasCaro = materialesResponse.Data?
                         .Where(m => m.Type == tipoMaterial.Value)
                         .OrderByDescending(m => m.Cost)
@@ -127,20 +136,18 @@ namespace WebApi.CoreBot
                 }
                 else if (tipoMaterial.HasValue)
                 {
-                    // Buscar todos los materiales del tipo solicitado
                     materialesFactura = materialesResponse.Data?
                         .Where(m => m.Type == tipoMaterial.Value)
                         .ToList() ?? new List<MaterialIa>();
                 }
                 else
                 {
-                    // Si no se especifican materiales ni tipo, usar todos
                     materialesFactura = materialesResponse.Data ?? new List<MaterialIa>();
                 }
 
                 if (empresa == null)
                 {
-                    return new PluginRespuesta { Success = false, Error = "No se encontró ninguna empresa con ese nombre." };
+                    return new PluginRespuesta { Success = false, Error = "No se encontró ninguna empresa con ese nombre o tipo." };
                 }
                 if (materialesFactura.Count == 0)
                 {
