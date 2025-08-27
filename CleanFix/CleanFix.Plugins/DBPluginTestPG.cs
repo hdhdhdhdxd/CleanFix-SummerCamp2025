@@ -9,17 +9,12 @@ using CleanFix.Plugins;
 
 namespace CleanFix.Plugins
 {
-    /// <summary>
     /// Plugin de acceso a base de datos para CleanFixBot. Permite consultar empresas y materiales.
-    /// </summary>
     public class DBPluginTestPG : IPlugin
     {
         private readonly string _connectionString;
         private readonly ILogger<DBPluginTestPG> _logger;
-
-        /// <summary>
         /// Constructor del plugin. Recibe la cadena de conexión y un logger opcional.
-        /// </summary>
         public DBPluginTestPG(string connectionString, ILogger<DBPluginTestPG> logger = null)
         {
             _connectionString = connectionString;
@@ -42,10 +37,7 @@ namespace CleanFix.Plugins
             else
                 Console.WriteLine(message);
         }
-
-        /// <summary>
-        /// Obtiene todas las empresas de la base de datos y las mapea a CompanyIa (sin Id ni IssueTypeId).
-        /// </summary>
+        /// Obtiene todas las empresas de la base de datos y las mapea a CompanyIa (incluyendo IssueTypeId).
         [KernelFunction]
         public EmpresaResponse GetAllEmpresas()
         {
@@ -56,7 +48,8 @@ namespace CleanFix.Plugins
                 using var connection = new SqlConnection(_connectionString);
                 connection.Open();
                 LogInfo("[DBPluginTestPG] Conexión abierta correctamente para empresas.");
-                var command = new SqlCommand("SELECT Name, Address, Number, Email, Price, WorkTime FROM dbo.Companies", connection);
+                // Incluye IssueTypeId en la consulta
+                var command = new SqlCommand("SELECT Name, Address, Number, Email, Price, WorkTime, IssueTypeId FROM dbo.Companies", connection);
                 using var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
@@ -67,9 +60,10 @@ namespace CleanFix.Plugins
                         Number = reader.IsDBNull(2) ? null : reader.GetString(2),
                         Email = reader.IsDBNull(3) ? null : reader.GetString(3),
                         Price = reader.IsDBNull(4) ? 0 : reader.GetDecimal(4),
-                        WorkTime = reader.IsDBNull(5) ? 0 : reader.GetInt32(5)
+                        WorkTime = reader.IsDBNull(5) ? 0 : reader.GetInt32(5),
+                        IssueTypeId = reader.IsDBNull(6) ? 0 : reader.GetInt32(6)
                     };
-                    LogInfo($"[DBPluginTestPG] Empresa obtenida: Name={emp.Name}, Price={emp.Price}");
+                    LogInfo($"[DBPluginTestPG] Empresa obtenida: Name={emp.Name}, Price={emp.Price}, IssueTypeId={emp.IssueTypeId}");
                     companiesIa.Add(emp);
                 }
             }
@@ -82,9 +76,7 @@ namespace CleanFix.Plugins
             return new EmpresaResponse { Success = true, Data = companiesIa };
         }
 
-        /// <summary>
-        /// Obtiene todos los materiales de la base de datos y los mapea a MaterialIa (sin Id ni IssueTypeId).
-        /// </summary>
+        /// Obtiene todos los materiales de la base de datos y los mapea a MaterialIa (incluyendo IssueTypeId).
         [KernelFunction]
         public MaterialResponse GetAllMaterials()
         {
@@ -95,7 +87,8 @@ namespace CleanFix.Plugins
                 using var connection = new SqlConnection(_connectionString);
                 connection.Open();
                 LogInfo("[DBPluginTestPG] Conexión abierta correctamente para materiales.");
-                var command = new SqlCommand("SELECT Name, Cost FROM dbo.Materials", connection);
+                // Incluye IssueTypeId en la consulta
+                var command = new SqlCommand("SELECT Name, Cost, IssueTypeId FROM dbo.Materials", connection);
                 using var reader = command.ExecuteReader();
                 while (reader.Read())
                 {
@@ -103,9 +96,10 @@ namespace CleanFix.Plugins
                     {
                         Name = reader.IsDBNull(0) ? null : reader.GetString(0),
                         Cost = reader.IsDBNull(1) ? 0 : reader.GetDecimal(1),
-                        Available = true
+                        Available = true,
+                        IssueTypeId = reader.IsDBNull(2) ? 0 : reader.GetInt32(2)
                     };
-                    LogInfo($"[DBPluginTestPG] Material obtenido: Name={mat.Name}, Cost={mat.Cost}");
+                    LogInfo($"[DBPluginTestPG] Material obtenido: Name={mat.Name}, Cost={mat.Cost}, IssueTypeId={mat.IssueTypeId}");
                     materialesIa.Add(mat);
                 }
             }
@@ -117,10 +111,7 @@ namespace CleanFix.Plugins
             LogInfo($"[DBPluginTestPG] Materiales obtenidos: {materialesIa.Count}");
             return new MaterialResponse { Success = true, Data = materialesIa };
         }
-
-        /// <summary>
         /// Procesa un mensaje del bot y ejecuta la consulta correspondiente sobre empresas o materiales.
-        /// </summary>
         public async Task<PluginRespuesta> EjecutarAsync(string mensaje)
         {
             mensaje = mensaje.ToLower();
@@ -136,7 +127,6 @@ namespace CleanFix.Plugins
             }
 
             // Filtros y patrones para empresas
-            // ...puedes añadir aquí patrones si lo necesitas...
 
             if (mensaje.Contains("más barata"))
             {
@@ -193,9 +183,7 @@ namespace CleanFix.Plugins
         }
     }
 
-    /// <summary>
     /// Respuesta de consulta de empresas para el bot.
-    /// </summary>
     public class EmpresaResponse
     {
         public bool Success { get; set; }
@@ -203,9 +191,7 @@ namespace CleanFix.Plugins
         public List<CompanyIa> Data { get; set; }
     }
 
-    /// <summary>
     /// Respuesta de consulta de materiales para el bot.
-    /// </summary>
     public class MaterialResponse
     {
         public bool Success { get; set; }
@@ -213,9 +199,7 @@ namespace CleanFix.Plugins
         public List<MaterialIa> Data { get; set; }
     }
 
-    /// <summary>
     /// Modelo de empresa para el bot (sin Id ni IssueTypeId).
-    /// </summary>
     public class CompanyIa
     {
         public string Name { get; set; }
@@ -224,16 +208,16 @@ namespace CleanFix.Plugins
         public string Email { get; set; }
         public decimal Price { get; set; }
         public int WorkTime { get; set; }
+        public int IssueTypeId { get; set; }
     }
 
-    /// <summary>
     /// Modelo de material para el bot (sin Id ni IssueTypeId).
-    /// </summary>
     public class MaterialIa
     {
         public string Name { get; set; }
         public decimal Cost { get; set; }
         public bool Available { get; set; }
+        public int IssueTypeId { get; set; }
     }
 }
 
