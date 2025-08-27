@@ -6,8 +6,8 @@ const init = (repository: CompanyRepository) => {
   companyRepository = repository
 }
 
-const getPaginated = async (pageNumber: number, pageSize: number) => {
-  return companyRepository.getPaginated(pageNumber, pageSize)
+const getPaginated = async (pageNumber: number, pageSize: number, typeIssueId?: number) => {
+  return companyRepository.getPaginated(pageNumber, pageSize, typeIssueId)
 }
 
 export const companyService = {
