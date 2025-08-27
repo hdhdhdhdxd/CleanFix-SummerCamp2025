@@ -12,6 +12,12 @@
   --color-primary-300: oklch(0.3333 0.0572 251.09);
   --color-accent-500: oklch(0.8263 0.1634 90.12);
 
+  --color-success-200: #e6f9ed;
+  --color-success-500: #18794e;
+
+  --color-warning-200: #ffeaea;
+  --color-warning-500: #b91c1c;
+
   --color-brand-0: oklch(1 0 0);
   --color-brand-50: oklch(0.97 0.01 251);
   --color-brand-100: oklch(0.94 0.015 251);
