@@ -11,13 +11,11 @@ public class CreateSolicitationDto
     public DateTime Date { get; set; }
     [StringLength(150, MinimumLength = 5, ErrorMessage = "La dirección debe tener entre 5 y 150 caracteres.")]
     public string Address { get; set; }
-    [StringLength(50, MinimumLength = 3, ErrorMessage = "El estado debe tener entre 3 y 50 caracteres.")]
-    public string? Status { get; set; }
     [Range(1, 10000, ErrorMessage = "El coste de mantenimiento debe estar entre 1 y 10000.")]
     public double MaintenanceCost { get; set; }
     [Required]
-    public int IssueTypeId { get; set; }
-    public string CodigoEdificio { get; set; } // Código del edificio
+    public int IssueTypeId { get; set; } // <-- Que sea un numero entre 1 y 7
+    public string BuildingCode { get; set; } // Código del edificio
     private class Mapping : Profile
     {
         public Mapping()
