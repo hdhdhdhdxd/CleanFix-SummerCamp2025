@@ -1,6 +1,7 @@
 using Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Companies.Queries.GetCompany;
 public record GetCompanyQuery(int Id) : IRequest<GetCompanyDto>;
@@ -18,10 +19,15 @@ public class GetCompanyQueryHandler : IRequestHandler<GetCompanyQuery, GetCompan
 
     public async Task<GetCompanyDto> Handle(GetCompanyQuery request, CancellationToken cancellationToken)
     {
-        var company = await _companyRepository.GetByIdAsync(request.Id);
+        var query = _companyRepository.GetQueryable();
+
+        var company = await query.Include(c => c.IssueType).FirstOrDefaultAsync(c => c.Id == request.Id);
+
         if (company == null)
             return null;
-        var result = _mapper.Map<GetCompanyDto>(company);
-        return result;
+
+        var companyDto = _mapper.Map<GetCompanyDto>(company);
+
+        return companyDto;
     }
 }
