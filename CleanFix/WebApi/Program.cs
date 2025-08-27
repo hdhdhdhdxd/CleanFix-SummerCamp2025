@@ -1,10 +1,7 @@
 using Bogus;
-using CleanFix.Plugins;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.SemanticKernel;
 using WebApi.BaseDatos;
-using WebApi.CoreBot;
 using WebApi.CoreBot;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,13 +17,15 @@ builder.Services.AddScoped<IBotService, CleanFixBotService>();
 // Registrar AssistantService para IA LLM
 builder.Services.AddScoped<WebApi.Services.IAssistantService, WebApi.Services.AssistantService>();
 
-// Configuración de CORS para permitir localhost:4200
+// Configuración de CORS 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularLocalhost",
-        policy => policy.WithOrigins("http://localhost:4200")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod());
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
 });
 
 // Add services to the container.
@@ -47,7 +46,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
 
-    
+
     var issueTypes = new List<IssueType>
         {
             new IssueType { Name = "Plumbing" },
@@ -93,9 +92,9 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.WorkTime, f => f.Random.Int(1, 30));
         var companies = companyFaker.Generate(190);
         db.Companies.AddRange(companies);
-        db.SaveChanges(); 
+        db.SaveChanges();
 
-       // Crear 10 apartamentos
+        // Crear 10 apartamentos
         var apartmentFaker = new Faker<Apartment>()
             .RuleFor(e => e.FloorNumber, f => f.Random.Int(1, 9))
             .RuleFor(e => e.Address, f => $"{f.Address}")
@@ -112,9 +111,9 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.Name, (f, e) => $"Material {f.UniqueIndex + 1}")
             .RuleFor(e => e.Cost, f => Math.Round((decimal)f.Random.Float(10, 100), 2))
             .RuleFor(e => e.Available, f => true);
-        var materials = materialFaker.Generate(10);
+        var materials = materialFaker.Generate(80);
         db.Materials.AddRange(materials);
-        db.SaveChanges(); 
+        db.SaveChanges();
 
         // Crear 10 solicitudes
         var solicitationStatusOptions = new[] { "In progress", "Ready", "Waiting" };
@@ -124,7 +123,8 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.Status, f => f.PickRandom(solicitationStatusOptions))
             .RuleFor(e => e.Address, f => f.Address.FullAddress())
             .RuleFor(e => e.MaintenanceCost, f => f.Random.Double(50, 1000))
-            .RuleFor(e => e.IssueType, f => f.PickRandom(issueTypes));
+            .RuleFor(e => e.IssueType, f => f.PickRandom(issueTypes))
+            .RuleFor(e => e.RequestId, f => f.Random.Int(1, 9999));
         var solicitations = solicitationFaker.Generate(10);
         db.Solicitations.AddRange(solicitations);
         db.SaveChanges();
@@ -167,7 +167,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
-app.UseCors("AllowAngularLocalhost");
+app.UseCors("AllowAll");
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
