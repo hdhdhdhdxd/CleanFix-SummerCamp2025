@@ -1,6 +1,8 @@
 ﻿using CleanFix.Plugins;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace WebApi.CoreBot
 {
@@ -67,10 +69,27 @@ namespace WebApi.CoreBot
                 return await _plugins["db"].EjecutarAsync(consulta);
             }
 
-            // Si la intención es generar factura, delega al plugin de factura
+            // Si la intención es generar factura, busca los datos y genera la factura
             if (intencion == IntencionUsuario.GenerarFactura)
             {
-                return await _plugins["factura"].EjecutarAsync(mensaje);
+                // Buscar empresa según criterio
+                var empresasResponse = await _plugins["db"].EjecutarAsync(mensaje.Contains("empresa") ? mensaje : "empresas");
+                var empresas = empresasResponse.Data as List<CompanyIa>;
+                CompanyIa empresa = empresas?.FirstOrDefault();
+
+                // Buscar materiales según criterio
+                var materialesResponse = await _plugins["db"].EjecutarAsync(mensaje.Contains("material") ? mensaje : "materiales");
+                var materiales = materialesResponse.Data as List<MaterialIa>;
+                var materialesFactura = materiales ?? new List<MaterialIa>();
+
+                if (empresa == null)
+                {
+                    return new PluginRespuesta { Success = false, Error = "No se encontró ninguna empresa que cumpla el criterio." };
+                }
+
+                var facturaPlugin = new FacturaPluginTestPG();
+                string factura = facturaPlugin.GenerarFactura(empresa, materialesFactura);
+                return new PluginRespuesta { Success = true, Data = factura };
             }
 
             if (intencion == IntencionUsuario.Salir)
