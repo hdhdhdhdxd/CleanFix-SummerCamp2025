@@ -2,6 +2,7 @@ using Application.Common.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
+using Application.Common.Utils;
 
 namespace Application.Incidences.Commands.CreateIncidence;
 
@@ -24,6 +25,12 @@ public class CreateIncidenceCommandHandler : IRequestHandler<CreateIncidenceComm
 
     public async Task<int> Handle(CreateIncidenceCommand request, CancellationToken cancellationToken)
     {
+        // Normalización antes de mapear y guardar
+        if (request.Incidence.Status != null)
+            request.Incidence.Status = Normalizer.NormalizarNombre(request.Incidence.Status);
+        if (request.Incidence.Description != null)
+            request.Incidence.Description = Normalizer.NormalizarNombre(request.Incidence.Description);
+
         var entity = _mapper.Map<Incidence>(request.Incidence);
         entity.Date = DateTime.UtcNow; // Asignar fecha de creación
         if (entity.Id == 0)

@@ -3,6 +3,7 @@ using AutoMapper;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Application.Common.Utils;
 
 namespace Application.Incidences.Commands.UpdateIncidence;
 
@@ -26,6 +27,12 @@ public class UpdateIncidenceCommandHandler : IRequestHandler<UpdateIncidenceComm
 
     public async Task Handle(UpdateIncidenceCommand request, CancellationToken cancellationToken)
     {
+        // Normalización antes de mapear y actualizar
+        if (request.Incidence.Status != null)
+            request.Incidence.Status = Normalizer.NormalizarNombre(request.Incidence.Status);
+        if (request.Incidence.Description != null)
+            request.Incidence.Description = Normalizer.NormalizarNombre(request.Incidence.Description);
+
         var entity = _mapper.Map<Incidence>(request.Incidence);
         try
         {

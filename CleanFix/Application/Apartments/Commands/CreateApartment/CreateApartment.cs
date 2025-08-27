@@ -2,6 +2,7 @@
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
+using Application.Common.Utils;
 
 namespace Application.Apartments.Commands.CreateApartment;
 
@@ -24,6 +25,10 @@ public class CreateApartmentCommandHandler : IRequestHandler<CreateApartmentComm
 
     public async Task<int> Handle(CreateApartmentCommand request, CancellationToken cancellationToken)
     {
+        // Normalización antes de mapear y guardar
+        if (request.Apartment.Address != null)
+            request.Apartment.Address = Normalizer.NormalizarNombre(request.Apartment.Address);
+
         var apartment = _mapper.Map<Apartment>(request.Apartment);
         apartment.CreationDate = DateTime.UtcNow;
 
