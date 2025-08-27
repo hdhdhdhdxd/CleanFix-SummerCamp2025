@@ -66,18 +66,6 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
     }*/
 
-    // Crear 10 empresas
-    var companyFaker = new Faker<Company>()
-        .RuleFor(e => e.IssueTypeId, f => f.Random.Int(1, 7))
-        .RuleFor(e => e.Name, (f, e) => $"Empresa {f.UniqueIndex + 1}")
-        .RuleFor(e => e.Address, f => $"{f.Address}")
-        .RuleFor(e => e.Number, f => f.Random.Int(100000000, 999999999).ToString())
-        .RuleFor(e => e.Email, f => $"empresa{f.UniqueIndex + 1}@test.com")
-        .RuleFor(e => e.Price, f => f.Random.Int(20, 500))
-        .RuleFor(e => e.WorkTime, f => f.Random.Int(20, 500));
-    var companies = companyFaker.Generate(190);
-    db.Companies.AddRange(companies);
-    db.SaveChanges();
 
     // Solo hacer seeding si las tablas están vacías
     if (!db.Apartments.Any() && !db.Companies.Any() && !db.Materials.Any() && !db.CompletedTasks.Any())
@@ -96,7 +84,7 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
 
         // Crear 10 empresas
-        /*var companyFaker = new Faker<Company>()
+        var companyFaker = new Faker<Company>()
             .RuleFor(e => e.IssueType, f => f.PickRandom(issueTypes))
             .RuleFor(e => e.Name, (f, e) => $"Empresa {f.UniqueIndex + 1}")
             .RuleFor(e => e.Address, f => $"{f.Address}")
@@ -106,7 +94,7 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.WorkTime, f => f.Random.Int(20, 500));
         var companies = companyFaker.Generate(190);
         db.Companies.AddRange(companies);
-        db.SaveChanges(); */
+        db.SaveChanges(); 
 
        // Crear 10 apartamentos
         var apartmentFaker = new Faker<Apartment>()
