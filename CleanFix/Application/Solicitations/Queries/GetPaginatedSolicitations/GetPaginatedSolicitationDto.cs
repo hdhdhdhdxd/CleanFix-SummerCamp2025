@@ -8,7 +8,9 @@ public class GetPaginatedSolicitationDto
     public DateTime Date { get; set; }
     public string? Status { get; set; }
     public string IssueType { get; set; }
+    public int IssueTypeId { get; set; } // Identificador del tipo de incidencia
     public string Address { get; set; }
+    public byte[] RowVersion { get; set; } // Para concurrencia
     private class Mapping : Profile
     {
         public Mapping()
@@ -17,7 +19,7 @@ public class GetPaginatedSolicitationDto
                 .ForMember(
                     dest => dest.IssueType,
                     opt => opt.MapFrom(src => src.IssueType.Name)
-                );
+                ); // Las demás propiedades se mapean automáticamente
         }
     }
 }

@@ -11,12 +11,12 @@ public class GetSolicitationDto
     public string? Status { get; set; }
     public double MaintenanceCost { get; set; }
     public IssueType IssueType { get; set; } // Nuevo campo para el nombre
+    public byte[] RowVersion { get; set; } // Para concurrencia
     private class Mapping : Profile
     {
         public Mapping()
         {
             CreateMap<Solicitation, GetSolicitationDto>();
-                
         }
     }
 }
