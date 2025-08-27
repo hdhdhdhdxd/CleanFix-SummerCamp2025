@@ -199,7 +199,7 @@ namespace CleanFix.Plugins
         public List<MaterialIa> Data { get; set; }
     }
 
-    /// Modelo de empresa para el bot (sin Id ni IssueTypeId).
+    /// Modelo de empresa para el bot (sin Id ni IssueTypeId expuesto al usuario).
     public class CompanyIa
     {
         public string Name { get; set; }
@@ -208,15 +208,18 @@ namespace CleanFix.Plugins
         public string Email { get; set; }
         public decimal Price { get; set; }
         public int WorkTime { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
         public int IssueTypeId { get; set; }
+        public int Type => IssueTypeId; // Alias público para que el bot pueda filtrar por 'tipo'
     }
 
-    /// Modelo de material para el bot (sin Id ni IssueTypeId).
+    /// Modelo de material para el bot (sin Id ni IssueTypeId expuesto al usuario).
     public class MaterialIa
     {
         public string Name { get; set; }
         public decimal Cost { get; set; }
         public bool Available { get; set; }
+        [System.Text.Json.Serialization.JsonIgnore]
         public int IssueTypeId { get; set; }
     }
 }
