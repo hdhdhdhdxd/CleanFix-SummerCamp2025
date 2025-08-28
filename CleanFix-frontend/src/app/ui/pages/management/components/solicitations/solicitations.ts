@@ -8,9 +8,7 @@ import { SolicitationDialog } from '../solicitation-dialog/solicitation-dialog'
 import { Table, TableColumn } from '../table/table'
 import { PaginatedData } from '@/core/domain/models/PaginatedData'
 import { SolicitationBrief } from '@/core/domain/models/SolicitationBrief'
-import { Solicitation } from '@/core/domain/models/Solicitation'
 import { Company } from '@/core/domain/models/Company'
-import { CompanyService } from '@/ui/services/company/company-service'
 
 @Component({
   selector: 'app-solicitations',
@@ -21,7 +19,6 @@ export class Solicitations implements OnInit {
   private route = inject(ActivatedRoute)
   private location = inject(Location)
   private solicitationService = inject(SolicitationService)
-  private companyService = inject(CompanyService)
 
   solicitations = signal<SolicitationBrief[]>([])
   totalPages = signal<number>(0)
@@ -32,7 +29,7 @@ export class Solicitations implements OnInit {
   pageSize = signal<number>(10)
   pageNumber = signal<number>(1)
 
-  selectedSolicitation: Solicitation | null = null
+  solicitationId: number | null = null
   companies = signal<Company[]>([])
   showDialog = signal<boolean>(false)
 
@@ -94,31 +91,12 @@ export class Solicitations implements OnInit {
   }
 
   handleRowClick(item: SolicitationBrief): void {
-    this.getSolicitationById(item.id)
+    this.solicitationId = item.id
+    this.showDialog.set(true)
   }
 
   handleCloseDialog(): void {
-    this.selectedSolicitation = null
+    this.solicitationId = null
     this.showDialog.set(false)
-  }
-
-  private getSolicitationById(id: number): void {
-    this.solicitationService.getById(id).subscribe((solicitation) => {
-      this.onSolicitationLoaded(solicitation)
-      this.loadCompanies()
-    })
-  }
-
-  private loadCompanies(): void {
-    this.companyService
-      .getPaginated(1, 10, this.selectedSolicitation?.issueType.id)
-      .subscribe((companies) => {
-        this.companies.set(companies.items)
-      })
-  }
-
-  private onSolicitationLoaded(solicitation: Solicitation): void {
-    this.selectedSolicitation = solicitation
-    this.showDialog.set(true)
   }
 }

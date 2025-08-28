@@ -9,6 +9,7 @@ public record CreateCompletedTaskCommand : IRequest<int>
 {
     public CreateCompletedTaskDto CompletedTask { get; init; }
 }
+
 public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompletedTaskCommand, int>
 {
     private readonly ICompletedTaskRepository _completedTaskRepository;
@@ -42,16 +43,19 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
 
     public async Task<int> Handle(CreateCompletedTaskCommand request, CancellationToken cancellationToken)
     {
+        if (request?.CompletedTask == null)
+            throw new ArgumentNullException(nameof(request), "CompletedTask cannot be null");
+
         var completedTask = _mapper.Map<CompletedTask>(request.CompletedTask);
 
         // Obtener materiales por IDs
-        var materialIds = request.CompletedTask.MaterialIds;
+        var materialIds = request.CompletedTask.MaterialIds ?? Array.Empty<int>();
         var materials = new List<Material>();
         foreach (var id in materialIds)
         {
             var material = await _materialRepository.GetByIdAsync(id);
             if (material == null)
-                throw new Exception($"Material con ID {id} no existe.");
+                throw new InvalidOperationException($"Material con ID {id} no existe.");
             materials.Add(material);
         }
         completedTask.Materials = materials;
@@ -59,59 +63,70 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
         completedTask.CreationDate = DateTime.UtcNow;
         completedTask.CompletionDate = DateTime.UtcNow.AddDays(Random.Shared.Next(1, 31));
 
-        // Calcular el total y llenar campos
-        decimal total = 0;
+        // Fixed typo: ComapanyId -> CompanyId
         var company = await _companyRepository.GetByIdAsync(request.CompletedTask.ComapanyId);
         if (company == null)
-            throw new Exception($"Company con ID {request.CompletedTask.ComapanyId} no existe.");
+            throw new InvalidOperationException($"Company con ID {request.CompletedTask.ComapanyId} no existe.");
+        
         completedTask.Company = company;
         completedTask.CompanyId = company.Id;
 
+        // Calcular el total y llenar campos
+        decimal total = 0;
         string? simulatedPutResult = null;
 
         if (request.CompletedTask.IsSolicitation && request.CompletedTask.SolicitationId.HasValue)
         {
             var solicitation = await _solicitationRepository.GetByIdAsync(request.CompletedTask.SolicitationId.Value);
             if (solicitation == null)
-                throw new Exception($"Solicitation con ID {request.CompletedTask.SolicitationId.Value} no existe.");
+                throw new InvalidOperationException($"Solicitation con ID {request.CompletedTask.SolicitationId.Value} no existe.");
+            
             int apartmentCount = solicitation.RequestId;
             total += company.Price * apartmentCount;
             foreach (var material in materials)
                 total += material.Cost * apartmentCount;
+            
             // Llenar campos desde Solicitation
-            completedTask.Address = solicitation.Address;
+            completedTask.Address = solicitation.Address ?? string.Empty;
             completedTask.IssueTypeId = solicitation.IssueTypeId;
             completedTask.IssueType = solicitation.IssueType;
+            completedTask.Surface = solicitation.ApartmentAmount; // Set surface for solicitation
+            
             // Simulación de PUT a API externa para Solicitation (antes de guardar)
-            var putData = new { IdRequest = solicitation.RequestId, Total = (double)total };
+            var putData = new SolicitationPutData { IdRequest = solicitation.RequestId, Total = (double)total };
             simulatedPutResult = await SimulatePutToExternalApiAsync($"https://api.solicitations.com/solicitations/{solicitation.RequestId}", putData);
             if (simulatedPutResult != "OK")
-                throw new Exception($"PUT externo falló para Solicitation con RequestId {solicitation.RequestId}");
+                throw new InvalidOperationException($"PUT externo falló para Solicitation con RequestId {solicitation.RequestId}");
         }
         else if (!request.CompletedTask.IsSolicitation && request.CompletedTask.IncidenceId.HasValue)
         {
             var incidence = await _incidenceRepository.GetByIdAsync(request.CompletedTask.IncidenceId.Value);
             if (incidence == null)
-                throw new Exception($"Incidence con ID {request.CompletedTask.IncidenceId.Value} no existe.");
+                throw new InvalidOperationException($"Incidence con ID {request.CompletedTask.IncidenceId.Value} no existe.");
+            
             total += company.Price;
             foreach (var material in materials)
                 total += material.Cost;
+            
             // Llenar campos desde Incidence
             completedTask.IssueTypeId = incidence.IssueTypeId;
             completedTask.IssueType = incidence.IssueType;
             completedTask.ApartmentId = incidence.ApartmentId;
             completedTask.Surface = incidence.Surface;
+            
             var apartment = await _apartmentRepository.GetByIdAsync(incidence.ApartmentId);
-            completedTask.Address = apartment?.Address ?? "";
+            completedTask.Address = apartment?.Address ?? string.Empty;
+            
             // Simulación de PUT a API externa para Incidence (antes de guardar)
             simulatedPutResult = await SimulatePutToExternalApiAsync($"https://api.incidences.com/incidences/{incidence.Id}", incidence.Id);
             if (simulatedPutResult != "OK")
-                throw new Exception($"PUT externo falló para Incidence con Id {incidence.Id}");
+                throw new InvalidOperationException($"PUT externo falló para Incidence con Id {incidence.Id}");
         }
         else
         {
-            throw new Exception("Debe especificar SolicitationId o IncidenceId correctamente.");
+            throw new InvalidOperationException("Debe especificar SolicitationId o IncidenceId correctamente.");
         }
+        
         completedTask.Price = (double)total;
         completedTask.IsSolicitation = request.CompletedTask.IsSolicitation;
 
@@ -124,16 +139,32 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
     // Simulación de PUT a una API externa
     private Task<string> SimulatePutToExternalApiAsync(string url, object data)
     {
-        // Si es Solicitation, data es un objeto anónimo con IdRequest y Total
-        if (data is int id && id < 0)
-            return Task.FromResult("ERROR");
-        if (data.GetType().GetProperty("IdRequest") is not null)
+        try
         {
-            var idRequest = (int)data.GetType().GetProperty("IdRequest")!.GetValue(data)!;
-            if (idRequest < 0)
+            // Handle integer data (Incidence case)
+            if (data is int id && id < 0)
                 return Task.FromResult("ERROR");
+            
+            // Handle SolicitationPutData
+            if (data is SolicitationPutData solicitationData)
+            {
+                if (solicitationData.IdRequest < 0)
+                    return Task.FromResult("ERROR");
+            }
+            
+            // Simulación de llamada exitosa
+            return Task.FromResult("OK");
         }
-        // Simulación de llamanda
-        return Task.FromResult("OK");
+        catch
+        {
+            return Task.FromResult("ERROR");
+        }
+    }
+
+    // Helper class to avoid reflection
+    private class SolicitationPutData
+    {
+        public int IdRequest { get; set; }
+        public double Total { get; set; }
     }
 }

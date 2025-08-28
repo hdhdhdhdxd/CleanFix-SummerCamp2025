@@ -53,7 +53,7 @@ const getById = async (id: number): Promise<Solicitation> => {
     description: responseJson.description,
     maintenanceCost: responseJson.maintenanceCost,
     buildingCode: responseJson.buildingCode,
-    apartmentCount: responseJson.apartmentCount,
+    apartmentAmount: responseJson.apartmentAmount,
   }
 }
 

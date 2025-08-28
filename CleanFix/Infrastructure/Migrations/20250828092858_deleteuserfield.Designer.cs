@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApi.BaseDatos;
 
@@ -11,9 +12,11 @@ using WebApi.BaseDatos;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20250828092858_deleteuserfield")]
+    partial class deleteuserfield
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -132,7 +135,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("nvarchar(200)")
                         .HasComment("Dirección de la tarea completada");
 
-                    b.Property<int?>("ApartmentId")
+                    b.Property<int>("ApartmentId")
                         .HasColumnType("int")
                         .HasComment("Id del apartamento asociado");
 
@@ -388,7 +391,9 @@ namespace Infrastructure.Migrations
                 {
                     b.HasOne("Domain.Entities.Apartment", "Apartment")
                         .WithMany()
-                        .HasForeignKey("ApartmentId");
+                        .HasForeignKey("ApartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Domain.Entities.Company", "Company")
                         .WithMany()
