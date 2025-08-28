@@ -18,7 +18,6 @@ public class CompletedTask : IEntity
     public IssueType IssueType { get; set; } // Agregada propiedad de navegación
     public List<Material> Materials { get; set; }
     public bool IsSolicitation { get; set; }
-    public User User { get; set; }
     public int Surface { get; set; } // Superficie del apartamento
     [Timestamp]
     public byte[] RowVersion { get; set; }
