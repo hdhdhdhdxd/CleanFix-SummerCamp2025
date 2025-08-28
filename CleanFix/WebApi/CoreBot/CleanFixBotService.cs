@@ -154,7 +154,7 @@ namespace WebApi.CoreBot
                     return new PluginRespuesta { Success = false, Error = "No se encontraron materiales con esos criterios." };
                 }
 
-                // Conversación + opción de factura
+                // Generar factura directamente
                 decimal iva = 0.21m;
                 decimal costeEmpresa = empresa.Price;
                 decimal costeMateriales = materialesFactura.Sum(m => m.Cost);
@@ -165,7 +165,7 @@ namespace WebApi.CoreBot
                 decimal total = totalSinIva + totalIva;
 
                 var sb = new System.Text.StringBuilder();
-                sb.AppendLine($"Total estimado:  ");
+                sb.AppendLine($"Total estimado:");
                 sb.AppendLine($"**{costeEmpresa:F2} € (servicio) + {costeMateriales:F2} € (material) = {total:F2} € (IVA: {ivaEmpresa:F2}€ + {ivaMateriales:F2}€ = {totalIva:F2} €)**");
                 sb.AppendLine();
                 sb.AppendLine($"Empresa: {empresa.Name} - Coste: {costeEmpresa:F2}€");
@@ -176,9 +176,6 @@ namespace WebApi.CoreBot
                 sb.AppendLine($"Total sin IVA: {totalSinIva:F2}€");
                 sb.AppendLine($"IVA: {totalIva:F2}€");
                 sb.AppendLine($"TOTAL: {total:F2}€ (IVA incluido: {totalIva:F2}€)");
-
-                sb.AppendLine();
-                sb.AppendLine("¿Quieres que te genere la factura con estos datos? Si es así, responde 'sí, genera la factura'. Si necesitas cambiar algo, dime qué quieres modificar.");
 
                 return new PluginRespuesta { Success = true, Data = sb.ToString() };
             }
