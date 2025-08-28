@@ -9,5 +9,5 @@ export interface SolicitationDto {
   maintenanceCost: number
   issueType: IssueTypeDto
   buildingCode: string
-  apartmentCount: number
+  apartmentAmount: number
 }

@@ -27,10 +27,9 @@
     </div>
   </div>
 
-  @if (showDialog() && selectedSolicitation) {
+  @if (showDialog() && solicitationId) {
     <app-solicitation-dialog
-      [selectedSolicitation]="selectedSolicitation"
-      [companies]="companies()"
+      [solicitationId]="solicitationId"
       (closeDialog)="handleCloseDialog()"
     />
   }

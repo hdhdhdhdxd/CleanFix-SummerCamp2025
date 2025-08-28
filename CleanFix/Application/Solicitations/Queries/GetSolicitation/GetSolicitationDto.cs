@@ -12,7 +12,8 @@ public class GetSolicitationDto
     public double MaintenanceCost { get; set; }
     public int IssueTypeId { get; set; } // Identificador del tipo de incidencia
     public IssueType IssueType { get; set; } // Nuevo campo para el nombre
-    public string BuildingCode { get; set; } // Código del edificio
+    public int ApartmentAmount { get; set; } // Código del edificio
+    public int RequestId { get; set; } // Código del request de speculab
     public byte[] RowVersion { get; set; } // Para concurrencia
     private class Mapping : Profile
     {

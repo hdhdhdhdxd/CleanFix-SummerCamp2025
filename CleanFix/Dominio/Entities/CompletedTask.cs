@@ -7,7 +7,7 @@ public class CompletedTask : IEntity
 {
     public int Id { get; set; } // Identificador único de la tarea completada
     public string Address { get; set; }
-    public int ApartmentId { get; set; }
+    public int? ApartmentId { get; set; }
     public Apartment? Apartment { get; set; }
     public Company Company { get; set; }
     public int CompanyId { get; set; } // Agregada propiedad para la clave foránea de Company

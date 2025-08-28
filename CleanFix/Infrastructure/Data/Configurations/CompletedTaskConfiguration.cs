@@ -13,7 +13,6 @@ public class CompletedTaskConfiguration : IEntityTypeConfiguration<CompletedTask
             .HasComment("Dirección de la tarea completada");
 
         builder.Property(t => t.ApartmentId)
-            .IsRequired()
             .HasComment("Id del apartamento asociado");
 
         builder.Property(t => t.CreationDate)

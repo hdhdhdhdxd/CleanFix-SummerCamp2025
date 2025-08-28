@@ -9,5 +9,5 @@ export interface Solicitation {
   description: string
   maintenanceCost: number
   buildingCode: string
-  apartmentCount: number
+  apartmentAmount: number
 }

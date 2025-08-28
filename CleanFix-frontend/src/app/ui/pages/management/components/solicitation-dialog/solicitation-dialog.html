@@ -33,31 +33,30 @@
 
     <div class="scrollbar-hide flex-1 overflow-y-auto p-4 sm:p-6">
       <div class="grid grid-cols-2 gap-3 sm:gap-4">
-        <div class="col-span-2 flex flex-col">
-          <span class="text-sm font-medium text-brand-600">Dirección</span>
-          <p class="text-base text-brand-800 sm:text-lg">{{ selectedSolicitation().address }}</p>
-        </div>
-
-        <div class="col-span-2 flex flex-col">
-          <span class="text-sm font-medium text-brand-600">Fecha</span>
-          <p class="text-base text-brand-800 sm:text-lg">
-            {{ selectedSolicitation().date | date: 'dd/MM/yyyy HH:mm' }}
-          </p>
-        </div>
-
-        <div class="flex flex-col">
-          <span class="text-sm font-medium text-brand-600">Tipo</span>
-          <p class="text-base font-semibold text-brand-800 sm:text-lg">
-            {{ selectedSolicitation().issueType.name }}
-          </p>
-        </div>
-
-        <div class="col-span-2 flex flex-col">
-          <span class="text-sm font-medium text-brand-600">Descripción</span>
-          <p class="text-base text-brand-800 sm:text-lg">
-            {{ selectedSolicitation().description }}
-          </p>
-        </div>
+        @if (solicitation()) {
+          <div class="col-span-2 flex flex-col">
+            <span class="text-sm font-medium text-brand-600">Dirección</span>
+            <p class="text-base text-brand-800 sm:text-lg">{{ solicitation()!.address }}</p>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="text-sm font-medium text-brand-600">Fecha</span>
+            <p class="text-base text-brand-800 sm:text-lg">
+              {{ solicitation()!.date | date: 'dd/MM/yyyy HH:mm' }}
+            </p>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-sm font-medium text-brand-600">Tipo</span>
+            <p class="text-base font-semibold text-brand-800 sm:text-lg">
+              {{ solicitation()!.issueType.name }}
+            </p>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="text-sm font-medium text-brand-600">Descripción</span>
+            <p class="text-base text-brand-800 sm:text-lg">
+              {{ solicitation()!.description }}
+            </p>
+          </div>
+        }
 
         <div class="col-span-2 flex flex-col">
           <span class="mb-1 text-sm font-medium text-brand-600">Empresa</span>
@@ -82,41 +81,39 @@
           >
             <div class="flex items-center gap-2">
               <span class="font-semibold text-brand-700">Nombre:</span>
-              <span class="text-brand-900">{{ selectedCompany.name }}</span>
+              <span class="text-brand-900">{{ selectedCompany!.name }}</span>
             </div>
             <div class="flex items-center gap-2">
               <span class="font-semibold text-brand-700">Email:</span>
-              <span class="text-brand-900">{{ selectedCompany.email }}</span>
+              <span class="text-brand-900">{{ selectedCompany!.email }}</span>
             </div>
             <div class="flex items-center gap-2">
               <span class="font-semibold text-brand-700">Teléfono:</span>
-              <span class="text-brand-900">{{ selectedCompany.number }}</span>
+              <span class="text-brand-900">{{ selectedCompany!.number }}</span>
             </div>
             <div class="flex items-center gap-2">
               <span class="font-semibold text-brand-700">Tipo de incidencia:</span>
-              <span class="text-brand-900">{{ selectedCompany.issueType }}</span>
+              <span class="text-brand-900">{{ selectedCompany!.issueType }}</span>
             </div>
           </div>
         }
-        @if (selectedCompany && apartmentCount() !== null) {
+        @if (selectedCompany && solicitation()) {
           <div class="col-span-2 mt-6 flex flex-col">
             <span class="mb-1 text-sm font-medium text-brand-600">Coste de la empresa</span>
             <div class="rounded bg-brand-50 px-4 py-2 text-xs text-brand-800">
               <span>
-                Coste empresa × Nº departamentos:<br />
-                ({{
-                  selectedSolicitation().maintenanceCost | currency: 'EUR' : 'symbol' : '1.2-2'
-                }}
-                × {{ apartmentCount() }}) =
+                Coste empresa x Nº departamentos:<br />
+                ({{ solicitation()!.maintenanceCost | currency: 'EUR' : 'symbol' : '1.2-2' }} x
+                {{ apartmentAmountValue }}) =
                 <b>{{
-                  selectedSolicitation().maintenanceCost * apartmentCount()!
+                  solicitation()!.maintenanceCost * apartmentAmountValue
                     | currency: 'EUR' : 'symbol' : '1.2-2'
                 }}</b>
               </span>
             </div>
           </div>
         }
-        @if (materials().length && apartmentCount() !== null) {
+        @if (materials().length) {
           <div class="col-span-2 mt-4 flex flex-col">
             <span class="mb-1 text-sm font-medium text-brand-600">Materiales asignados</span>
             <ul class="space-y-2">
@@ -136,9 +133,9 @@
                     {{ material.available ? 'Disponible' : 'No disponible' }}
                   </div>
                   <div class="mt-1 text-xs font-medium text-brand-800">
-                    Total para {{ apartmentCount() }} departamentos:
+                    Total para {{ apartmentAmountValue }} departamentos:
                     <span class="font-bold">{{
-                      material.cost * apartmentCount()! | currency: 'EUR' : 'symbol' : '1.2-2'
+                      material.cost * apartmentAmountValue | currency: 'EUR' : 'symbol' : '1.2-2'
                     }}</span>
                   </div>
                 </li>
@@ -166,6 +163,7 @@
             ? 'Selecciona una empresa y materiales para continuar'
             : null
         "
+        (click)="createTask()"
       >
         Iniciar Trabajo
       </button>
