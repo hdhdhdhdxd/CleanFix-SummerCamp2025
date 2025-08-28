@@ -18,11 +18,13 @@ namespace WebApi.Controllers
         private readonly IAssistantService _assistantService;
         private readonly string _connectionString;
         private readonly IFacturaPdfService _facturaPdfService;
+        private readonly IConfiguration _config;
 
         public ChatBoxIAController(IAssistantService assistantService, IFacturaPdfService facturaPdfService, IConfiguration config)
         {
             _assistantService = assistantService;
             _facturaPdfService = facturaPdfService;
+            _config = config;
             _connectionString = config.GetConnectionString("CleanFixDB");
         }
 
@@ -147,14 +149,21 @@ namespace WebApi.Controllers
                 TotalConIVA = total
             };
             var pdfBytes = await _facturaPdfService.GenerarFacturaPdfAsync(factura);
-            // Enviar email (configuración SMTP debe estar en appsettings/secrets)
-            var smtpClient = new SmtpClient("smtp.tu-servidor.com")
+
+            // Leer configuración SMTP de appsettings/secrets
+            var smtpHost = _config["Email:SmtpHost"];
+            var smtpPort = int.Parse(_config["Email:SmtpPort"]);
+            var smtpUser = _config["Email:SmtpUser"];
+            var smtpPass = _config["Email:SmtpPass"];
+            var from = _config["Email:From"];
+
+            var smtpClient = new SmtpClient(smtpHost)
             {
-                Port = 587,
-                Credentials = new NetworkCredential("usuario", "contraseña"),
+                Port = smtpPort,
+                Credentials = new NetworkCredential(smtpUser, smtpPass),
                 EnableSsl = true,
             };
-            var mail = new MailMessage("facturas@cleanfix.com", request.EmailDestino)
+            var mail = new MailMessage(from, request.EmailDestino)
             {
                 Subject = "Factura CleanFixBot",
                 Body = "Adjuntamos su factura en PDF.",
