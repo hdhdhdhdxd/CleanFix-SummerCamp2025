@@ -1,15 +1,16 @@
-import { NgStyle } from '@angular/common'
+import { CommonModule, NgStyle } from '@angular/common'
 import { Component } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, NgStyle],
+  imports: [FormsModule, NgStyle, CommonModule],
   templateUrl: './login.html',
 })
 export class Login {
   username = ''
   password = ''
+  showPassword = false
 
   onSubmit() {
     // Aquí iría la lógica de autenticación
