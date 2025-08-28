@@ -1,33 +1,39 @@
 <form
-  class="mx-auto mt-10 flex max-w-sm flex-col gap-4 rounded-lg bg-white p-6 shadow-md"
+  class="mx-auto mt-16 flex max-w-sm flex-col gap-6 rounded-xl border border-brand-200 bg-brand-50 p-8 shadow-lg"
   (ngSubmit)="onSubmit()"
 >
-  <h2 class="mb-4 text-center text-2xl font-bold">Iniciar sesión</h2>
+  <h2 class="mb-6 text-center font-primary text-3xl font-bold text-brand-700">Iniciar sesión</h2>
   <div>
-    <label for="username" class="block text-sm font-medium text-gray-700">Usuario</label>
+    <label for="username" class="mb-1 block font-primary text-sm font-semibold text-brand-600"
+      >Usuario</label
+    >
     <input
       id="username"
       name="username"
       type="text"
       [(ngModel)]="username"
-      class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+      class="mt-1 block w-full rounded-lg border border-brand-300 bg-white px-4 py-2 font-primary text-brand-700 focus:border-brand-500 focus:outline-none"
       required
+      autocomplete="username"
     />
   </div>
   <div>
-    <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+    <label for="password" class="mb-1 block font-primary text-sm font-semibold text-brand-600"
+      >Contraseña</label
+    >
     <input
       id="password"
       name="password"
       type="password"
       [(ngModel)]="password"
-      class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+      class="mt-1 block w-full rounded-lg border border-brand-300 bg-white px-4 py-2 font-primary text-brand-700 focus:border-brand-500 focus:outline-none"
       required
+      autocomplete="current-password"
     />
   </div>
   <button
     type="submit"
-    class="w-full rounded-md bg-blue-600 py-2 font-semibold text-white transition-colors hover:bg-blue-700"
+    class="w-full rounded-lg bg-brand-500 py-2 font-primary font-semibold text-white shadow-sm transition-colors hover:bg-brand-700"
   >
     Entrar
   </button>
