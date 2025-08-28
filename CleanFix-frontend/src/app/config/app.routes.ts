@@ -1,3 +1,4 @@
+import { Login } from '@/ui/pages/login/login'
 import { Routes } from '@angular/router'
 
 export const routes: Routes = [
@@ -18,6 +19,7 @@ export const routes: Routes = [
     loadChildren: () =>
       import('@/ui/pages/management/management.routes').then((r) => r.MANAGEMENT_ROUTES),
   },
+  { path: 'login', component: Login },
   {
     path: '**',
     redirectTo: '',
