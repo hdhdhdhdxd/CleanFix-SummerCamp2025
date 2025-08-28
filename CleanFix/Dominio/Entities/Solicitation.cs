@@ -12,6 +12,7 @@ public class Solicitation : IEntity
     public string? Status { get; set; } // Estado de la solicitud (e.g., pendiente, en proceso, completada)
     public double MaintenanceCost { get; set; } // Costo de mantenimiento asociado a la solicitud
     public int IssueTypeId { get; set; }
+    public int ApartmentAmount { get; set; }
     public IssueType IssueType { get; set; } // Id del tipo de incidencia asociada a la solicitud
     public int RequestId { get; set; } // Código del request de speculab
     [Timestamp]
