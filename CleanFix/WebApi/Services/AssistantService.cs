@@ -22,17 +22,39 @@ namespace WebApi.Services
             string connectionString = config["Database:ConnectionString"];
             decimal iva = decimal.Parse(config["Bot:IVA"]);
             string moneda = config["Bot:Moneda"];
-            // Nuevo: deploymentName
             string deploymentName = config["AzureOpenAI:Deployment"] ?? "gpt-4.1";
 
+            //Setup del bot con Azure OpenAI
+
             var builder = Kernel.CreateBuilder();
-            // REGISTRO DE SERVICIO AZURE OPENAI
             builder.AddAzureOpenAIChatCompletion(
                 deploymentName: deploymentName,
                 endpoint: endpoint,
                 apiKey: apiKey
             );
-            _promptTemplate = @"Eres un asistente inteligente que responde preguntas sobre empresas y materiales.\n\nTienes la siguiente información de empresas (companies) en formato JSON: {{$empresas}} Cada empresa tiene propiedades como: Id, Name, Type (tipo), Price.\n\nTambién tienes la siguiente información de materiales (materials) en formato JSON: {{$materiales}} Cada material tiene propiedades como: Id, Name, Issue (tipo), Available (disponible).\n\nUsa esta información para responder la pregunta del usuario: {{$pregunta}} Responde de forma clara y útil.\n\nSi la pregunta no tiene relación con los datos, responde que no puedes ayudar.";
+
+            // PROMPT MEJORADO
+            _promptTemplate = @"
+Eres CleanFixBot, un asistente experto en recomendar empresas y materiales para resolver problemas de mantenimiento y reparaciones en viviendas y oficinas.
+
+Dispones de la siguiente información de empresas (companies) en formato JSON: {{$empresas}}
+Cada empresa tiene: Id, Name, Type (tipo de problema que resuelve), Price (precio del servicio).
+
+También tienes la siguiente información de materiales (materials) en formato JSON: {{$materiales}}
+Cada material tiene: Name, Issue (tipo de problema), Available (disponible).
+
+Cuando el usuario te haga una pregunta, analiza el contexto y responde de forma clara, cercana y profesional. Si puedes, recomienda empresas o materiales adecuados, explica brevemente por qué los recomiendas y ofrece ayuda adicional si es necesario.
+
+Ejemplos de cómo responder:
+- Si el usuario describe un problema concreto, sugiere empresas y materiales que encajen, usando frases como: 
+  'Te recomiendo la empresa X porque está especializada en problemas eléctricos y tiene buen precio.'
+- Si no hay datos suficientes, pide más información de forma amable.
+- Si la pregunta no tiene relación con el servicio, responde de forma educada que solo puedes ayudar con temas de empresas y materiales.
+
+Pregunta del usuario: {{$pregunta}}
+
+Responde de forma natural, útil y adaptada al usuario.
+";
 
             // Inicializa plugins y kernel
             var dbPlugin = new DBPluginTestPG(config.GetConnectionString("CleanFixDB"));
