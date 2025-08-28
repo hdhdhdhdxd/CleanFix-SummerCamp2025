@@ -1,13 +1,9 @@
-import { CompanyService } from '@/ui/services/company/company-service'
-import { AsyncPipe, NgFor, NgIf } from '@angular/common'
-import { Component, inject } from '@angular/core'
+import { Component } from '@angular/core'
+import { ChatboxComponent } from '../chatbox/chatbox'
 
 @Component({
   selector: 'app-service-request',
-  imports: [AsyncPipe, NgFor, NgIf],
+  imports: [ChatboxComponent],
   templateUrl: './service-request.html',
 })
-export class ServiceRequest {
-  companyService = inject(CompanyService)
-  pagination = this.companyService.getPaginated(1, 10)
-}
+export class ServiceRequest {}
