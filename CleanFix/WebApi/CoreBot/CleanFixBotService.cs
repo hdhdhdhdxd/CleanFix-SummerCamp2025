@@ -154,22 +154,27 @@ namespace WebApi.CoreBot
                     return new PluginRespuesta { Success = false, Error = "No se encontraron materiales con esos criterios." };
                 }
 
-                // NUEVO: Formato de factura detallado
+                // Generar factura directamente con desglose de IVA
                 decimal iva = 0.21m;
                 decimal costeEmpresa = empresa.Price;
                 decimal costeMateriales = materialesFactura.Sum(m => m.Cost);
                 decimal ivaEmpresa = costeEmpresa * iva;
                 decimal ivaMateriales = costeMateriales * iva;
-                decimal total = costeEmpresa + ivaEmpresa + costeMateriales + ivaMateriales;
                 decimal totalIva = ivaEmpresa + ivaMateriales;
+                decimal totalSinIva = costeEmpresa + costeMateriales;
+                decimal total = totalSinIva + totalIva;
 
                 var sb = new System.Text.StringBuilder();
-                sb.AppendLine($"Empresa: {empresa.Name} - Coste: {costeEmpresa:F2}€");
+                sb.AppendLine($"**Total estimado de la factura:**  ");
+                sb.AppendLine($"Servicio de {empresa.Name}: **{costeEmpresa:F2}**  ");
                 foreach (var m in materialesFactura)
                 {
-                    sb.AppendLine($"Material: {m.Name} - Coste: {m.Cost:F2}€");
+                    sb.AppendLine($"{m.Name}: **{m.Cost:F2}**  ");
                 }
-                sb.AppendLine($"Factura con IVA: {total:F2}€ (IVA incluido: {totalIva:F2}€)");
+                sb.AppendLine($"**Total (añadiendo IVA):** **{total:F2}**  ");
+                sb.AppendLine($"(IVA: {ivaEmpresa:F2}€ servicio + {ivaMateriales:F2}€ material = {totalIva:F2}€)\n");
+                sb.AppendLine($"Desglose: Servicio sin IVA: {costeEmpresa:F2}€, Material sin IVA: {costeMateriales:F2}€, IVA total: {totalIva:F2}€");
+                sb.AppendLine($"TOTAL CON IVA: {total:F2}€");
 
                 return new PluginRespuesta { Success = true, Data = sb.ToString() };
             }

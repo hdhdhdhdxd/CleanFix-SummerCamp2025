@@ -6,6 +6,8 @@ using CleanFix.Plugins;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Net.Mail;
+using System.Net;
 
 namespace WebApi.Controllers
 {
@@ -15,10 +17,12 @@ namespace WebApi.Controllers
     {
         private readonly IAssistantService _assistantService;
         private readonly string _connectionString;
+        private readonly IFacturaPdfService _facturaPdfService;
 
-        public ChatBoxIAController(IAssistantService assistantService, IConfiguration config)
+        public ChatBoxIAController(IAssistantService assistantService, IFacturaPdfService facturaPdfService, IConfiguration config)
         {
             _assistantService = assistantService;
+            _facturaPdfService = facturaPdfService;
             _connectionString = config.GetConnectionString("CleanFixDB");
         }
 
@@ -86,6 +90,96 @@ namespace WebApi.Controllers
             {
                 return BadRequest(new FacturaResponse { Success = false, Error = ex.Message });
             }
+        }
+
+        [HttpPost("factura/pdf")]
+        public async Task<IActionResult> GenerarFacturaPdf([FromBody] FacturaRequest request)
+        {
+            var dbPlugin = new DBPluginTestPG(_connectionString);
+            var empresasResponse = dbPlugin.GetAllEmpresas();
+            var materialesResponse = dbPlugin.GetAllMaterials();
+            var empresa = empresasResponse.Data?.FirstOrDefault(e =>
+                string.Equals(e.Name, request.EmpresaNombre, StringComparison.OrdinalIgnoreCase));
+            var materiales = materialesResponse.Data?
+                .Where(m => request.MaterialesNombres.Contains(m.Name, StringComparer.OrdinalIgnoreCase))
+                .ToList() ?? new List<MaterialIa>();
+            if (empresa == null || materiales.Count == 0)
+                return BadRequest("Empresa o materiales no encontrados");
+            decimal iva = 0.21m;
+            decimal costeEmpresa = empresa.Price;
+            decimal costeMateriales = materiales.Sum(m => m.Cost);
+            decimal ivaEmpresa = costeEmpresa * iva;
+            decimal ivaMateriales = costeMateriales * iva;
+            decimal total = costeEmpresa + ivaEmpresa + costeMateriales + ivaMateriales;
+            var factura = new FacturaDetalleDto
+            {
+                Empresa = new FacturaEmpresaDto { Nombre = empresa.Name, Coste = costeEmpresa },
+                Materiales = materiales.Select(m => new FacturaMaterialDto { Nombre = m.Name, Coste = m.Cost }).ToList(),
+                TotalConIVA = total
+            };
+            var pdfBytes = await _facturaPdfService.GenerarFacturaPdfAsync(factura);
+            return File(pdfBytes, "application/pdf", $"Factura_{empresa.Name}.pdf");
+        }
+
+        [HttpPost("factura/email")]
+        public async Task<IActionResult> EnviarFacturaPorEmail([FromBody] FacturaPdfRequest request)
+        {
+            var dbPlugin = new DBPluginTestPG(_connectionString);
+            var empresasResponse = dbPlugin.GetAllEmpresas();
+            var materialesResponse = dbPlugin.GetAllMaterials();
+            var empresa = empresasResponse.Data?.FirstOrDefault(e =>
+                string.Equals(e.Name, request.EmpresaNombre, StringComparison.OrdinalIgnoreCase));
+            var materiales = materialesResponse.Data?
+                .Where(m => request.MaterialesNombres.Contains(m.Name, StringComparer.OrdinalIgnoreCase))
+                .ToList() ?? new List<MaterialIa>();
+            if (empresa == null || materiales.Count == 0)
+                return BadRequest("Empresa o materiales no encontrados");
+            decimal iva = 0.21m;
+            decimal costeEmpresa = empresa.Price;
+            decimal costeMateriales = materiales.Sum(m => m.Cost);
+            decimal ivaEmpresa = costeEmpresa * iva;
+            decimal ivaMateriales = costeMateriales * iva;
+            decimal total = costeEmpresa + ivaEmpresa + costeMateriales + ivaMateriales;
+            var factura = new FacturaDetalleDto
+            {
+                Empresa = new FacturaEmpresaDto { Nombre = empresa.Name, Coste = costeEmpresa },
+                Materiales = materiales.Select(m => new FacturaMaterialDto { Nombre = m.Name, Coste = m.Cost }).ToList(),
+                TotalConIVA = total
+            };
+            var pdfBytes = await _facturaPdfService.GenerarFacturaPdfAsync(factura);
+            // Enviar email (configuración SMTP debe estar en appsettings/secrets)
+            var smtpClient = new SmtpClient("smtp.tu-servidor.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential("usuario", "contraseña"),
+                EnableSsl = true,
+            };
+            var mail = new MailMessage("facturas@cleanfix.com", request.EmailDestino)
+            {
+                Subject = "Factura CleanFixBot",
+                Body = "Adjuntamos su factura en PDF.",
+            };
+            mail.Attachments.Add(new Attachment(new System.IO.MemoryStream(pdfBytes), $"Factura_{empresa.Name}.pdf"));
+            await smtpClient.SendMailAsync(mail);
+            return Ok("Factura enviada por email");
+        }
+
+        [HttpPost("factura/recomendar")]
+        public IActionResult RecomendarAlternativas([FromBody] FacturaRequest request)
+        {
+            var dbPlugin = new DBPluginTestPG(_connectionString);
+            var empresasResponse = dbPlugin.GetAllEmpresas();
+            var materialesResponse = dbPlugin.GetAllMaterials();
+            var recomendador = new RecomendacionService();
+            var alternativas = recomendador.RecomendarAlternativas(empresasResponse.Data, materialesResponse.Data, request.EmpresaNombre, request.MaterialesNombres);
+            return Ok(alternativas);
+        }
+
+        [HttpPost("incidencia")]
+        public async Task<IActionResult> ReportarIncidencia([FromBody] IncidenciaRequest request, [FromServices] IIncidenciaService incidenciaService)
+        {
+            await incidenciaService.ReportarIncidenciaAsync(request.Usuario, request.Descripcion, request.Tipo, request.Referencia);
+            return Ok("Incidencia reportada correctamente");
         }
     }
 }

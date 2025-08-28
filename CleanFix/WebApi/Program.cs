@@ -3,6 +3,10 @@ using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using WebApi.BaseDatos;
 using WebApi.CoreBot;
+using WebApi.Services;
+
+// Añadir licencia Community para QuestPDF
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +20,10 @@ builder.Services.AddScoped<IBotService, CleanFixBotService>();
 
 // Registrar AssistantService para IA LLM
 builder.Services.AddScoped<WebApi.Services.IAssistantService, WebApi.Services.AssistantService>();
+
+// Registro de servicios para nuevas funcionalidades
+builder.Services.AddScoped<IFacturaPdfService, FacturaPdfService>();
+builder.Services.AddScoped<IIncidenciaService, IncidenciaService>();
 
 // Configuración de CORS 
 builder.Services.AddCors(options =>
