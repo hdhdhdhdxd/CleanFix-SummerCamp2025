@@ -161,6 +161,7 @@ namespace WebApi.CoreBot
                 decimal ivaEmpresa = costeEmpresa * iva;
                 decimal ivaMateriales = costeMateriales * iva;
                 decimal total = costeEmpresa + ivaEmpresa + costeMateriales + ivaMateriales;
+                decimal totalIva = ivaEmpresa + ivaMateriales;
 
                 var sb = new System.Text.StringBuilder();
                 sb.AppendLine($"Empresa: {empresa.Name} - Coste: {costeEmpresa:F2}€");
@@ -168,7 +169,7 @@ namespace WebApi.CoreBot
                 {
                     sb.AppendLine($"Material: {m.Name} - Coste: {m.Cost:F2}€");
                 }
-                sb.AppendLine($"Factura con IVA: {total:F2}€");
+                sb.AppendLine($"Factura con IVA: {total:F2}€ (IVA incluido: {totalIva:F2}€)");
 
                 return new PluginRespuesta { Success = true, Data = sb.ToString() };
             }
