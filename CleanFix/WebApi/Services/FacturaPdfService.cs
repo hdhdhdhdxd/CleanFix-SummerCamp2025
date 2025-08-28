@@ -32,39 +32,43 @@ namespace WebApi.Services
             decimal totalIva = ivaEmpresa + totalMaterialesIva;
             decimal totalConIva = totalSinIva + totalIva;
 
-            // Construir el string de la "tabla" con separadores
-            var sb = new StringBuilder();
-            sb.AppendLine(" Empresa proveedora:");
-            sb.AppendLine();
-            sb.AppendLine($" - Nombre: {factura.Empresa.Nombre}");
-            sb.AppendLine();
-            sb.AppendLine(" Materiales incluidos:");
-            sb.AppendLine();
-            sb.AppendLine(" | ID | Nombre             | Costo    | IVA (21%) | Total    |");
-            sb.AppendLine(" |----|--------------------|----------|-----------|----------|");
-            foreach (var m in materiales)
-            {
-                sb.AppendLine($" | {m.Id,2} | {m.Nombre,-18} | €{m.Coste,7:F2} | €{m.IVA,8:F2} | €{m.Total,7:F2} |");
-            }
-            sb.AppendLine();
-            sb.AppendLine(" -----------------------------------------");
-            sb.AppendLine($" Total materiales: €{totalMaterialesSinIva:F2}");
-            sb.AppendLine($" IVA materiales (21%): €{totalMaterialesIva:F2}");
-            sb.AppendLine(" -----------------------------------------");
-            sb.AppendLine($" Costo empresa: €{costeEmpresa:F2}");
-            sb.AppendLine($" IVA empresa (21%): €{ivaEmpresa:F2}");
-            sb.AppendLine(" -----------------------------------------");
-            sb.AppendLine($" *TOTAL FACTURA:*");
-            sb.AppendLine($"   *€{totalConIva:F2}*");
-            sb.AppendLine(" -----------------------------------------");
-
             var document = Document.Create(container =>
             {
                 container.Page(page =>
                 {
                     page.Margin(30);
-                    page.Header().Text($"Factura CleanFixBot").SemiBold().FontSize(20);
-                    page.Content().Text(sb.ToString()).FontFamily("Consolas").FontSize(11);
+                    page.Content().Column(col =>
+                    {
+                        col.Item().Text("Factura CleanFix").Bold().FontSize(28).AlignCenter();
+                        col.Item().Text("").FontSize(6); // Espacio
+                        col.Item().Text("").FontSize(6); // Espacio
+                        col.Item().Text("").FontSize(6); // Espacio
+                        col.Item().Text("Empresa proveedora:").Bold().FontSize(13);
+                        col.Item().Text($" - Nombre: {factura.Empresa.Nombre}").FontSize(11);
+                        col.Item().Text("").FontSize(6);
+                        col.Item().Text("Materiales incluidos:").Bold().FontSize(13);
+                        // Tabla simulada con monoespaciado
+                        var sb = new StringBuilder();
+                        sb.AppendLine(" | ID | Nombre             | Costo    | IVA (21%) | Total    |");
+                        sb.AppendLine(" |----|--------------------|----------|-----------|----------|");
+                        foreach (var m in materiales)
+                        {
+                            sb.AppendLine($" | {m.Id,2} | {m.Nombre,-18} | €{m.Coste,7:F2} | €{m.IVA,8:F2} | €{m.Total,7:F2} |");
+                        }
+                        col.Item().Text(sb.ToString()).FontFamily("Consolas").FontSize(11);
+                        col.Item().Text("").FontSize(6);
+                        col.Item().Text("").FontSize(6);
+                        col.Item().Text(" -----------------------------------------");
+                        col.Item().Text($" Total materiales: €{totalMaterialesSinIva:F2}");
+                        col.Item().Text($" IVA materiales (21%): €{totalMaterialesIva:F2}");
+                        col.Item().Text(" -----------------------------------------");
+                        col.Item().Text($" Costo empresa: €{costeEmpresa:F2}");
+                        col.Item().Text($" IVA empresa (21%): €{ivaEmpresa:F2}");
+                        col.Item().Text(" -----------------------------------------");
+                        col.Item().Text("*TOTAL FACTURA:*").Bold().FontSize(13);
+                        col.Item().Text($"   *€{totalConIva:F2}*").Bold().FontSize(13);
+                        col.Item().Text(" -----------------------------------------");
+                    });
                 });
             });
             using var ms = new MemoryStream();
