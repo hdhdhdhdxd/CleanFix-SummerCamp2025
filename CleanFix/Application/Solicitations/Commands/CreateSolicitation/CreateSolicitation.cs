@@ -26,10 +26,8 @@ public class CreateSolicitationCommandHandler : IRequestHandler<CreateSolicitati
     public async Task<int> Handle(CreateSolicitationCommand request, CancellationToken cancellationToken)
     {
         // Normalización antes de mapear y guardar
-        if (request.Solicitation.Address != null)
+        if (!string.IsNullOrEmpty(request.Solicitation.Address))
             request.Solicitation.Address = Normalizer.NormalizarNombre(request.Solicitation.Address);
-        if (request.Solicitation.BuildingCode != null)
-            request.Solicitation.BuildingCode = Normalizer.NormalizarNombre(request.Solicitation.BuildingCode);
 
         var entity = _mapper.Map<Solicitation>(request.Solicitation);
         entity.Date = DateTime.UtcNow; // Asignar fecha de creación

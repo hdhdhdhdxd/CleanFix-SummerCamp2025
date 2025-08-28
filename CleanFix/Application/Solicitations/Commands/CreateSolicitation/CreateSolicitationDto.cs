@@ -15,7 +15,7 @@ public class CreateSolicitationDto
     public double MaintenanceCost { get; set; }
     [Required]
     public int IssueTypeId { get; set; } // <-- Que sea un numero entre 1 y 7
-    public string BuildingCode { get; set; } // Código del edificio
+    public int RequestId { get; set; } 
     public int ApartmentAmount { get; set; } // Nuevo campo solicitado
     private class Mapping : Profile
     {

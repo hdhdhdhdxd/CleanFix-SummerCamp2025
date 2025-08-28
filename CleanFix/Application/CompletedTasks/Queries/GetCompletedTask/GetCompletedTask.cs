@@ -1,6 +1,7 @@
 using Application.Common.Interfaces;
 using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.CompletedTasks.Queries.GetCompletedTask;
 public record GetCompletedTaskQuery(int Id) : IRequest<GetCompletedTaskDto>;
@@ -18,7 +19,16 @@ public class GetCompletedTaskQueryHandler : IRequestHandler<GetCompletedTaskQuer
 
     public async Task<GetCompletedTaskDto> Handle(GetCompletedTaskQuery request, CancellationToken cancellationToken)
     {
-        var completedTask = await _completedTaskRepository.GetByIdAsync(request.Id);
+        var query = _completedTaskRepository.GetQueryable()
+            .Include(ct => ct.Materials)
+            .Include(ct => ct.Company)
+            .Include(ct => ct.IssueType)
+            .Include(ct => ct.Apartment)
+            .AsNoTracking();
+
+        var completedTask = await query
+            .FirstOrDefaultAsync(ct => ct.Id == request.Id, cancellationToken);
+
         var result = _mapper.Map<GetCompletedTaskDto>(completedTask);
         return result;
     }
