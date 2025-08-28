@@ -64,9 +64,9 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
         completedTask.CompletionDate = DateTime.UtcNow.AddDays(Random.Shared.Next(1, 31));
 
         // Fixed typo: ComapanyId -> CompanyId
-        var company = await _companyRepository.GetByIdAsync(request.CompletedTask.ComapanyId);
+        var company = await _companyRepository.GetByIdAsync(request.CompletedTask.CompanyId);
         if (company == null)
-            throw new InvalidOperationException($"Company con ID {request.CompletedTask.ComapanyId} no existe.");
+            throw new InvalidOperationException($"Company con ID {request.CompletedTask.CompanyId} no existe.");
         
         completedTask.Company = company;
         completedTask.CompanyId = company.Id;
@@ -81,7 +81,7 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
             if (solicitation == null)
                 throw new InvalidOperationException($"Solicitation con ID {request.CompletedTask.SolicitationId.Value} no existe.");
             
-            int apartmentCount = solicitation.RequestId;
+            int apartmentCount = solicitation.ApartmentAmount;
             total += company.Price * apartmentCount;
             foreach (var material in materials)
                 total += material.Cost * apartmentCount;
@@ -90,7 +90,6 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
             completedTask.Address = solicitation.Address ?? string.Empty;
             completedTask.IssueTypeId = solicitation.IssueTypeId;
             completedTask.IssueType = solicitation.IssueType;
-            completedTask.Surface = solicitation.ApartmentAmount; // Set surface for solicitation
             
             // Simulación de PUT a API externa para Solicitation (antes de guardar)
             var putData = new SolicitationPutData { IdRequest = solicitation.RequestId, Total = (double)total };

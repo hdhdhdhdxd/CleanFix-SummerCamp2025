@@ -67,6 +67,10 @@
       min-height: 100vh;
     }
 
+    /* Oculta el icono nativo de mostrar contraseña en Edge */
+    input[type='password']::-ms-reveal {
+      display: none;
+    }
     .h-screen {
       height: 100vh;
     }

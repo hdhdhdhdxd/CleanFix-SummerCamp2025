@@ -17,10 +17,12 @@ import { Material } from '@/core/domain/models/Material'
 import { SolicitationService } from '@/ui/services/solicitation/solicitation-service'
 import { CompanyService } from '@/ui/services/company/company-service'
 import { CompletedTaskService } from '@/ui/services/completedtask/completed-task-service'
+import { FormsModule } from '@angular/forms'
+import { SnackbarService } from '@/ui/shared/snackbar/snackbar.service'
 
 @Component({
   selector: 'app-solicitation-dialog',
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, FormsModule],
   templateUrl: './solicitation-dialog.html',
   styleUrls: ['./solicitation-dialog.css'],
 })
@@ -29,6 +31,7 @@ export class SolicitationDialog implements AfterViewInit, OnInit {
   private materialService = inject(MaterialService)
   private companyService = inject(CompanyService)
   private completedTaskService = inject(CompletedTaskService)
+  private snackbarService = inject(SnackbarService)
 
   solicitationId = input.required<number>()
   solicitation = signal<Solicitation | null>(null)
@@ -125,15 +128,26 @@ export class SolicitationDialog implements AfterViewInit, OnInit {
     const solicitation = this.solicitation()
     const company = this.selectedCompany
     const materials = this.materials()
-    if (!solicitation || !company || !materials.length) {
+    if (!solicitation || !company || !materials.length || company.id === 0) {
       throw new Error('Invalid data')
     }
-    return this.completedTaskService.create(
-      solicitation.id,
-      solicitation.issueType.id,
-      company.id,
-      true,
-      materials.map((m) => m.id),
-    )
+    this.completedTaskService
+      .create(
+        solicitation.id,
+        solicitation.issueType.id,
+        company.id,
+        true,
+        materials.map((m) => m.id),
+      )
+      .subscribe({
+        next: () => {
+          this.snackbarService.show('Tarea creada con éxito', true)
+          this.closeModal()
+        },
+        error: (err) => {
+          this.snackbarService.show('Error al crear tarea', false)
+          throw err
+        },
+      })
   }
 }

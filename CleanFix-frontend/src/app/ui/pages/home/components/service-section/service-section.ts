@@ -1,4 +1,5 @@
-import { Component } from '@angular/core'
+import { Component, inject } from '@angular/core'
+import { Router } from '@angular/router'
 import { ServiceCard } from '../service-card/service-card'
 
 @Component({
@@ -6,4 +7,9 @@ import { ServiceCard } from '../service-card/service-card'
   imports: [ServiceCard],
   templateUrl: './service-section.html',
 })
-export class ServiceSection {}
+export class ServiceSection {
+  router = inject(Router)
+  goToChatbox() {
+    this.router.navigate(['/service-request'])
+  }
+}
