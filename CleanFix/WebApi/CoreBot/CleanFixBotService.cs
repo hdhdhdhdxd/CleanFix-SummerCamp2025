@@ -161,16 +161,21 @@ namespace WebApi.CoreBot
                 decimal ivaEmpresa = costeEmpresa * iva;
                 decimal ivaMateriales = costeMateriales * iva;
                 decimal totalIva = ivaEmpresa + ivaMateriales;
-                decimal total = costeEmpresa + costeMateriales + totalIva;
+                decimal totalSinIva = costeEmpresa + costeMateriales;
+                decimal total = totalSinIva + totalIva;
 
                 var sb = new System.Text.StringBuilder();
+                sb.AppendLine($"Total estimado:  ");
+                sb.AppendLine($"**{costeEmpresa:F2} € (servicio) + {costeMateriales:F2} € (material) = {total:F2} € (IVA: {ivaEmpresa:F2}€ + {ivaMateriales:F2}€ = {totalIva:F2} €)**");
+                sb.AppendLine();
                 sb.AppendLine($"Empresa: {empresa.Name} - Coste: {costeEmpresa:F2}€");
                 foreach (var m in materialesFactura)
                 {
                     sb.AppendLine($"Material: {m.Name} - Coste: {m.Cost:F2}€");
                 }
+                sb.AppendLine($"Total sin IVA: {totalSinIva:F2}€");
                 sb.AppendLine($"IVA: {totalIva:F2}€");
-                sb.AppendLine($"TOTAL: {total:F2}€");
+                sb.AppendLine($"TOTAL: {total:F2}€ (IVA incluido: {totalIva:F2}€)");
 
                 sb.AppendLine();
                 sb.AppendLine("¿Quieres que te genere la factura con estos datos? Si es así, responde 'sí, genera la factura'. Si necesitas cambiar algo, dime qué quieres modificar.");
