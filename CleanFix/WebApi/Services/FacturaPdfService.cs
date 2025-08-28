@@ -5,6 +5,7 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using System.Linq;
+using System.Text;
 
 namespace WebApi.Services
 {
@@ -16,8 +17,9 @@ namespace WebApi.Services
             decimal costeEmpresa = factura.Empresa.Coste;
             decimal ivaEmpresa = costeEmpresa * iva;
             decimal totalEmpresa = costeEmpresa + ivaEmpresa;
-            var materiales = factura.Materiales.Select(m => new
+            var materiales = factura.Materiales.Select((m, idx) => new
             {
+                Id = idx + 1,
                 Nombre = m.Nombre,
                 Coste = m.Coste,
                 IVA = m.Coste * iva,
@@ -30,65 +32,41 @@ namespace WebApi.Services
             decimal totalIva = ivaEmpresa + totalMaterialesIva;
             decimal totalConIva = totalSinIva + totalIva;
 
+            // Construir el string de la "tabla" con separadores
+            var sb = new StringBuilder();
+            sb.AppendLine(" Empresa proveedora:");
+            sb.AppendLine();
+            sb.AppendLine($" - Nombre: {factura.Empresa.Nombre}");
+            sb.AppendLine();
+            sb.AppendLine(" Materiales incluidos:");
+            sb.AppendLine();
+            sb.AppendLine(" | ID | Nombre             | Costo    | IVA (21%) | Total    |");
+            sb.AppendLine(" |----|--------------------|----------|-----------|----------|");
+            foreach (var m in materiales)
+            {
+                sb.AppendLine($" | {m.Id,2} | {m.Nombre,-18} | €{m.Coste,7:F2} | €{m.IVA,8:F2} | €{m.Total,7:F2} |");
+            }
+            sb.AppendLine();
+            sb.AppendLine(" -----------------------------------------");
+            sb.AppendLine($" Total materiales: €{totalMaterialesSinIva:F2}");
+            sb.AppendLine($" IVA materiales (21%): €{totalMaterialesIva:F2}");
+            sb.AppendLine(" -----------------------------------------");
+            sb.AppendLine($" Costo empresa: €{costeEmpresa:F2}");
+            sb.AppendLine($" IVA empresa (21%): €{ivaEmpresa:F2}");
+            sb.AppendLine(" -----------------------------------------");
+            sb.AppendLine($" *TOTAL FACTURA:*");
+            sb.AppendLine($"   *€{totalConIva:F2}*");
+            sb.AppendLine(" -----------------------------------------");
+
             var document = Document.Create(container =>
             {
                 container.Page(page =>
                 {
                     page.Margin(30);
                     page.Header().Text($"Factura CleanFixBot").SemiBold().FontSize(20);
-                    page.Content().Column(col =>
-                    {
-                        col.Item().Text($"Datos de la factura").Bold().FontSize(14);
-                        col.Item().Table(table =>
-                        {
-                            table.ColumnsDefinition(columns =>
-                            {
-                                columns.RelativeColumn(3); // Concepto
-                                columns.RelativeColumn(2); // Precio sin IVA
-                                columns.RelativeColumn(2); // IVA
-                                columns.RelativeColumn(2); // Precio con IVA
-                            });
-                            table.Header(header =>
-                            {
-                                header.Cell().Element(CellStyle).Text("Concepto").Bold();
-                                header.Cell().Element(CellStyle).Text("Precio sin IVA").Bold();
-                                header.Cell().Element(CellStyle).Text("IVA").Bold();
-                                header.Cell().Element(CellStyle).Text("Precio con IVA").Bold();
-                            });
-                            // Empresa/servicio
-                            table.Cell().Element(CellStyle).Text($"Servicio: {factura.Empresa.Nombre}");
-                            table.Cell().Element(CellStyle).Text($"{costeEmpresa:F2} €");
-                            table.Cell().Element(CellStyle).Text($"{ivaEmpresa:F2} €");
-                            table.Cell().Element(CellStyle).Text($"{totalEmpresa:F2} €");
-                            // Materiales
-                            foreach (var mat in materiales)
-                            {
-                                table.Cell().Element(CellStyle).Text($"Material: {mat.Nombre}");
-                                table.Cell().Element(CellStyle).Text($"{mat.Coste:F2} €");
-                                table.Cell().Element(CellStyle).Text($"{mat.IVA:F2} €");
-                                table.Cell().Element(CellStyle).Text($"{mat.Total:F2} €");
-                            }
-                        });
-                        col.Item().PaddingVertical(10);
-                        col.Item().Text($"Resumen").Bold().FontSize(14);
-                        col.Item().Table(table =>
-                        {
-                            table.ColumnsDefinition(columns =>
-                            {
-                                columns.RelativeColumn(3);
-                                columns.RelativeColumn(2);
-                            });
-                            table.Cell().Element(CellStyle).Text("Total sin IVA:");
-                            table.Cell().Element(CellStyle).Text($"{totalSinIva:F2} €");
-                            table.Cell().Element(CellStyle).Text("IVA total:");
-                            table.Cell().Element(CellStyle).Text($"{totalIva:F2} €");
-                            table.Cell().Element(CellStyle).Text("TOTAL CON IVA:").Bold();
-                            table.Cell().Element(CellStyle).Text($"{totalConIva:F2} €").Bold();
-                        });
-                    });
+                    page.Content().Text(sb.ToString()).FontFamily("Consolas").FontSize(11);
                 });
             });
-            static IContainer CellStyle(IContainer container) => container.PaddingVertical(2).PaddingHorizontal(4);
             using var ms = new MemoryStream();
             document.GeneratePdf(ms);
             return ms.ToArray();
