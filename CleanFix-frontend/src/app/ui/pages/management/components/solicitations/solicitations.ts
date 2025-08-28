@@ -40,7 +40,6 @@ export class Solicitations implements OnInit {
     { key: 'address', label: 'Dirección', type: 'text' },
     { key: 'date', label: 'Fecha', type: 'date' },
     { key: 'issueType', label: 'Tipo', type: 'text' },
-    { key: 'status', label: 'Estado', type: 'status' },
   ]
 
   ngOnInit() {

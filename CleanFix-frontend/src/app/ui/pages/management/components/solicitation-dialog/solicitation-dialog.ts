@@ -10,7 +10,6 @@ import {
   signal,
   ViewChild,
   inject,
-  computed,
 } from '@angular/core'
 import { MaterialService } from '@/ui/services/material/material-service'
 import { Material } from '@/core/domain/models/Material'
@@ -83,13 +82,18 @@ export class SolicitationDialog implements AfterViewInit {
     this.apartmentCount.set(30)
   }
 
-  getTotalMaterialCost = computed(() => {
+  get totalMaterialsCost(): number {
+    const count = this.apartmentCount() || 0
+    return this.materials().reduce((acc, m) => acc + m.cost * count, 0)
+  }
+
+  get totalCompanyCost(): number {
     const count = this.apartmentCount() || 0
     const maintenance = this.selectedSolicitation().maintenanceCost || 0
-    return this.materials().reduce((acc, m) => acc + m.cost * count * maintenance, 0)
-  })
+    return maintenance * count
+  }
 
-  get totalUnitMaterialCost(): number {
-    return this.materials().reduce((acc, m) => acc + m.cost, 0)
+  get totalJobCost(): number {
+    return this.totalMaterialsCost + this.totalCompanyCost
   }
 }

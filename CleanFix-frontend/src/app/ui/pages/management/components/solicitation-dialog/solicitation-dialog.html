@@ -32,23 +32,16 @@
     </header>
 
     <div class="scrollbar-hide flex-1 overflow-y-auto p-4 sm:p-6">
-      <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-        <div class="flex flex-col sm:col-span-2">
+      <div class="grid grid-cols-2 gap-3 sm:gap-4">
+        <div class="col-span-2 flex flex-col">
           <span class="text-sm font-medium text-brand-600">Dirección</span>
           <p class="text-base text-brand-800 sm:text-lg">{{ selectedSolicitation().address }}</p>
         </div>
 
-        <div class="flex flex-col sm:col-span-2">
+        <div class="col-span-2 flex flex-col">
           <span class="text-sm font-medium text-brand-600">Fecha</span>
           <p class="text-base text-brand-800 sm:text-lg">
             {{ selectedSolicitation().date | date: 'dd/MM/yyyy HH:mm' }}
-          </p>
-        </div>
-
-        <div class="flex flex-col">
-          <span class="text-sm font-medium text-brand-600">Estado</span>
-          <p class="text-base font-semibold text-brand-800 sm:text-lg">
-            {{ selectedSolicitation().status }}
           </p>
         </div>
 
@@ -59,14 +52,14 @@
           </p>
         </div>
 
-        <div class="flex flex-col sm:col-span-2">
+        <div class="col-span-2 flex flex-col">
           <span class="text-sm font-medium text-brand-600">Descripción</span>
           <p class="text-base text-brand-800 sm:text-lg">
             {{ selectedSolicitation().description }}
           </p>
         </div>
 
-        <div class="mt-6 flex flex-col sm:col-span-2">
+        <div class="col-span-2 flex flex-col">
           <span class="mb-1 text-sm font-medium text-brand-600">Empresa</span>
           <div class="flex items-center gap-2">
             <select
@@ -106,7 +99,7 @@
           </div>
         }
         @if (selectedCompany && apartmentCount() !== null) {
-          <div class="mt-6 flex flex-col sm:col-span-2">
+          <div class="col-span-2 mt-6 flex flex-col">
             <span class="mb-1 text-sm font-medium text-brand-600">Coste de la empresa</span>
             <div class="rounded bg-brand-50 px-4 py-2 text-xs text-brand-800">
               <span>
@@ -124,7 +117,7 @@
           </div>
         }
         @if (materials().length && apartmentCount() !== null) {
-          <div class="mt-4 flex flex-col sm:col-span-2">
+          <div class="col-span-2 mt-4 flex flex-col">
             <span class="mb-1 text-sm font-medium text-brand-600">Materiales asignados</span>
             <ul class="space-y-2">
               @for (material of materials(); track $index) {
@@ -154,7 +147,7 @@
             <div class="mt-4 rounded bg-brand-100 px-4 py-2 text-right font-bold text-brand-900">
               Total del trabajo:
               <span>
-                {{ getTotalMaterialCost() | currency: 'EUR' : 'symbol' : '1.2-2' }}
+                {{ totalJobCost | currency: 'EUR' : 'symbol' : '1.2-2' }}
               </span>
             </div>
           </div>
