@@ -1,9 +1,10 @@
+import { NgStyle } from '@angular/common'
 import { Component } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule],
+  imports: [FormsModule, NgStyle],
   templateUrl: './login.html',
 })
 export class Login {
