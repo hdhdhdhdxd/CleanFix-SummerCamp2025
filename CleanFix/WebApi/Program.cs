@@ -5,6 +5,9 @@ using WebApi.BaseDatos;
 using WebApi.CoreBot;
 using WebApi.Services;
 
+// Añadir licencia Community para QuestPDF
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddInfrastructureServices();
