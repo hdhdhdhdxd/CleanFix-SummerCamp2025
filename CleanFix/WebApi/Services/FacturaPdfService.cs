@@ -44,9 +44,13 @@ namespace WebApi.Services
                         col.Item().Text("").FontSize(6); // Espacio
                         col.Item().Text("").FontSize(6); // Espacio
                         col.Item().Text("Empresa proveedora:").Bold().FontSize(13);
+                        col.Item().Text("").FontSize(6); // Espacio
+                        col.Item().Text("").FontSize(6); // Espacio
                         col.Item().Text($" - Nombre: {factura.Empresa.Nombre}").FontSize(11);
                         col.Item().Text("").FontSize(6);
                         col.Item().Text("Materiales incluidos:").Bold().FontSize(13);
+                        col.Item().Text("").FontSize(6); // Espacio
+                        col.Item().Text("").FontSize(6); // Espacio
                         // Tabla simulada con monoespaciado
                         var sb = new StringBuilder();
                         sb.AppendLine(" | ID | Nombre             | Costo    | IVA (21%) | Total    |");
@@ -55,18 +59,25 @@ namespace WebApi.Services
                         {
                             sb.AppendLine($" | {m.Id,2} | {m.Nombre,-18} | €{m.Coste,7:F2} | €{m.IVA,8:F2} | €{m.Total,7:F2} |");
                         }
+                        sb.AppendLine(" |----|--------------------|----------|-----------|----------|");
                         col.Item().Text(sb.ToString()).FontFamily("Consolas").FontSize(11);
                         col.Item().Text("").FontSize(6);
                         col.Item().Text("").FontSize(6);
                         col.Item().Text(" -----------------------------------------");
+                        col.Item().Text("").FontSize(6); // Espacio
                         col.Item().Text($" Total materiales: €{totalMaterialesSinIva:F2}");
                         col.Item().Text($" IVA materiales (21%): €{totalMaterialesIva:F2}");
+                        col.Item().Text("").FontSize(6); // Espacio
                         col.Item().Text(" -----------------------------------------");
+                        col.Item().Text("").FontSize(6); // Espacio
                         col.Item().Text($" Costo empresa: €{costeEmpresa:F2}");
                         col.Item().Text($" IVA empresa (21%): €{ivaEmpresa:F2}");
+                        col.Item().Text("").FontSize(6); // Espacio
                         col.Item().Text(" -----------------------------------------");
+                        col.Item().Text("").FontSize(6); // Espacio
                         col.Item().Text("*TOTAL FACTURA:*").Bold().FontSize(13);
                         col.Item().Text($"   *€{totalConIva:F2}*").Bold().FontSize(13);
+                        col.Item().Text("").FontSize(6); // Espacio
                         col.Item().Text(" -----------------------------------------");
                     });
                 });
