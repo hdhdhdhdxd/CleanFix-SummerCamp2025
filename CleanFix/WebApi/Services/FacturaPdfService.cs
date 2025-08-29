@@ -84,6 +84,7 @@ namespace WebApi.Services
             });
             using var ms = new MemoryStream();
             document.GeneratePdf(ms);
+            ms.Seek(0, SeekOrigin.Begin); // Asegura que el stream esté al inicio
             return ms.ToArray();
         }
     }

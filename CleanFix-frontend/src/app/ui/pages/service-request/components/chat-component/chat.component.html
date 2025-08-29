@@ -1,10 +1,9 @@
 <!-- chat.component.html -->
-<div class="flex h-screen flex-col">
-  <header class="flex h-12 items-center bg-gray-800 px-4 text-white">
-    <h1 class="text-lg font-semibold">Chat AI</h1>
-  </header>
-
-  <div class="flex-1 space-y-4 overflow-y-auto bg-gray-100 p-4">
+<div
+  class="flex h-screen w-full max-w-full flex-col"
+  style="background: linear-gradient(135deg, var(--color-brand-700), var(--color-brand-900))"
+>
+  <div class="flex-1 space-y-4 overflow-y-auto p-4">
     <div *ngFor="let msg of messages">
       <div [ngClass]="{ 'text-right': msg.from === 'user', 'text-left': msg.from === 'bot' }">
         <div class="message" [ngClass]="msg.from">
@@ -13,40 +12,49 @@
       </div>
     </div>
   </div>
-
-  <div class="chat-content">
-    <form (ngSubmit)="sendMessage()">
-      <input
-        [(ngModel)]="newMessage"
-        name="message"
-        autocomplete="off"
-        placeholder="Escribe tu mensaje..."
-        required
-      />
-      <button type="submit">
-        <svg
-          width="22"
-          height="22"
-          viewBox="0 0 22 22"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            d="M2 11L20 11"
-            stroke="white"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <path
-            d="M13 4L20 11L13 18"
-            stroke="white"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-      </button>
-    </form>
-  </div>
+  <form
+    (ngSubmit)="sendMessage()"
+    class="flex items-center gap-2 border-t p-4"
+    style="
+      background: linear-gradient(
+        90deg,
+        color-mix(in oklch, var(--color-accent-500) 70%, black 30%),
+        var(--color-accent-500)
+      );
+    "
+  >
+    <input
+      [(ngModel)]="newMessage"
+      name="message"
+      autocomplete="off"
+      placeholder="Escribe tu mensaje..."
+      required
+      class="flex-1 rounded-lg border border-brand-900 px-3 py-2 text-white placeholder:text-brand-300 focus:border-brand-700 focus:outline-none"
+      style="background: var(--color-brand-700); color: white"
+    />
+    <button type="submit" class="rounded-full bg-gray-800 p-2 text-white hover:bg-gray-700">
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 22 22"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M2 11L20 11"
+          stroke="white"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M13 4L20 11L13 18"
+          stroke="white"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+  </form>
 </div>
