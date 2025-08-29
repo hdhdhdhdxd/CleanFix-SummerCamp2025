@@ -123,8 +123,8 @@ namespace WebApi.Controllers
             return File(pdfBytes, "application/pdf", $"Factura_{empresa.Name}.pdf");
         }
 
-        [HttpPost("factura/email")]
-        public async Task<IActionResult> EnviarFacturaPorEmail([FromBody] FacturaPdfRequest request)
+        [HttpPost("factura/gmail")]
+        public async Task<IActionResult> EnviarFacturaPorGmail([FromBody] FacturaPdfRequest request)
         {
             var dbPlugin = new DBPluginTestPG(_connectionString);
             var empresasResponse = dbPlugin.GetAllEmpresas();
@@ -148,29 +148,25 @@ namespace WebApi.Controllers
                 Materiales = materiales.Select(m => new FacturaMaterialDto { Nombre = m.Name, Coste = m.Cost }).ToList(),
                 TotalConIVA = total
             };
+            // Generar el PDF igual que en /factura/pdf
             var pdfBytes = await _facturaPdfService.GenerarFacturaPdfAsync(factura);
 
-            // Leer configuración SMTP de appsettings/secrets
-            var smtpHost = _config["Email:SmtpHost"];
-            var smtpPort = int.Parse(_config["Email:SmtpPort"]);
-            var smtpUser = _config["Email:SmtpUser"];
-            var smtpPass = _config["Email:SmtpPass"];
-            var from = _config["Email:From"];
+            var payload = new
+            {
+                email = request.EmailDestino,
+                facturaPdf = Convert.ToBase64String(pdfBytes),
+                asunto = "Tu factura CleanFix",
+                mensaje = "Adjuntamos tu factura solicitada."
+            };
 
-            var smtpClient = new SmtpClient(smtpHost)
-            {
-                Port = smtpPort,
-                Credentials = new NetworkCredential(smtpUser, smtpPass),
-                EnableSsl = true,
-            };
-            var mail = new MailMessage(from, request.EmailDestino)
-            {
-                Subject = "Factura CleanFixBot",
-                Body = "Adjuntamos su factura en PDF.",
-            };
-            mail.Attachments.Add(new Attachment(new System.IO.MemoryStream(pdfBytes), $"Factura_{empresa.Name}.pdf"));
-            await smtpClient.SendMailAsync(mail);
-            return Ok("Factura enviada por email");
+            using var httpClient = new HttpClient();
+            var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(payload), System.Text.Encoding.UTF8, "application/json");
+            var response = await httpClient.PostAsync("https://hook.eu2.make.com/7pw1u52rkbwmstxlwac79kfwyr56s1y6", content);
+
+            if (response.IsSuccessStatusCode)
+                return Ok("Factura enviada correctamente por Gmail (Make).");
+            else
+                return StatusCode((int)response.StatusCode, "Error al enviar la factura por Gmail (Make).");
         }
 
         [HttpPost("factura/recomendar")]
