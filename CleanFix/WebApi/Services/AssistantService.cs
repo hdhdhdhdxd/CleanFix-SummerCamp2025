@@ -33,34 +33,15 @@ namespace WebApi.Services
                 apiKey: apiKey
             );
 
-            // PROMPT REVISADO: Instruye a CleanFixBot a que SIEMPRE genere la factura con desglose de IVA si el usuario lo pide
-            _promptTemplate = @"
-Eres CleanFixBot, un asistente experto en recomendar empresas y materiales para resolver problemas de mantenimiento y reparaciones en viviendas y oficinas.
+            // PROMPT REVISADO: Responde de forma breve y directa
+            _promptTemplate = @"Eres CleanFixBot, un asistente experto en recomendar empresas y materiales para mantenimiento y reparaciones. 
 
-Dispones de la siguiente información de empresas (companies) en formato JSON: {{$empresas}}
-Cada empresa tiene: Id, Name, Type (tipo de problema que resuelve), Price (precio del servicio).
+Tienes la siguiente información de empresas (companies) en JSON: {{$empresas}}
+Tienes la siguiente información de materiales (materials) en JSON: {{$materiales}}
 
-También tienes la siguiente información de materiales (materials) en formato JSON: {{$materiales}}
-Cada material tiene: Name, Issue (tipo de problema), Available (disponible).
+Responde de forma breve y clara. Si el usuario pide una factura, muestra solo el total, desglose de IVA y materiales. Si pregunta por empresas o materiales, responde con la información relevante en frases cortas. Si no puedes ayudar, dilo directamente. 
 
-Si el usuario te pide una factura, SIEMPRE genera la factura directamente con el desglose de IVA (21%) y el total con IVA incluido, usando este formato:
-
-**Total estimado de la factura:**  
-Servicio de [NombreEmpresa]: **[CosteServicio]**  
-[NombreMaterial]: **[CosteMaterial]**  
-**Total (añadiendo IVA):** **[TotalConIVA]**  
-(IVA: [IVAservicio]€ servicio + [IVAmaterial]€ material = [IVATotal]€)
-Desglose: Servicio sin IVA: [CosteServicio]€, Material sin IVA: [CosteMaterial]€, IVA total: [IVATotal]€
-TOTAL CON IVA: [TotalConIVA]€
-
-No pidas más datos ni recomiendes contactar a la empresa si el usuario ya ha dado los datos necesarios para la factura.
-
-Si el usuario pide información de empresas o materiales, responde de forma natural y profesional, recomendando empresas o materiales según el caso.
-
-Pregunta del usuario: {{$pregunta}}
-
-Responde de forma clara, útil y adaptada al usuario.
-";
+Pregunta: {{$pregunta}}";
 
             // Inicializa plugins y kernel
             var dbPlugin = new DBPluginTestPG(config.GetConnectionString("CleanFixDB"));
