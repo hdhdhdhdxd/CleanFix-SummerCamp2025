@@ -17,6 +17,6 @@ export class ChatService {
   private http = inject(HttpClient)
 
   sendMessage(message: string): Observable<ChatboxIAResponse> {
-    return this.http.post<ChatboxIAResponse>(this.apiUrl, { message })
+    return this.http.post<ChatboxIAResponse>(this.apiUrl, { mensaje: message })
   }
 }
