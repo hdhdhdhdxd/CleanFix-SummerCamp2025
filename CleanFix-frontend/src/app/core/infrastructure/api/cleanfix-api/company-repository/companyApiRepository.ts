@@ -2,7 +2,7 @@ import { Company } from '@/core/domain/models/Company'
 import { CompanyDto } from './CompanyDto'
 import { environment } from 'src/environments/environment'
 import { PaginatedData } from '@/core/domain/models/PaginatedData'
-import { PaginatedDataDto } from '../interfaces/PaginatedDataDto'
+import { PaginatedDataDto } from '../common/interfaces/PaginatedDataDto'
 import { HttpParams } from '@angular/common/http'
 
 const getPaginated = async (

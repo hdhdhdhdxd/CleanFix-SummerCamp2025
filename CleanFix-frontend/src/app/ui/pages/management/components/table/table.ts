@@ -1,40 +1,22 @@
-import { CompletedTaskBrief } from '@/core/domain/models/CompletedTaskBrief'
-import { Incidence } from '@/core/domain/models/Incedence'
-import { SolicitationBrief } from '@/core/domain/models/SolicitationBrief'
 import { CurrencyPipe, DatePipe, NgClass, NgIf } from '@angular/common'
 import { Component, input, output } from '@angular/core'
 
+interface TableColumnBase<T> {
+  key: keyof T
+  label: string
+}
+
 export type TableColumn<T> =
-  | {
-      key: keyof T
-      label: string
-      type: 'text' | 'currency' | 'date' | 'number' | 'status'
-    }
-  | TableColumnProgress<T>
-  | TableColumnBoolean<T>
-
-export interface TableColumnProgress<T> {
-  key: keyof T
-  label: string
-  type: 'progress'
-  keyStart: keyof T
-  keyEnd: keyof T
-}
-
-export interface TableColumnBoolean<T> {
-  key: keyof T
-  label: string
-  type: 'boolean'
-  labelTrue: string
-  labelFalse: string
-}
+  | (TableColumnBase<T> & { type: 'text' | 'currency' | 'date' | 'number' | 'status' })
+  | (TableColumnBase<T> & { type: 'progress'; keyStart: keyof T; keyEnd: keyof T })
+  | (TableColumnBase<T> & { type: 'boolean'; labelTrue: string; labelFalse: string })
 
 @Component({
   selector: 'app-table',
   imports: [CurrencyPipe, DatePipe, NgClass, NgIf],
   templateUrl: './table.html',
 })
-export class Table<T extends SolicitationBrief | Incidence | CompletedTaskBrief> {
+export class Table<T> {
   items = input<T[]>([])
   tableColumns = input.required<TableColumn<T>[]>()
   rowClick = output<T>()
@@ -51,11 +33,16 @@ export class Table<T extends SolicitationBrief | Incidence | CompletedTaskBrief>
     return customColumns
   }
 
-  getProgressValues(item: T, column: TableColumnProgress<T>): { inicio: Date; fin: Date } | null {
-    return {
-      inicio: item[column.keyStart] as Date,
-      fin: item[column.keyEnd] as Date,
+  getProgressValues(
+    item: T,
+    column: { keyStart: keyof T; keyEnd: keyof T },
+  ): { inicio: Date; fin: Date } | null {
+    const inicio = item[column.keyStart]
+    const fin = item[column.keyEnd]
+    if (inicio instanceof Date && fin instanceof Date) {
+      return { inicio, fin }
     }
+    return null
   }
 
   getValue<K extends keyof T>(item: T, key: K): T[K] {
