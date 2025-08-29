@@ -1,0 +1,25 @@
+<div class="flex h-full flex-col">
+  <div class="mx-7 my-5">
+    <app-search-bar />
+  </div>
+
+  <div class="mx-7 mb-5 flex min-h-0 flex-grow flex-col">
+    <div class="min-h-0 flex-grow">
+      <app-table [items]="completedTasks()" [tableColumns]="columns" />
+    </div>
+    <div>
+      <app-pagination
+        [props]="{
+          pageNumber: pageNumber(),
+          pageSize: pageSize(),
+          totalPages: totalPages(),
+          totalCount: totalCount(),
+          hasPreviousPage: hasPreviousPage(),
+          hasNextPage: hasNextPage(),
+        }"
+        (pageNumberChange)="setPageNumber($event)"
+        (pageSizeChange)="setPageSize($event)"
+      />
+    </div>
+  </div>
+</div>
