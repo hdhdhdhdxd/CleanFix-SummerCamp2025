@@ -14,7 +14,6 @@ public class GetSolicitationDto
     public IssueType IssueType { get; set; } // Nuevo campo para el nombre
     public int ApartmentAmount { get; set; } // Código del edificio
     public int RequestId { get; set; } // Código del request de speculab
-    public byte[] RowVersion { get; set; } // Para concurrencia
     private class Mapping : Profile
     {
         public Mapping()

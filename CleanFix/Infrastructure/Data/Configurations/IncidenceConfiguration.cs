@@ -16,14 +16,6 @@ public class IncidenceConfiguration : IEntityTypeConfiguration<Incidence>
             .HasMaxLength(500)
             .HasComment("Descripción de la incidencia");
 
-        builder.Property(i => i.ApartmentId)
-            .IsRequired()
-            .HasComment("Id del apartamento asociado");
-
-        builder.Property(i => i.Surface)
-            .IsRequired()
-            .HasComment("Superficie del apartamento");
-
         builder.Property(i => i.Priority)
             .IsRequired()
             .HasComment("Prioridad de la incidencia");

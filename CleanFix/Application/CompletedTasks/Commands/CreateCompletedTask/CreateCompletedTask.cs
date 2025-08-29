@@ -96,6 +96,10 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
             simulatedPutResult = await SimulatePutToExternalApiAsync($"https://api.solicitations.com/solicitations/{solicitation.RequestId}", putData);
             if (simulatedPutResult != "OK")
                 throw new InvalidOperationException($"PUT externo falló para Solicitation con RequestId {solicitation.RequestId}");
+
+            // Eliminar la Solicitation si todo salió bien
+            _solicitationRepository.Remove(solicitation);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
         else if (!request.CompletedTask.IsSolicitation && request.CompletedTask.IncidenceId.HasValue)
         {
@@ -105,21 +109,22 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
             
             total += company.Price;
             foreach (var material in materials)
-                total += material.Cost;
+                total += incidence.Surface * material.CostPerSquareMeter;
             
             // Llenar campos desde Incidence
             completedTask.IssueTypeId = incidence.IssueTypeId;
             completedTask.IssueType = incidence.IssueType;
-            completedTask.ApartmentId = incidence.ApartmentId;
             completedTask.Surface = incidence.Surface;
-            
-            var apartment = await _apartmentRepository.GetByIdAsync(incidence.ApartmentId);
-            completedTask.Address = apartment?.Address ?? string.Empty;
+            completedTask.Address = incidence.Address;
             
             // Simulación de PUT a API externa para Incidence (antes de guardar)
             simulatedPutResult = await SimulatePutToExternalApiAsync($"https://api.incidences.com/incidences/{incidence.Id}", incidence.Id);
             if (simulatedPutResult != "OK")
                 throw new InvalidOperationException($"PUT externo falló para Incidence con Id {incidence.Id}");
+
+            // Eliminar la Incidence si todo salió bien
+            _incidenceRepository.Remove(incidence);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
         else
         {
