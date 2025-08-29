@@ -1,10 +1,10 @@
-import { CommonModule, NgStyle } from '@angular/common'
+import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, NgStyle, CommonModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './login.html',
 })
 export class Login {
