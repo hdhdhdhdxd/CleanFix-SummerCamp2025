@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common'
 import { Component, inject } from '@angular/core'
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router'
 import { Footer } from '../shared/footer/footer'
@@ -6,7 +7,7 @@ import { Snackbar } from '../shared/snackbar/snackbar'
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Footer, Header, Snackbar],
+  imports: [RouterOutlet, Footer, Header, Snackbar, CommonModule],
   templateUrl: './main.html',
 })
 export class Main {
