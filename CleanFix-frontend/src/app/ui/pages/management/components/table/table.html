@@ -73,7 +73,7 @@
                               <div class="flex min-w-[120px] flex-col gap-1">
                                 <div class="h-2 w-full rounded bg-brand-100">
                                   <div
-                                    class="h-2 rounded transition-all"
+                                    class="h-2 min-w-[6px] rounded transition-all"
                                     [style.width]="
                                       getProgressBarInfoRango(progress.inicio, progress.fin)
                                         .percent + '%'
@@ -156,80 +156,104 @@
           >
             @for (column of getColumns(); track column.key) {
               <div
-                class="flex items-center justify-between border-b border-brand-100 py-2 last:border-b-0"
+                class="flex items-start justify-between border-b border-brand-100 py-2 last:border-b-0"
               >
-                <span class="text-sm font-medium text-brand-700">{{ column.label }}:</span>
-                <span class="text-sm text-brand-600">
-                  @switch (column.type) {
-                    @case ('currency') {
-                      {{
-                        getCurrencyValue(item, column.key) | currency: 'EUR' : 'symbol' : '1.2-2'
-                      }}
-                    }
-                    @case ('date') {
-                      {{ getDateValue(item, column.key) | date: 'dd/MM/yyyy' }}
-                    }
-                    @case ('number') {
-                      {{ getValue(item, column.key) }}
-                    }
-                    @case ('status') {
-                      <span
-                        class="inline-flex rounded-full px-2 py-1 text-xs font-semibold"
-                        [ngClass]="getStatusClass(getStringValue(item, column.key))"
-                      >
-                        {{ getValue(item, column.key) }}
-                      </span>
-                    }
-                    @case ('progress') {
-                      @if (getProgressValues(item, column)) {}
-                      <ng-container *ngIf="getProgressValues(item, column) as progress">
-                        <ng-container *ngIf="progress.inicio && progress.fin">
-                          <div class="flex min-w-[120px] flex-col gap-1">
-                            <div class="h-2 w-full rounded bg-brand-100">
-                              <div
-                                class="h-2 rounded transition-all"
-                                [style.width]="
-                                  getProgressBarInfoRango(progress.inicio, progress.fin).percent +
-                                  '%'
-                                "
-                                [style.background]="
+                <span class="flex-shrink-0 text-sm font-medium text-brand-700"
+                  >{{ column.label }}:</span
+                >
+                <div class="ml-3 flex min-w-0 flex-1 items-center justify-end">
+                  <div class="w-full min-w-0 text-sm text-brand-600">
+                    @switch (column.type) {
+                      @case ('currency') {
+                        <div class="truncate text-right">
+                          {{
+                            getCurrencyValue(item, column.key)
+                              | currency: 'EUR' : 'symbol' : '1.2-2'
+                          }}
+                        </div>
+                      }
+                      @case ('date') {
+                        <div class="text-right">
+                          {{ getDateValue(item, column.key) | date: 'dd/MM/yyyy' }}
+                        </div>
+                      }
+                      @case ('number') {
+                        <div class="text-right">{{ getValue(item, column.key) }}</div>
+                      }
+                      @case ('status') {
+                        <div class="flex justify-end">
+                          <span
+                            class="inline-flex rounded-full px-2 py-1 text-xs font-semibold"
+                            [ngClass]="getStatusClass(getStringValue(item, column.key))"
+                          >
+                            {{ getValue(item, column.key) }}
+                          </span>
+                        </div>
+                      }
+                      @case ('boolean') {
+                        <div class="text-right">
+                          <ng-container *ngIf="getValue(item, column.key); else falseBlock">
+                            {{ column.labelTrue || 'Sí' }}
+                          </ng-container>
+                          <ng-template #falseBlock>
+                            {{ column.labelFalse || 'No' }}
+                          </ng-template>
+                        </div>
+                      }
+                      @case ('progress') {
+                        @if (getProgressValues(item, column)) {}
+                        <ng-container *ngIf="getProgressValues(item, column) as progress">
+                          <ng-container *ngIf="progress.inicio && progress.fin">
+                            <div class="ml-auto flex w-full max-w-[180px] flex-col items-end gap-1">
+                              <div class="h-2 w-full overflow-hidden rounded bg-brand-100">
+                                <div
+                                  class="h-2 min-w-[6px] rounded transition-all"
+                                  [style.width]="
+                                    getProgressBarInfoRango(progress.inicio, progress.fin).percent +
+                                    '%'
+                                  "
+                                  [style.background]="
+                                    getProgressBarInfoRango(progress.inicio, progress.fin)
+                                      .status === 'completed'
+                                      ? 'var(--color-success-500)'
+                                      : 'var(--color-brand-500)'
+                                  "
+                                ></div>
+                              </div>
+                              <span
+                                class="mt-1 text-right text-xs font-medium"
+                                [style.color]="
                                   getProgressBarInfoRango(progress.inicio, progress.fin).status ===
                                   'completed'
                                     ? 'var(--color-success-500)'
                                     : 'var(--color-brand-500)'
                                 "
-                              ></div>
+                              >
+                                {{
+                                  getProgressBarInfoRango(progress.inicio, progress.fin).status ===
+                                  'completed'
+                                    ? 'Completado'
+                                    : 'En progreso (' +
+                                      getProgressBarInfoRango(progress.inicio, progress.fin)
+                                        .percent +
+                                      '%)'
+                                }}
+                              </span>
+                              <span class="mt-1 text-right text-xs text-brand-600"
+                                >Fin: {{ progress.fin | date: 'dd/MM/yyyy' }}</span
+                              >
                             </div>
-                            <span
-                              class="mt-1 text-xs font-medium"
-                              [style.color]="
-                                getProgressBarInfoRango(progress.inicio, progress.fin).status ===
-                                'completed'
-                                  ? 'var(--color-success-500)'
-                                  : 'var(--color-brand-500)'
-                              "
-                            >
-                              {{
-                                getProgressBarInfoRango(progress.inicio, progress.fin).status ===
-                                'completed'
-                                  ? 'Completado'
-                                  : 'En progreso (' +
-                                    getProgressBarInfoRango(progress.inicio, progress.fin).percent +
-                                    '%)'
-                              }}
-                            </span>
-                            <span class="mt-1 text-xs text-brand-600">
-                              Fin: {{ progress.fin | date: 'dd/MM/yyyy' }}
-                            </span>
-                          </div>
+                          </ng-container>
                         </ng-container>
-                      </ng-container>
+                      }
+                      @default {
+                        <span class="block truncate text-right">{{
+                          getValue(item, column.key)
+                        }}</span>
+                      }
                     }
-                    @default {
-                      {{ getValue(item, column.key) }}
-                    }
-                  }
-                </span>
+                  </div>
+                </div>
               </div>
             }
           </div>
