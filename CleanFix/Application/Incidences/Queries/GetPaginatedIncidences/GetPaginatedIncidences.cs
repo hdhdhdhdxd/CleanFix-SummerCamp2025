@@ -23,6 +23,8 @@ public class GetPaginatedIncidencesQueryHandler : IRequestHandler<GetPaginatedIn
     public async Task<PaginatedList<GetPaginatedIncidenceDto>> Handle(GetPaginatedIncidencesQuery request, CancellationToken cancellationToken)
     {
         var incidences = await _incidenceRepository.GetQueryable()
+            .Include(i => i.IssueType)
+            .Include(i => i.Apartment)
             .AsNoTracking()
             .ProjectTo<GetPaginatedIncidenceDto>(_mapper.ConfigurationProvider).PaginatedListAsync(request.PageNumber, request.PageSize);
 
