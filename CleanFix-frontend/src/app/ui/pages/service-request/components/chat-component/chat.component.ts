@@ -1,11 +1,12 @@
 // chat.component.ts
+import { CommonModule } from '@angular/common'
 import { Component, inject } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ChatService } from 'src/app/ui/services/chat/chat.service'
 
 @Component({
   selector: 'app-chat',
-  imports: [FormsModule],
+  imports: [FormsModule, CommonModule],
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css'],
 })
