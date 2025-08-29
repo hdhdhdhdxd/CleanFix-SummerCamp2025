@@ -132,8 +132,9 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.Address, f => f.Address.FullAddress())
             .RuleFor(e => e.MaintenanceCost, f => f.Random.Double(50, 1000))
             .RuleFor(e => e.IssueType, f => f.PickRandom(issueTypes))
+            .RuleFor(e => e.ApartmentAmount, f => f.Random.Int(1, 100))
             .RuleFor(e => e.RequestId, f => f.Random.Int(1, 9999));
-        var solicitations = solicitationFaker.Generate(10);
+        var solicitations = solicitationFaker.Generate(20);
         db.Solicitations.AddRange(solicitations);
         db.SaveChanges();
 
@@ -161,7 +162,7 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.Materials, f => materials.OrderBy(x => f.Random.Int()).Take(f.Random.Int(1, 5)).ToList())
             .RuleFor(e => e.Surface, f => f.Random.Int(50, 200))
             .RuleFor(e => e.IsSolicitation, f => f.Random.Bool());
-        var completedTasks = completedTaskFaker.Generate(10);
+        var completedTasks = completedTaskFaker.Generate(20);
         db.CompletedTasks.AddRange(completedTasks);
         db.SaveChanges();
     }

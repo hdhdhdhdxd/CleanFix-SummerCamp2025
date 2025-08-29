@@ -5,8 +5,10 @@ namespace Application.CompletedTasks.Queries.GetPaginatedCompletedTasks;
 public class GetPaginatedCompletedTaskDto
 {
     public int Id { get; set; }
+    public string Address { get; set; }
     public string CompanyName { get; set; }
     public string IssueType { get; set; } // Propiedad IssueType como string
+    public bool IsSolicitation { get; set; }
     public DateTime CreationDate { get; set; }
     public DateTime CompletionDate { get; set; }
     private class Mapping : Profile
