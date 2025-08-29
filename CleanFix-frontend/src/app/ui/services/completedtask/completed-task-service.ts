@@ -1,4 +1,6 @@
 import { completedTaskService } from '@/core/application/completedTaskService'
+import { CompletedTaskBrief } from '@/core/domain/models/CompletedTaskBrief'
+import { PaginatedData } from '@/core/domain/models/PaginatedData'
 import { Injectable } from '@angular/core'
 import { Observable, from } from 'rxjs'
 
@@ -22,5 +24,12 @@ export class CompletedTaskService {
         MaterialIds,
       ),
     )
+  }
+
+  getPaginated(
+    pageNumber: number,
+    pageSize: number,
+  ): Observable<PaginatedData<CompletedTaskBrief>> {
+    return from(completedTaskService.getPaginated(pageNumber, pageSize))
   }
 }

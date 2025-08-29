@@ -57,6 +57,61 @@
                             {{ getValue(item, column.key) }}
                           </span>
                         }
+                        @case ('boolean') {
+                          <span>
+                            <ng-container *ngIf="getValue(item, column.key); else falseBlock">
+                              {{ column.labelTrue || 'Sí' }}
+                            </ng-container>
+                            <ng-template #falseBlock>
+                              {{ column.labelFalse || 'No' }}
+                            </ng-template>
+                          </span>
+                        }
+                        @case ('progress') {
+                          <ng-container *ngIf="getProgressValues(item, column) as progress">
+                            <ng-container *ngIf="progress.inicio && progress.fin">
+                              <div class="flex min-w-[120px] flex-col gap-1">
+                                <div class="h-2 w-full rounded bg-brand-100">
+                                  <div
+                                    class="h-2 rounded transition-all"
+                                    [style.width]="
+                                      getProgressBarInfoRango(progress.inicio, progress.fin)
+                                        .percent + '%'
+                                    "
+                                    [style.background]="
+                                      getProgressBarInfoRango(progress.inicio, progress.fin)
+                                        .status === 'completed'
+                                        ? 'var(--color-success-500)'
+                                        : 'var(--color-brand-500)'
+                                    "
+                                  ></div>
+                                </div>
+                                <span
+                                  class="mt-1 text-xs font-medium"
+                                  [style.color]="
+                                    getProgressBarInfoRango(progress.inicio, progress.fin)
+                                      .status === 'completed'
+                                      ? 'var(--color-success-500)'
+                                      : 'var(--color-brand-500)'
+                                  "
+                                >
+                                  {{
+                                    getProgressBarInfoRango(progress.inicio, progress.fin)
+                                      .status === 'completed'
+                                      ? 'Completado'
+                                      : 'En progreso (' +
+                                        getProgressBarInfoRango(progress.inicio, progress.fin)
+                                          .percent +
+                                        '%)'
+                                  }}
+                                </span>
+                                <span class="mt-1 text-xs text-brand-600">
+                                  Fin: {{ progress.fin | date: 'dd/MM/yyyy' }}
+                                </span>
+                              </div>
+                            </ng-container>
+                          </ng-container>
+                        }
                         @default {
                           {{ getValue(item, column.key) }}
                         }
@@ -124,6 +179,51 @@
                       >
                         {{ getValue(item, column.key) }}
                       </span>
+                    }
+                    @case ('progress') {
+                      @if (getProgressValues(item, column)) {}
+                      <ng-container *ngIf="getProgressValues(item, column) as progress">
+                        <ng-container *ngIf="progress.inicio && progress.fin">
+                          <div class="flex min-w-[120px] flex-col gap-1">
+                            <div class="h-2 w-full rounded bg-brand-100">
+                              <div
+                                class="h-2 rounded transition-all"
+                                [style.width]="
+                                  getProgressBarInfoRango(progress.inicio, progress.fin).percent +
+                                  '%'
+                                "
+                                [style.background]="
+                                  getProgressBarInfoRango(progress.inicio, progress.fin).status ===
+                                  'completed'
+                                    ? 'var(--color-success-500)'
+                                    : 'var(--color-brand-500)'
+                                "
+                              ></div>
+                            </div>
+                            <span
+                              class="mt-1 text-xs font-medium"
+                              [style.color]="
+                                getProgressBarInfoRango(progress.inicio, progress.fin).status ===
+                                'completed'
+                                  ? 'var(--color-success-500)'
+                                  : 'var(--color-brand-500)'
+                              "
+                            >
+                              {{
+                                getProgressBarInfoRango(progress.inicio, progress.fin).status ===
+                                'completed'
+                                  ? 'Completado'
+                                  : 'En progreso (' +
+                                    getProgressBarInfoRango(progress.inicio, progress.fin).percent +
+                                    '%)'
+                              }}
+                            </span>
+                            <span class="mt-1 text-xs text-brand-600">
+                              Fin: {{ progress.fin | date: 'dd/MM/yyyy' }}
+                            </span>
+                          </div>
+                        </ng-container>
+                      </ng-container>
                     }
                     @default {
                       {{ getValue(item, column.key) }}
