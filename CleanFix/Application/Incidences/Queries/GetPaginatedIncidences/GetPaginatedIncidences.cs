@@ -25,7 +25,9 @@ public class GetPaginatedIncidencesQueryHandler : IRequestHandler<GetPaginatedIn
         var incidences = await _incidenceRepository.GetQueryable()
             .Include(i => i.IssueType)
             .AsNoTracking()
-            .ProjectTo<GetPaginatedIncidenceDto>(_mapper.ConfigurationProvider).PaginatedListAsync(request.PageNumber, request.PageSize);
+            .OrderByDescending(i => i.Date)
+            .ProjectTo<GetPaginatedIncidenceDto>(_mapper.ConfigurationProvider)
+            .PaginatedListAsync(request.PageNumber, request.PageSize);
 
         return incidences;
     }
