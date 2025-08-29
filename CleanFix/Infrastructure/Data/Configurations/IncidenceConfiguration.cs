@@ -11,11 +11,6 @@ public class IncidenceConfiguration : IEntityTypeConfiguration<Incidence>
             .IsRequired()
             .HasComment("Fecha de la incidencia");
 
-        builder.Property(i => i.Status)
-            .IsRequired()
-            .HasMaxLength(50)
-            .HasComment("Estado de la incidencia");
-
         builder.Property(i => i.Description)
             .IsRequired()
             .HasMaxLength(500)

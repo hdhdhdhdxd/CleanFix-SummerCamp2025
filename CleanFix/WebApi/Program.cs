@@ -143,7 +143,6 @@ using (var scope = app.Services.CreateScope())
         var incidenceFaker = new Faker<Incidence>()
             .RuleFor(e => e.IssueType, f => f.PickRandom(issueTypes))
             .RuleFor(e => e.Date, f => f.Date.Recent())
-            .RuleFor(e => e.Status, f => f.PickRandom(statusOptions))
             .RuleFor(e => e.Description, f => f.Lorem.Sentence())
             .RuleFor(e => e.Priority, f => f.PickRandom<Priority>())
             .RuleFor(e => e.ApartmentId, f => f.Random.Int(0, 10));
