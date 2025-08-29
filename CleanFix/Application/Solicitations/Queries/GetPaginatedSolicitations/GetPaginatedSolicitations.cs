@@ -7,7 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Solicitations.Queries.GetPaginatedSolicitations;
-public record GetPaginatedSolicitationsQuery(int PageNumber, int PageSize) : IRequest<PaginatedList<GetPaginatedSolicitationDto>>;
+public record GetPaginatedSolicitationsQuery(int PageNumber, int PageSize, string? FilterString) : IRequest<PaginatedList<GetPaginatedSolicitationDto>>;
 
 public class GetPaginatedSolicitationsQueryHandler : IRequestHandler<GetPaginatedSolicitationsQuery, PaginatedList<GetPaginatedSolicitationDto>>
 {
@@ -22,8 +22,21 @@ public class GetPaginatedSolicitationsQueryHandler : IRequestHandler<GetPaginate
 
     public async Task<PaginatedList<GetPaginatedSolicitationDto>> Handle(GetPaginatedSolicitationsQuery request, CancellationToken cancellationToken)
     {
-        var solicitations = await _solicitationRepository.GetQueryable()
-            .AsNoTracking()
+        var query = _solicitationRepository.GetQueryable()
+            .Include(s => s.IssueType)
+            .AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(request.FilterString))
+        {
+            var filter = request.FilterString.ToLower();
+            query = query.Where(s =>
+                (s.Address != null && s.Address.ToLower().Contains(filter)) ||
+                s.Date.ToString().ToLower().Contains(filter) ||
+                s.IssueType.Name.ToLower().Contains(filter)
+            );
+        }
+
+        var solicitations = await query
             .OrderByDescending(i => i.Date)
             .ProjectTo<GetPaginatedSolicitationDto>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageNumber, request.PageSize);

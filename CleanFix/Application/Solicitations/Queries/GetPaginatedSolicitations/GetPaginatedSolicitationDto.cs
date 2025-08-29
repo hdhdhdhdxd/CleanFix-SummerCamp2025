@@ -6,7 +6,6 @@ public class GetPaginatedSolicitationDto
 {
     public int Id { get; set; }
     public DateTime Date { get; set; }
-    public string? Status { get; set; }
     public string IssueType { get; set; }
     public int IssueTypeId { get; set; } // Identificador del tipo de incidencia
     public string Address { get; set; }
