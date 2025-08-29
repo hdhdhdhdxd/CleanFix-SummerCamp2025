@@ -14,7 +14,7 @@ public class GetPaginatedIncidenceDto
         public Mapping()
         {
             CreateMap<Incidence, GetPaginatedIncidenceDto>()
-                .ForMember(dest => dest.IssueType, opt => opt.MapFrom(src => src.IssueType != null ? src.IssueType.Name : null));
+                .ForMember(dest => dest.IssueType, opt => opt.MapFrom(src => src.IssueType != null ? src.IssueType.Name : ""));
         }
     }
 }

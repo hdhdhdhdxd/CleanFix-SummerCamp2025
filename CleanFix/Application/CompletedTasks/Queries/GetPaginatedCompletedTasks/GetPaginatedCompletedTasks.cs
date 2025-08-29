@@ -7,7 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.CompletedTasks.Queries.GetPaginatedCompletedTasks;
-public record GetPaginatedCompletedTasksQuery(int PageNumber, int PageSize) : IRequest<PaginatedList<GetPaginatedCompletedTaskDto>>;
+public record GetPaginatedCompletedTasksQuery(int PageNumber, int PageSize, string? FilterString) : IRequest<PaginatedList<GetPaginatedCompletedTaskDto>>;
 
 public class GetPaginatedCompletedTasksQueryHandler : IRequestHandler<GetPaginatedCompletedTasksQuery, PaginatedList<GetPaginatedCompletedTaskDto>>
 {
@@ -22,10 +22,25 @@ public class GetPaginatedCompletedTasksQueryHandler : IRequestHandler<GetPaginat
 
     public async Task<PaginatedList<GetPaginatedCompletedTaskDto>> Handle(GetPaginatedCompletedTasksQuery request, CancellationToken cancellationToken)
     {
-        var completedTasks = await _completedTaskRepository.GetQueryable()
+        var query = _completedTaskRepository.GetQueryable()
             .Include(ct => ct.Company)
             .Include(ct => ct.IssueType)
-            .AsNoTracking()
+            .AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(request.FilterString))
+        {
+            var filter = request.FilterString.ToLower();
+            query = query.Where(ct =>
+                (ct.Address != null && ct.Address.ToLower().Contains(filter)) ||
+                (ct.Company != null && ct.Company.Name.ToLower().Contains(filter)) ||
+                ct.CreationDate.ToString().ToLower().Contains(filter) ||
+                ct.CompletionDate.ToString().ToLower().Contains(filter) ||
+                (ct.IsSolicitation && "solicitud".Contains(filter)) ||
+                (!ct.IsSolicitation && "incidencia".Contains(filter))
+            );
+        }
+
+        var completedTasks = await query
             .OrderByDescending(i => i.CreationDate)
             .ProjectTo<GetPaginatedCompletedTaskDto>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageNumber, request.PageSize);
