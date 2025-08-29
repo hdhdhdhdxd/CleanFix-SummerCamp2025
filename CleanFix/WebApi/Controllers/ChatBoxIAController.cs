@@ -28,6 +28,13 @@ namespace WebApi.Controllers
             _connectionString = config.GetConnectionString("CleanFixDB");
         }
 
+        public class MensajeResponse
+        {
+            public bool Success { get; set; }
+            public string Error { get; set; }
+            public object Data { get; set; }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] MensajeRequest request)
         {
@@ -41,11 +48,32 @@ namespace WebApi.Controllers
                 });
             }
             var respuesta = await _assistantService.ProcesarMensajeAsync(request.Mensaje);
+
+            // Detectar intención de factura de forma simple
+            var mensajeLower = request.Mensaje.ToLowerInvariant();
+            bool esFactura = mensajeLower.Contains("factura") || mensajeLower.Contains("pdf") || mensajeLower.Contains("enviar factura") || mensajeLower.Contains("descargar factura");
+
+            if (esFactura)
+            {
+                // Puedes ajustar la URL base según tu despliegue
+                var pdfUrl = "/api/chatboxia/factura/pdf";
+                return Ok(new MensajeResponse
+                {
+                    Success = true,
+                    Error = null,
+                    Data = new {
+                        mensaje = "¿Quieres descargar la factura o recibirla por email?",
+                        pdfUrl = pdfUrl,
+                        puedeEnviarEmail = true
+                    }
+                });
+            }
+
             return Ok(new MensajeResponse
             {
                 Success = true,
                 Error = null,
-                Data = respuesta
+                Data = new { mensaje = respuesta }
             });
         }
 
