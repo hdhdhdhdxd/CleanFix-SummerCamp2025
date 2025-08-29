@@ -1,7 +1,7 @@
 import { Router } from '@angular/router'
 // chat.component.ts
 import { CommonModule } from '@angular/common'
-import { Component, inject } from '@angular/core'
+import { Component, inject, signal } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ChatService } from 'src/app/ui/services/chat/chat.service'
 
@@ -12,7 +12,7 @@ import { ChatService } from 'src/app/ui/services/chat/chat.service'
   styleUrls: ['./chat.component.css'],
 })
 export class ChatComponent {
-  messages: { from: 'user' | 'bot'; text: string }[] = []
+  messages = signal<{ from: 'user' | 'bot'; text: string }[]>([])
   newMessage = ''
 
   chatService = inject(ChatService)
@@ -22,15 +22,24 @@ export class ChatComponent {
     const userMessage = this.newMessage.trim()
     if (!userMessage) return
 
-    this.messages.push({ from: 'user', text: userMessage })
+    this.messages.update((msgs: { from: 'user' | 'bot'; text: string }[]) => [
+      ...msgs,
+      { from: 'user', text: userMessage },
+    ])
     this.newMessage = ''
 
     this.chatService.sendMessage(userMessage).subscribe({
       next: (res) => {
-        this.messages.push({ from: 'bot', text: res.data })
+        this.messages.update((msgs: { from: 'user' | 'bot'; text: string }[]) => [
+          ...msgs,
+          { from: 'bot', text: res.data },
+        ])
       },
       error: () => {
-        this.messages.push({ from: 'bot', text: 'Ocurrió un error al procesar tu mensaje.' })
+        this.messages.update((msgs: { from: 'user' | 'bot'; text: string }[]) => [
+          ...msgs,
+          { from: 'bot', text: 'Ocurrió un error al procesar tu mensaje.' },
+        ])
       },
     })
   }
