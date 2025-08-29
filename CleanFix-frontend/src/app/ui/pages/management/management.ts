@@ -29,7 +29,7 @@ export class Management implements OnInit, AfterViewInit {
     {
       label: 'Historial de Trabajos',
       icon: 'wrench',
-      route: '/management/requests',
+      route: '/management/completed-tasks',
     },
   ]
 

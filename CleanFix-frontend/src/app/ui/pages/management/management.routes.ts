@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router'
 import { Management } from './management'
 import { Solicitations } from './components/solicitations/solicitations'
-import { Requests } from './components/requests/requests'
 import { Incidences } from './components/incidences/incidences'
+import { CompletedTasks } from './components/completed-tasks/completed-tasks'
 
 export const MANAGEMENT_ROUTES: Routes = [
   {
@@ -11,7 +11,7 @@ export const MANAGEMENT_ROUTES: Routes = [
     children: [
       { path: '', redirectTo: 'solicitations', pathMatch: 'full' },
       { path: 'solicitations', component: Solicitations },
-      { path: 'requests', component: Requests },
+      { path: 'completed-tasks', component: CompletedTasks },
       { path: 'incidences', component: Incidences },
       { path: '**', redirectTo: 'solicitations' },
     ],
