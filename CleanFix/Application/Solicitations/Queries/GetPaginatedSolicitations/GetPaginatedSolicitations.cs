@@ -24,6 +24,7 @@ public class GetPaginatedSolicitationsQueryHandler : IRequestHandler<GetPaginate
     {
         var solicitations = await _solicitationRepository.GetQueryable()
             .AsNoTracking()
+            .OrderByDescending(i => i.Date)
             .ProjectTo<GetPaginatedSolicitationDto>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageNumber, request.PageSize);
 

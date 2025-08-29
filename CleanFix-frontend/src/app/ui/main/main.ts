@@ -1,12 +1,26 @@
-import { Component } from '@angular/core'
-import { RouterOutlet } from '@angular/router'
+import { CommonModule } from '@angular/common'
+import { Component, inject } from '@angular/core'
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router'
 import { Footer } from '../shared/footer/footer'
 import { Header } from '../shared/header/header'
 import { Snackbar } from '../shared/snackbar/snackbar'
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Footer, Header, Snackbar],
+  imports: [RouterOutlet, Footer, Header, Snackbar, CommonModule],
   templateUrl: './main.html',
 })
-export class Main {}
+export class Main {
+  showFooter = true
+
+  private router = inject(Router)
+
+  constructor() {
+    this.router.events.subscribe((event: unknown) => {
+      if (event instanceof NavigationEnd) {
+        // Oculta el footer en la ruta /service-request
+        this.showFooter = !event.urlAfterRedirects.startsWith('/service-request')
+      }
+    })
+  }
+}
