@@ -1,3 +1,4 @@
+import { Router } from '@angular/router'
 // chat.component.ts
 import { CommonModule } from '@angular/common'
 import { Component, inject } from '@angular/core'
@@ -15,6 +16,7 @@ export class ChatComponent {
   newMessage = ''
 
   chatService = inject(ChatService)
+  router = inject(Router)
 
   sendMessage() {
     const userMessage = this.newMessage.trim()
@@ -31,5 +33,9 @@ export class ChatComponent {
         this.messages.push({ from: 'bot', text: 'Ocurrió un error al procesar tu mensaje.' })
       },
     })
+  }
+
+  goHome() {
+    this.router.navigate(['/'])
   }
 }
