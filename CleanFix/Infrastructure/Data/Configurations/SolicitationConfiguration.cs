@@ -15,10 +15,6 @@ public class SolicitationConfiguration : IEntityTypeConfiguration<Solicitation>
             .IsRequired()
             .HasComment("Fecha de la solicitud");
 
-        builder.Property(s => s.Status)
-            .HasMaxLength(50)
-            .HasComment("Estado de la solicitud");
-
         builder.Property(s => s.Address)
             .IsRequired()
             .HasMaxLength(300)
