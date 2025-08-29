@@ -22,7 +22,12 @@ const create = async (
   )
 }
 
+const getPaginated = async (pageNumber: number, pageSize: number) => {
+  return completedTaskRepository.getPaginated(pageNumber, pageSize)
+}
+
 export const completedTaskService = {
   init,
   create,
+  getPaginated,
 }
