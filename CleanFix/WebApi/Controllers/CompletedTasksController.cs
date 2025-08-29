@@ -19,9 +19,12 @@ namespace WebApi.Controllers
 
         // GET: api/completedtasks/paginated
         [HttpGet("paginated")]
-        public async Task<ActionResult<IEnumerable<GetPaginatedCompletedTaskDto>>> GetPaginatedCompletedTasks([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<ActionResult<IEnumerable<GetPaginatedCompletedTaskDto>>> GetPaginatedCompletedTasks(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? filterString = null)
         {
-            var result = await _sender.Send(new GetPaginatedCompletedTasksQuery(pageNumber, pageSize));
+            var result = await _sender.Send(new GetPaginatedCompletedTasksQuery(pageNumber, pageSize, filterString));
             return Ok(result);
         }
 

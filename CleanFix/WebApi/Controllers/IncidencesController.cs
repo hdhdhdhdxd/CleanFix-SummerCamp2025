@@ -21,9 +21,12 @@ namespace WebApi.Controllers
 
         // GET: api/Incidences/paginated
         [HttpGet("paginated")]
-        public async Task<ActionResult<IEnumerable<GetPaginatedIncidenceDto>>> GetPaginatedIncidences([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<ActionResult<IEnumerable<GetPaginatedIncidenceDto>>> GetPaginatedIncidences(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string? filterString = null)
         {
-            var result = await _sender.Send(new GetPaginatedIncidencesQuery(pageNumber, pageSize));
+            var result = await _sender.Send(new GetPaginatedIncidencesQuery(pageNumber, pageSize, filterString));
             return Ok(result);
         }
 
