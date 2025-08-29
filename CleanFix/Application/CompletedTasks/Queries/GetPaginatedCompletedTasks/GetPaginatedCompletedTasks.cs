@@ -26,6 +26,7 @@ public class GetPaginatedCompletedTasksQueryHandler : IRequestHandler<GetPaginat
             .Include(ct => ct.Company)
             .Include(ct => ct.IssueType)
             .AsNoTracking()
+            .OrderByDescending(i => i.CreationDate)
             .ProjectTo<GetPaginatedCompletedTaskDto>(_mapper.ConfigurationProvider)
             .PaginatedListAsync(request.PageNumber, request.PageSize);
 
