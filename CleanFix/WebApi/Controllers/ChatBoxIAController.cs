@@ -148,25 +148,28 @@ namespace WebApi.Controllers
                 Materiales = materiales.Select(m => new FacturaMaterialDto { Nombre = m.Name, Coste = m.Cost }).ToList(),
                 TotalConIVA = total
             };
-            // Generar el PDF igual que en /factura/pdf
             var pdfBytes = await _facturaPdfService.GenerarFacturaPdfAsync(factura);
 
-            var payload = new
-            {
-                email = request.EmailDestino,
-                facturaPdf = Convert.ToBase64String(pdfBytes),
-                asunto = "Tu factura CleanFix",
-                mensaje = "Adjuntamos tu factura solicitada."
-            };
+            // Log para depuración: tamaño del PDF
+            Console.WriteLine($"[FacturaPorGmail] PDF size: {pdfBytes.Length}");
 
             using var httpClient = new HttpClient();
-            var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(payload), System.Text.Encoding.UTF8, "application/json");
-            var response = await httpClient.PostAsync("https://hook.eu2.make.com/7pw1u52rkbwmstxlwac79kfwyr56s1y6", content);
+            using var form = new MultipartFormDataContent();
+            // Adjuntar el PDF como archivo binario, igual que en /factura/pdf
+            var fileContent = new ByteArrayContent(pdfBytes);
+            fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+            form.Add(fileContent, "file", $"Factura_{empresa.Name}.pdf");
+            // Agregar los metadatos como campos de formulario
+            form.Add(new StringContent(request.EmailDestino ?? string.Empty), "email");
+            form.Add(new StringContent("Tu factura CleanFix"), "asunto");
+            form.Add(new StringContent("Adjuntamos tu factura solicitada."), "mensaje");
+
+            var response = await httpClient.PostAsync("https://hook.eu2.make.com/7pw1u52rkbwmstxlwac79kfwyr56s1y6", form);
 
             if (response.IsSuccessStatusCode)
-                return Ok("Factura enviada correctamente por Gmail (Make).");
+                return Ok("Factura enviada correctamente por Gmail (Make). (binario)");
             else
-                return StatusCode((int)response.StatusCode, "Error al enviar la factura por Gmail (Make).");
+                return StatusCode((int)response.StatusCode, "Error al enviar la factura por Gmail (Make). (binario)");
         }
 
         [HttpPost("factura/recomendar")]
