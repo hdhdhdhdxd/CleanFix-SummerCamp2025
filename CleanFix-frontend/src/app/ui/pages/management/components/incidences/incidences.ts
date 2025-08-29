@@ -1,12 +1,12 @@
 import { Component, inject, OnInit, signal } from '@angular/core'
 import { Table, TableColumn } from '../table/table'
-import { Incidence } from '@/core/domain/models/Incedence'
 import { IncidenceService } from '@/ui/services/incidence/incidence-service'
 import { ActivatedRoute } from '@angular/router'
 import { Location } from '@angular/common'
 import { SearchBar } from '../search-bar/search-bar'
 import { Pagination } from '../pagination/pagination'
 import { PaginatedData } from '@/core/domain/models/PaginatedData'
+import { IncidenceBrief } from '@/core/domain/models/IncidenceBrief'
 
 @Component({
   selector: 'app-incidences',
@@ -18,7 +18,7 @@ export class Incidences implements OnInit {
   private location = inject(Location)
   private incidenceService = inject(IncidenceService)
 
-  incidences = signal<Incidence[]>([])
+  incidences = signal<IncidenceBrief[]>([])
   totalPages = signal<number>(0)
   totalCount = signal<number>(0)
   hasPreviousPage = signal<boolean>(false)
@@ -27,14 +27,10 @@ export class Incidences implements OnInit {
   pageSize = signal<number>(10)
   pageNumber = signal<number>(1)
 
-  columns: TableColumn<Incidence>[] = [
-    { key: 'id', label: 'ID', type: 'number' },
-    { key: 'type', label: 'Tipo', type: 'text' },
+  columns: TableColumn<IncidenceBrief>[] = [
+    { key: 'address', label: 'Dirección', type: 'text' },
     { key: 'date', label: 'Fecha', type: 'date' },
-    { key: 'status', label: 'Estado', type: 'text' },
-    { key: 'description', label: 'Descripción', type: 'text' },
-    { key: 'apartmentId', label: 'Apartamento', type: 'number' },
-    { key: 'surface', label: 'Superficie', type: 'number' },
+    { key: 'issueType', label: 'Tipo', type: 'text' },
     { key: 'priority', label: 'Prioridad', type: 'text' },
   ]
 
@@ -67,7 +63,7 @@ export class Incidences implements OnInit {
     })
   }
 
-  private updateValues(pagination: PaginatedData<Incidence>) {
+  private updateValues(pagination: PaginatedData<IncidenceBrief>) {
     this.incidences.set(pagination.items)
     this.pageNumber.set(pagination.pageNumber)
     this.totalPages.set(pagination.totalPages)

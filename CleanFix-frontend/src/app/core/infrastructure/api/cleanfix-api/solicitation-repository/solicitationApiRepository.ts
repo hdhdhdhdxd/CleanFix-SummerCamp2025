@@ -3,7 +3,7 @@ import { SolicitationRepository } from '@/core/domain/repositories/SolicitationR
 import { environment } from 'src/environments/environment'
 import { SolicitationBriefDto } from './SolicitationBriefDto'
 import { PaginatedData } from '@/core/domain/models/PaginatedData'
-import { PaginatedDataDto } from '../interfaces/PaginatedDataDto'
+import { PaginatedDataDto } from '../common/interfaces/PaginatedDataDto'
 import { SolicitationBrief } from '@/core/domain/models/SolicitationBrief'
 import { SolicitationDto } from './SolicitationDto'
 

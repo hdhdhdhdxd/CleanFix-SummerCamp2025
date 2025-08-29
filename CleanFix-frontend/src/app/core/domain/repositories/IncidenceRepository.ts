@@ -1,6 +1,6 @@
-import { Incidence } from '../models/Incedence'
+import { IncidenceBrief } from '../models/IncidenceBrief'
 import { PaginatedData } from '../models/PaginatedData'
 
 export interface IncidenceRepository {
-  getPaginated(pageNumber: number, pageSize: number): Promise<PaginatedData<Incidence>>
+  getPaginated(pageNumber: number, pageSize: number): Promise<PaginatedData<IncidenceBrief>>
 }

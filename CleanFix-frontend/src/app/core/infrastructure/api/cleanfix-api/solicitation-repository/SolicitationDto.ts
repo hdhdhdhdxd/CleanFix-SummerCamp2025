@@ -1,4 +1,4 @@
-import { IssueTypeDto } from '../interfaces/IssueTypeDto'
+import { IssueTypeDto } from '../common/interfaces/IssueTypeDto'
 
 export interface SolicitationDto {
   id: number
