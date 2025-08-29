@@ -63,7 +63,7 @@ Pregunta: {{$pregunta}}";
             _kernel = builder.Build();
         }
 
-        public async Task<string> ProcesarMensajeAsync(string mensaje)
+        public async Task<string> ProcesarMensajeAsync(string mensaje, List<string> historial = null)
         {
             // LOG para depuración
             Debug.WriteLine($"[AssistantService] Pregunta recibida: {mensaje}");
@@ -76,13 +76,23 @@ Pregunta: {{$pregunta}}";
             if (mensaje.Contains("lista materiales") || mensaje.Contains("todos los materiales") || mensaje.Trim().ToLower() == "materiales")
                 return _materialesJson;
 
-            // 2. Solo llama a OpenAI si es lenguaje natural complejo
+            // 2. Usa el historial si está presente
+            string contexto = string.Empty;
+            if (historial != null && historial.Count > 0)
+            {
+                contexto = string.Join("\n", historial) + "\nUsuario: " + mensaje;
+            }
+            else
+            {
+                contexto = mensaje;
+            }
+
             var promptFunction = _kernel.CreateFunctionFromPrompt(_promptTemplate);
             var kernelArgs = new KernelArguments
             {
                 ["empresas"] = _empresasJson,
                 ["materiales"] = _materialesJson,
-                ["pregunta"] = mensaje
+                ["pregunta"] = contexto
             };
 
             try

@@ -47,7 +47,7 @@ namespace WebApi.Controllers
                     Data = null
                 });
             }
-            var respuesta = await _assistantService.ProcesarMensajeAsync(request.Mensaje);
+            var respuesta = await _assistantService.ProcesarMensajeAsync(request.Mensaje, request.Historial);
 
             // Detectar intención de factura de forma simple
             var mensajeLower = request.Mensaje.ToLowerInvariant();
