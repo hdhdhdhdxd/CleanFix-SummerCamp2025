@@ -1,14 +1,15 @@
-import { Incidence } from '@/core/domain/models/Incedence'
 import { environment } from 'src/environments/environment'
-import { IncidenceDto } from './IncidenceDto'
 import { IncidenceRepository } from '@/core/domain/repositories/IncidenceRepository'
-import { PaginatedDataDto } from '../interfaces/PaginatedDataDto'
+import { PaginatedDataDto } from '../common/interfaces/PaginatedDataDto'
 import { PaginatedData } from '@/core/domain/models/PaginatedData'
+import { IncidenceBrief } from '@/core/domain/models/IncidenceBrief'
+import { IncidenceBriefDto } from './incidenceBriefDto'
+import { priorities } from './priorityMapper'
 
 const getPaginated = async (
   pageNumber: number,
   pageSize: number,
-): Promise<PaginatedData<Incidence>> => {
+): Promise<PaginatedData<IncidenceBrief>> => {
   const response = await fetch(
     environment.baseUrl + `incidences/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
   )
@@ -16,18 +17,15 @@ const getPaginated = async (
     throw new Error('Error al obtener las incidencias')
   }
 
-  const responseJson: PaginatedDataDto<IncidenceDto> = await response.json()
+  const responseJson: PaginatedDataDto<IncidenceBriefDto> = await response.json()
 
   return {
-    items: responseJson.items.map((incidenceDto: IncidenceDto) => ({
+    items: responseJson.items.map((incidenceDto: IncidenceBriefDto) => ({
       id: incidenceDto.id,
-      type: incidenceDto.type,
+      address: incidenceDto.address,
       date: new Date(incidenceDto.date),
-      status: incidenceDto.status,
-      description: incidenceDto.description,
-      apartmentId: incidenceDto.apartmentId,
-      surface: incidenceDto.surface,
-      priority: incidenceDto.priority,
+      issueType: incidenceDto.issueType,
+      priority: priorities[incidenceDto.priority],
     })),
     pageNumber: responseJson.pageNumber,
     totalPages: responseJson.totalPages,

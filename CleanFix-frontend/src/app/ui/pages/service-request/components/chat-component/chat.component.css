@@ -1,0 +1,108 @@
+/* chat.component.css */
+.chat-window {
+  max-width: 600px;
+  margin: auto;
+  border: 1px solid #ccc;
+  padding: 1rem;
+}
+
+.chat-window {
+  display: flex;
+  flex-direction: column;
+  height: 480px;
+  max-width: 520px;
+  margin: 0 auto;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e3e7fa 100%);
+  box-shadow: 0 4px 24px rgba(60, 80, 180, 0.1);
+  overflow: hidden;
+  border: none;
+}
+
+.messages {
+  flex: 1;
+  padding: 24px 18px 12px 18px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.message {
+  display: inline-block;
+  padding: 12px 18px;
+  border-radius: 22px;
+  max-width: 80%;
+  font-size: 16px;
+  line-height: 1.5;
+  word-break: break-word;
+  box-shadow: 0 2px 8px rgba(60, 80, 180, 0.04);
+  animation: fadeIn 0.4s;
+}
+
+.message.user {
+  background: linear-gradient(90deg, #6a8cff 0%, #4f5fff 100%);
+  color: #fff;
+  align-self: flex-end;
+  border-bottom-right-radius: 6px;
+}
+
+.message.bot {
+  background: linear-gradient(90deg, #e3e7fa 0%, #c7d2fe 100%);
+  color: #222;
+  align-self: flex-start;
+  border-bottom-left-radius: 6px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+form {
+  display: flex;
+  padding: 16px;
+  border-top: 1px solid #e0e0e0;
+  background: linear-gradient(90deg, #f8fafc 0%, #e3e7fa 100%);
+}
+
+input[name='message'] {
+  flex: 1;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 22px;
+  background: #f4f6fb;
+  font-size: 16px;
+  outline: none;
+  box-shadow: 0 1px 4px rgba(60, 80, 180, 0.04);
+  margin-right: 10px;
+  transition: box-shadow 0.2s;
+}
+input[name='message']:focus {
+  box-shadow: 0 2px 8px rgba(60, 80, 180, 0.1);
+}
+
+button[type='submit'] {
+  padding: 12px 28px;
+  border: none;
+  border-radius: 22px;
+  background: linear-gradient(90deg, #6a8cff 0%, #4f5fff 100%);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(60, 80, 180, 0.08);
+  transition:
+    background 0.2s,
+    box-shadow 0.2s;
+}
+button[type='submit']:hover {
+  background: linear-gradient(90deg, #4f5fff 0%, #6a8cff 100%);
+  box-shadow: 0 4px 16px rgba(60, 80, 180, 0.12);
+}

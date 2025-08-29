@@ -118,6 +118,7 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.IssueType, f => f.PickRandom(issueTypes))
             .RuleFor(e => e.Name, (f, e) => $"Material {f.UniqueIndex + 1}")
             .RuleFor(e => e.Cost, f => Math.Round((decimal)f.Random.Float(10, 100), 2))
+            .RuleFor(e => e.CostPerSquareMeter, f => Math.Round((decimal)f.Random.Float(1, 3), 2))
             .RuleFor(e => e.Available, f => true);
         var materials = materialFaker.Generate(80);
         db.Materials.AddRange(materials);
@@ -143,10 +144,10 @@ using (var scope = app.Services.CreateScope())
         var incidenceFaker = new Faker<Incidence>()
             .RuleFor(e => e.IssueType, f => f.PickRandom(issueTypes))
             .RuleFor(e => e.Date, f => f.Date.Recent())
-            .RuleFor(e => e.Status, f => f.PickRandom(statusOptions))
             .RuleFor(e => e.Description, f => f.Lorem.Sentence())
             .RuleFor(e => e.Priority, f => f.PickRandom<Priority>())
-            .RuleFor(e => e.ApartmentId, f => f.Random.Int(0, 10));
+            .RuleFor(e => e.Surface, f => f.Random.Int(20, 200))
+            .RuleFor(e => e.Address, f => f.Address.FullAddress());
         var incidences = incidenceFaker.Generate(10);
         db.Incidences.AddRange(incidences);
         db.SaveChanges();

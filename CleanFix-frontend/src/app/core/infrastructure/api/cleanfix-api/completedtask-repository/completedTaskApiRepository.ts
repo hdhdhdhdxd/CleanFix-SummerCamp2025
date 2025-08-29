@@ -1,7 +1,7 @@
 import { CompletedTaskBrief } from '@/core/domain/models/CompletedTaskBrief'
 import { PaginatedData } from '@/core/domain/models/PaginatedData'
 import { environment } from 'src/environments/environment'
-import { PaginatedDataDto } from '../interfaces/PaginatedDataDto'
+import { PaginatedDataDto } from '../common/interfaces/PaginatedDataDto'
 import { CompletedTaskBriefDto } from './CompletedTaskBriefDto'
 
 const create = async (

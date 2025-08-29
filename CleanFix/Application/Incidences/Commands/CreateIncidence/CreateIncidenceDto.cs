@@ -6,23 +6,20 @@ namespace Application.Incidences.Commands.CreateIncidence;
 public class CreateIncidenceDto
 {
     [Required]
-    public int IssueTypeId { get; set; } // Solo el Id, no el objeto
-    [Required]
-    public DateTime Date { get; set; }
+    public int IssueTypeId { get; set; } // Del 1 al 7
     [StringLength(50, MinimumLength = 3, ErrorMessage = "El estado debe tener entre 3 y 50 caracteres.")]
-    public string Status { get; set; }
-    [StringLength(200, MinimumLength = 5, ErrorMessage = "La descripción debe tener entre 5 y 200 caracteres.")]
     public string Description { get; set; }
-    [Required(ErrorMessage = "El ApartmentId es obligatorio.")]
-    public int ApartmentId { get; set; }
     [Required]
-    public Priority Priority { get; set; }
+    public string Address { get; set; } // Dirección del apartamento
+    [Required]
+    public int Surface { get; set; } // Superficie del apartamento
+    [Required]
+    public Priority Priority { get; set; }  // Del 1 al 4
     private class Mapping : Profile
     {
         public Mapping()
         {
-            CreateMap<CreateIncidenceDto, Incidence>()
-                .ForMember(dest => dest.IssueTypeId, opt => opt.MapFrom(src => src.IssueTypeId));
+            CreateMap<CreateIncidenceDto, Incidence>();
         }
     }
 }

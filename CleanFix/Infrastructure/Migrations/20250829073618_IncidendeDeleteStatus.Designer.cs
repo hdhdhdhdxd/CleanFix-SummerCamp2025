@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebApi.BaseDatos;
 
@@ -11,9 +12,11 @@ using WebApi.BaseDatos;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    partial class DatabaseContextModelSnapshot : ModelSnapshot
+    [Migration("20250829073618_IncidendeDeleteStatus")]
+    partial class IncidendeDeleteStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -165,8 +168,8 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
-                    b.Property<double>("Surface")
-                        .HasColumnType("float")
+                    b.Property<int>("Surface")
+                        .HasColumnType("int")
                         .HasComment("Superficie del apartamento");
 
                     b.Property<int?>("UserId")
@@ -193,9 +196,9 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ApartmentId")
+                        .HasColumnType("int")
+                        .HasComment("Id del apartamento asociado");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2")
@@ -222,9 +225,12 @@ namespace Infrastructure.Migrations
                         .HasColumnType("rowversion");
 
                     b.Property<int>("Surface")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasComment("Superficie del apartamento");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApartmentId");
 
                     b.HasIndex("IssueTypeId");
 
@@ -269,9 +275,6 @@ namespace Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)")
                         .HasComment("Costo del material");
-
-                    b.Property<decimal>("CostPerSquareMeter")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("IssueTypeId")
                         .HasColumnType("int")
@@ -411,11 +414,19 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Incidence", b =>
                 {
+                    b.HasOne("Domain.Entities.Apartment", "Apartment")
+                        .WithMany()
+                        .HasForeignKey("ApartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Domain.Entities.IssueType", "IssueType")
                         .WithMany()
                         .HasForeignKey("IssueTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Apartment");
 
                     b.Navigation("IssueType");
                 });
