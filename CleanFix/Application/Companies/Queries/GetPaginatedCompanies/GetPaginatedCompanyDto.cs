@@ -14,6 +14,7 @@ public class GetPaginatedCompanyDto
     public int Id { get; set; }
     public string Name { get; set; }
     public string Number { get; set; }
+    public decimal Price { get; set; }
     public string Email { get; set; }
     public string IssueType { get; set; } // Renombrado y tipado como string
     private class Mapping : Profile

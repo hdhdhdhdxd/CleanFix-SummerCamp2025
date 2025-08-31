@@ -8,7 +8,6 @@ import { SolicitationDialog } from '../solicitation-dialog/solicitation-dialog'
 import { Table, TableColumn } from '../table/table'
 import { PaginatedData } from '@/core/domain/models/PaginatedData'
 import { SolicitationBrief } from '@/core/domain/models/SolicitationBrief'
-import { Company } from '@/core/domain/models/Company'
 
 @Component({
   selector: 'app-solicitations',
@@ -30,7 +29,6 @@ export class Solicitations implements OnInit {
   pageNumber = signal<number>(1)
 
   solicitationId: number | null = null
-  companies = signal<Company[]>([])
   showDialog = signal<boolean>(false)
 
   columns: TableColumn<SolicitationBrief>[] = [
@@ -98,5 +96,9 @@ export class Solicitations implements OnInit {
   handleCloseDialog(): void {
     this.solicitationId = null
     this.showDialog.set(false)
+  }
+
+  handleTaskCreated(): void {
+    this.loadSolicitations(this.pageNumber(), this.pageSize())
   }
 }

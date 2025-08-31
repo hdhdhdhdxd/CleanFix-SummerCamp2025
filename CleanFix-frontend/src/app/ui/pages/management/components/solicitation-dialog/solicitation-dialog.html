@@ -95,6 +95,12 @@
               <span class="font-semibold text-brand-700">Tipo de incidencia:</span>
               <span class="text-brand-900">{{ selectedCompany!.issueType }}</span>
             </div>
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-brand-700">Precio:</span>
+              <span class="text-brand-900">{{
+                selectedCompany!.price | currency: 'EUR' : 'symbol' : '1.2-2'
+              }}</span>
+            </div>
           </div>
         }
         @if (selectedCompany && solicitation()) {
@@ -102,13 +108,8 @@
             <span class="mb-1 text-sm font-medium text-brand-600">Coste de la empresa</span>
             <div class="rounded bg-brand-50 px-4 py-2 text-xs text-brand-800">
               <span>
-                Coste empresa x Nº departamentos:<br />
-                ({{ solicitation()!.maintenanceCost | currency: 'EUR' : 'symbol' : '1.2-2' }} x
-                {{ apartmentAmountValue }}) =
-                <b>{{
-                  solicitation()!.maintenanceCost * apartmentAmountValue
-                    | currency: 'EUR' : 'symbol' : '1.2-2'
-                }}</b>
+                Coste fijo de la empresa:<br />
+                <b>{{ totalCompanyCost | currency: 'EUR' : 'symbol' : '1.2-2' }}</b>
               </span>
             </div>
           </div>
@@ -141,7 +142,24 @@
                 </li>
               }
             </ul>
-            <div class="mt-4 rounded bg-brand-100 px-4 py-2 text-right font-bold text-brand-900">
+            <div class="mt-4 rounded bg-brand-50 px-4 py-2 text-xs text-brand-800">
+              <div class="space-y-1">
+                <div class="flex justify-between">
+                  <span>Coste empresa (fijo):</span>
+                  <span class="font-medium">{{
+                    totalCompanyCost | currency: 'EUR' : 'symbol' : '1.2-2'
+                  }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Coste materiales ({{ apartmentAmountValue }} departamentos):</span>
+                  <span class="font-medium">{{
+                    totalMaterialsCost | currency: 'EUR' : 'symbol' : '1.2-2'
+                  }}</span>
+                </div>
+                <hr class="border-brand-300" />
+              </div>
+            </div>
+            <div class="mt-2 rounded bg-brand-100 px-4 py-2 text-right font-bold text-brand-900">
               Total del trabajo:
               <span>
                 {{ totalJobCost | currency: 'EUR' : 'symbol' : '1.2-2' }}

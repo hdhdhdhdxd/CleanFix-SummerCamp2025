@@ -10,6 +10,8 @@ public class UpdateMaterialDto
     [Required]
     public string Name { get; set; }
     [Required]
+    public decimal CostPerSquareMeter { get; set; }
+    [Required]
     public decimal Cost { get; set; }
     [Required]
     public bool Available { get; set; }

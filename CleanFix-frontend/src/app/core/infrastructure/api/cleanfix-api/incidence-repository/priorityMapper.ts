@@ -1,6 +1,6 @@
 export const priorities: Record<number, string> = {
-  1: 'Baja',
-  2: 'Media',
-  3: 'Alta',
-  4: 'Urgente',
+  0: 'Baja',
+  1: 'Media',
+  2: 'Alta',
+  3: 'Urgente',
 }

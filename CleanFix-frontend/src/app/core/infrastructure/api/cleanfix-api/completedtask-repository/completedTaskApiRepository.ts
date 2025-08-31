@@ -19,7 +19,7 @@ const create = async (
     materialIds,
   }
 
-  const response = await fetch(environment.baseUrl + 'completedtasks', {
+  const response = await fetch(environment.baseUrl + '/completedtasks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -37,7 +37,7 @@ const getPaginated = async (
   pageSize: number,
 ): Promise<PaginatedData<CompletedTaskBrief>> => {
   const response = await fetch(
-    `${environment.baseUrl}completedtasks/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+    `${environment.baseUrl}/completedtasks/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
     {
       method: 'GET',
       headers: {

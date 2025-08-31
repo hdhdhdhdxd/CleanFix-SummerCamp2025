@@ -5,7 +5,11 @@
 
   <div class="mx-7 mb-5 flex min-h-0 flex-grow flex-col">
     <div class="min-h-0 flex-grow">
-      <app-table [items]="incidences()" [tableColumns]="columns" />
+      <app-table
+        [items]="incidences()"
+        [tableColumns]="columns"
+        (rowClick)="handleRowClick($event)"
+      />
     </div>
     <div>
       <app-pagination
@@ -22,4 +26,11 @@
       />
     </div>
   </div>
+  @if (showDialog() && incidenceId) {
+    <app-incidence-dialog
+      [incidenceId]="incidenceId"
+      (closeDialog)="handleCloseDialog()"
+      (taskCreated)="handleTaskCreated()"
+    />
+  }
 </div>
