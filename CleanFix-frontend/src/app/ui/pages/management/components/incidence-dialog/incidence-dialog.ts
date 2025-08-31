@@ -24,6 +24,7 @@ import {
   selector: 'app-incidence-dialog',
   imports: [CommonModule, DatePipe, FormsModule],
   templateUrl: './incidence-dialog.html',
+  styleUrls: ['./incidence-dialog.css'],
 })
 export class IncidenceDialog implements OnInit, AfterViewInit {
   private incidenceService = inject(IncidenceService)
