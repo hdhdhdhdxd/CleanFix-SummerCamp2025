@@ -38,6 +38,7 @@ export class SolicitationDialog implements AfterViewInit, OnInit {
   companies = signal<Company[]>([])
   selectedCompanyId = signal<number | null>(null)
   materials = signal<Material[]>([])
+  isLoading = signal<boolean>(true)
 
   closeDialog = output<void>()
   taskCreated = output<void>() // Nuevo evento para cuando se crea una tarea
@@ -64,15 +65,29 @@ export class SolicitationDialog implements AfterViewInit, OnInit {
   }
 
   private fetchSolicitationAndCompanies(): void {
-    this.solicitationService.getById(this.solicitationId()).subscribe((solicitation) => {
-      this.solicitation.set(solicitation)
-      this.fetchCompanies(solicitation.issueType.id)
+    this.isLoading.set(true)
+    this.solicitationService.getById(this.solicitationId()).subscribe({
+      next: (solicitation) => {
+        this.solicitation.set(solicitation)
+        this.fetchCompanies(solicitation.issueType.id)
+      },
+      error: (error) => {
+        console.error('Error loading solicitation:', error)
+        this.isLoading.set(false)
+      },
     })
   }
 
   private fetchCompanies(issueTypeId: number): void {
-    this.companyService.getPaginated(1, 10, issueTypeId).subscribe((companies) => {
-      this.companies.set(companies.items)
+    this.companyService.getPaginated(1, 10, issueTypeId).subscribe({
+      next: (companies) => {
+        this.companies.set(companies.items)
+        this.isLoading.set(false)
+      },
+      error: (error) => {
+        console.error('Error loading companies:', error)
+        this.isLoading.set(false)
+      },
     })
   }
 

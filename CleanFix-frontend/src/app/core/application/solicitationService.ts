@@ -6,8 +6,8 @@ const init = (repository: SolicitationRepository) => {
   solicitationRepository = repository
 }
 
-const getPaginated = async (pageNumber: number, pageSize: number) => {
-  return solicitationRepository.getPaginated(pageNumber, pageSize)
+const getPaginated = async (pageNumber: number, pageSize: number, filterString?: string) => {
+  return solicitationRepository.getPaginated(pageNumber, pageSize, filterString)
 }
 
 const getById = async (id: number) => {

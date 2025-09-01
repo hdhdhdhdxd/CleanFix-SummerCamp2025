@@ -10,12 +10,22 @@ import { SolicitationDto } from './SolicitationDto'
 const getPaginated = async (
   pageNumber: number,
   pageSize: number,
+  filterString?: string,
 ): Promise<PaginatedData<SolicitationBrief>> => {
+  const params = new URLSearchParams({
+    pageNumber: pageNumber.toString(),
+    pageSize: pageSize.toString(),
+  })
+
+  if (filterString) {
+    params.append('filterString', filterString)
+  }
+
   const response = await fetch(
-    environment.baseUrl + `/solicitations/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+    `${environment.baseUrl}/solicitations/paginated?${params.toString()}`,
   )
   if (!response.ok) {
-    throw new Error('Error al obtener las empresas')
+    throw new Error('Error al obtener las solicitudes')
   }
 
   const responseJson: PaginatedDataDto<SolicitationBriefDto> = await response.json()

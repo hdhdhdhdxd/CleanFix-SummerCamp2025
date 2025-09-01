@@ -1,10 +1,25 @@
 <search>
-  <form class="flex space-x-2.5">
-    <input
-      class="w-xs rounded-lg border border-brand-300 px-3 py-2 focus:border-brand-700 focus:outline-none"
-      name="filter-text-input"
-      placeholder="Buscar documentos..."
-    />
-    <button class="rounded-lg bg-primary-500 px-3 text-brand-0">Buscar</button>
+  <form class="flex space-x-2.5" (submit)="onSubmit($event)">
+    <div class="relative">
+      <input
+        class="w-xs rounded-lg border border-brand-300 px-3 py-2 transition-all duration-200 hover:border-brand-500 hover:shadow-sm focus:border-brand-700 focus:ring-2 focus:ring-brand-200 focus:outline-none"
+        type="search"
+        name="filter-text-input"
+        placeholder="Buscar documentos..."
+        autocomplete="off"
+        [value]="value()"
+        (input)="onInput($event)"
+        (search)="onSearch($event)"
+        (keydown.enter)="onSubmit($event)"
+        aria-label="Buscar documentos"
+      />
+    </div>
+    <button
+      type="submit"
+      class="hover:bg-primary-600 active:bg-primary-700 focus:ring-primary-200 rounded-lg bg-primary-500 px-4 py-2 text-brand-0 transition-all duration-200 hover:shadow-md focus:ring-2 focus:outline-none active:scale-95"
+      aria-label="Ejecutar búsqueda"
+    >
+      Buscar
+    </button>
   </form>
 </search>

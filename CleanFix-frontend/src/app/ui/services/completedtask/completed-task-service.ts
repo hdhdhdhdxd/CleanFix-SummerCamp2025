@@ -30,8 +30,9 @@ export class CompletedTaskService {
   getPaginated(
     pageNumber: number,
     pageSize: number,
+    filterString?: string,
   ): Observable<PaginatedData<CompletedTaskBrief>> {
-    return from(completedTaskService.getPaginated(pageNumber, pageSize))
+    return from(completedTaskService.getPaginated(pageNumber, pageSize, filterString))
   }
 
   getById(id: string): Observable<CompletedTask> {

@@ -27,6 +27,11 @@ export class Solicitations implements OnInit {
 
   pageSize = signal<number>(10)
   pageNumber = signal<number>(1)
+  searchTerm = signal<string>('')
+
+  isLoading = signal<boolean>(false)
+  hasError = signal<boolean>(false)
+  errorMessage = signal<string>('')
 
   solicitationId: number | null = null
   showDialog = signal<boolean>(false)
@@ -41,14 +46,19 @@ export class Solicitations implements OnInit {
     const currentParams = this.route.snapshot.queryParams
     const initialPageSize = +(currentParams['pageSize'] || 10)
     const initialPageNumber = +(currentParams['pageNumber'] || 1)
+    const initialSearchTerm = currentParams['search'] || ''
 
     this.pageSize.set(initialPageSize)
     this.pageNumber.set(initialPageNumber)
+    this.searchTerm.set(initialSearchTerm)
 
-    if (!currentParams['pageSize'] && !currentParams['pageNumber']) {
+    const hasParams =
+      currentParams['pageSize'] || currentParams['pageNumber'] || currentParams['search']
+    if (!hasParams) {
       this.updateUrl()
     }
-    this.loadSolicitations(this.pageNumber(), this.pageSize())
+
+    this.loadSolicitations(this.pageNumber(), this.pageSize(), this.searchTerm())
   }
 
   private updateUrl(): void {
@@ -56,13 +66,34 @@ export class Solicitations implements OnInit {
     queryParams.set('pageSize', this.pageSize().toString())
     queryParams.set('pageNumber', this.pageNumber().toString())
 
+    const searchValue = this.searchTerm().trim()
+    if (searchValue) {
+      queryParams.set('search', searchValue)
+    }
+
     const url = `${this.location.path().split('?')[0]}?${queryParams.toString()}`
     this.location.replaceState(url)
   }
 
-  private loadSolicitations(page: number, pageSize: number) {
-    this.solicitationService.getPaginated(page, pageSize).subscribe((result) => {
-      this.updateValues(result)
+  private loadSolicitations(page: number, pageSize: number, searchTerm?: string) {
+    const filterString = searchTerm?.trim() || undefined
+
+    this.isLoading.set(true)
+    this.hasError.set(false)
+    this.errorMessage.set('')
+
+    this.solicitationService.getPaginated(page, pageSize, filterString).subscribe({
+      next: (result) => {
+        this.updateValues(result)
+        this.isLoading.set(false)
+      },
+      error: (error) => {
+        console.error('Error loading solicitations:', error)
+        this.isLoading.set(false)
+        this.hasError.set(true)
+        this.errorMessage.set('Error al cargar las solicitudes. Por favor, inténtelo de nuevo.')
+        this.solicitations.set([])
+      },
     })
   }
 
@@ -78,14 +109,22 @@ export class Solicitations implements OnInit {
   setPageNumber($event: number) {
     this.pageNumber.set($event)
     this.updateUrl()
-    this.loadSolicitations($event, this.pageSize())
+    this.loadSolicitations($event, this.pageSize(), this.searchTerm())
   }
 
   setPageSize($event: number) {
     this.pageSize.set($event)
     this.pageNumber.set(1)
     this.updateUrl()
-    this.loadSolicitations(1, $event)
+    this.loadSolicitations(1, $event, this.searchTerm())
+  }
+
+  onSearchChange(searchTerm: string) {
+    const trimmedTerm = searchTerm.trim()
+    this.searchTerm.set(trimmedTerm)
+    this.pageNumber.set(1)
+    this.updateUrl()
+    this.loadSolicitations(1, this.pageSize(), trimmedTerm || undefined)
   }
 
   handleRowClick(item: SolicitationBrief): void {
@@ -99,6 +138,6 @@ export class Solicitations implements OnInit {
   }
 
   handleTaskCreated(): void {
-    this.loadSolicitations(this.pageNumber(), this.pageSize())
+    this.loadSolicitations(this.pageNumber(), this.pageSize(), this.searchTerm())
   }
 }

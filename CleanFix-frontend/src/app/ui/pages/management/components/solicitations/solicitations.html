@@ -1,6 +1,6 @@
 <div class="flex h-full flex-col">
   <div class="mx-7 my-5">
-    <app-search-bar />
+    <app-search-bar [initialValue]="searchTerm()" (searchChange)="onSearchChange($event)" />
   </div>
 
   <div class="mx-7 mb-5 flex min-h-0 flex-grow flex-col">
@@ -8,6 +8,11 @@
       <app-table
         [items]="solicitations()"
         [tableColumns]="columns"
+        [isLoading]="isLoading()"
+        [hasError]="hasError()"
+        [errorMessage]="errorMessage()"
+        [searchTerm]="searchTerm()"
+        [emptyMessage]="'No hay solicitudes disponibles'"
         (rowClick)="handleRowClick($event)"
       />
     </div>

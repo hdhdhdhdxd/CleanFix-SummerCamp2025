@@ -22,8 +22,8 @@ const create = async (
   )
 }
 
-const getPaginated = async (pageNumber: number, pageSize: number) => {
-  return completedTaskRepository.getPaginated(pageNumber, pageSize)
+const getPaginated = async (pageNumber: number, pageSize: number, filterString?: string) => {
+  return completedTaskRepository.getPaginated(pageNumber, pageSize, filterString)
 }
 
 const getById = async (id: string) => {

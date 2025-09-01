@@ -10,6 +10,10 @@ export interface CompletedTaskRepository {
     isSolicitation: boolean,
     MaterialIds: number[],
   ): Promise<void>
-  getPaginated(pageNumber: number, pageSize: number): Promise<PaginatedData<CompletedTaskBrief>>
+  getPaginated(
+    pageNumber: number,
+    pageSize: number,
+    filterString?: string,
+  ): Promise<PaginatedData<CompletedTaskBrief>>
   getById(id: string): Promise<CompletedTask>
 }
