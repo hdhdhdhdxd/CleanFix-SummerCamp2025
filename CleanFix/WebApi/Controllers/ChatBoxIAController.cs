@@ -342,21 +342,22 @@ namespace WebApi.Controllers
                 sb.Append("Materiales: ");
                 sb.Append(string.Join(", ", factura.Materiales.Select(m => $"{m.Nombre} - €{m.Coste:F2}")));
                 sb.AppendLine();
+                decimal iva = 0.21m;
+                decimal ivaEmpresa = factura.Empresa.Coste * iva;
+                decimal ivaMateriales = factura.Materiales?.Sum(m => m.Coste) * iva ?? 0;
+                decimal totalIva = ivaEmpresa + ivaMateriales;
+                sb.AppendLine($"IVA: €{totalIva:F2}");
+                sb.AppendLine($"Total con IVA: €{factura.TotalConIVA:F2}");
             }
             else
             {
                 // Sugerir materiales si no hay ninguno en la factura
                 var dbPlugin = new DBPluginTestPG(_connectionString);
                 var materialesResponse = dbPlugin.GetAllMaterials();
-                var sugeridos = materialesResponse.Data?.Take(5).Select(m => m.Name).ToList() ?? new List<string>();
-                sb.AppendLine($"Necesitas añadir algún material para la factura. Te recomiendo estos: {string.Join(", ", sugeridos)}");
+                var sugeridos = materialesResponse.Data?.Take(4).ToList() ?? new List<MaterialIa>();
+                sb.Append("Debes añadir algún material, te recomiendo estos: Materiales: ");
+                sb.Append(string.Join(", ", sugeridos.Select(m => $"{m.Name} - €{m.Cost:F2}")));
             }
-            decimal iva = 0.21m;
-            decimal ivaEmpresa = factura.Empresa.Coste * iva;
-            decimal ivaMateriales = factura.Materiales?.Sum(m => m.Coste) * iva ?? 0;
-            decimal totalIva = ivaEmpresa + ivaMateriales;
-            sb.AppendLine($"IVA: €{totalIva:F2}");
-            sb.AppendLine($"Total con IVA: €{factura.TotalConIVA:F2}");
             return sb.ToString();
         }
     }
