@@ -82,35 +82,18 @@ namespace WebApi.Controllers
                             Data = new { mensaje = $"Empresa encontrada: {empresa.Name} (ID: {empresa.Number}, Tipo: {empresa.IssueTypeId}, Precio: €{empresa.Price:F2})" }
                         });
                     }
-                }
-
-                // 2. Buscar por ID de empresa (CompanyIa.Number) solo si no se encontró por nombre
-                var empresaIdMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"empresa\s*(\d+)$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                if (empresaIdMatch.Success)
-                {
-                    var empresaId = empresaIdMatch.Groups[1].Value.Trim();
-                    var empresa = empresas.FirstOrDefault(e => e.Number != null && e.Number.Equals(empresaId, StringComparison.OrdinalIgnoreCase));
-                    if (empresa != null)
-                    {
-                        return Ok(new MensajeResponse
-                        {
-                            Success = true,
-                            Error = null,
-                            Data = new { mensaje = $"Empresa encontrada: {empresa.Name} (ID: {empresa.Number}, Tipo: {empresa.IssueTypeId}, Precio: €{empresa.Price:F2})" }
-                        });
-                    }
                     else
                     {
                         return Ok(new MensajeResponse
                         {
                             Success = true,
                             Error = null,
-                            Data = new { mensaje = $"No se encontró la empresa con ID {empresaId}." }
+                            Data = new { mensaje = $"No se encontró la empresa con nombre '{nombre}'." }
                         });
                     }
                 }
 
-                // 3. Buscar por tipo numérico o nombre de problema (IssueType)
+                // 2. Buscar por tipo numérico o nombre de problema (IssueType)
                 var tipoMatches = System.Text.RegularExpressions.Regex.Matches(request.Mensaje, @"tipo\\s*([a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                 var tiposSolicitados = new HashSet<int>();
                 var tiposTexto = new List<string>();
@@ -178,7 +161,7 @@ namespace WebApi.Controllers
                 {
                     Success = true,
                     Error = null,
-                    Data = new { mensaje = "No se reconoce el tipo, nombre o ID de empresa/material/problema. Intenta especificar el nombre, ID o tipo correctamente." }
+                    Data = new { mensaje = "No se reconoce el tipo, nombre o ID de empresa/material/problema. Intenta especificar el nombre o tipo correctamente." }
                 });
             }
             // --- FIN NUEVO ---
