@@ -47,26 +47,75 @@ namespace WebApi.Controllers
                     Data = null
                 });
             }
-            var respuesta = await _assistantService.ProcesarMensajeAsync(request.Mensaje, request.Historial);
 
-            // Detectar intención de factura de forma simple
+            // Limitar el historial a los últimos 3 mensajes
+            var historial = request.Historial != null && request.Historial.Count > 3
+                ? request.Historial.Skip(request.Historial.Count - 3).ToList()
+                : request.Historial;
+
             var mensajeLower = request.Mensaje.ToLowerInvariant();
             bool esFactura = mensajeLower.Contains("factura") || mensajeLower.Contains("pdf") || mensajeLower.Contains("enviar factura") || mensajeLower.Contains("descargar factura");
+            bool pideMateriales = mensajeLower.Contains("material") || mensajeLower.Contains("materiales");
+            bool pideEmpresas = mensajeLower.Contains("empresa") || mensajeLower.Contains("empresas");
 
+            // Mensaje ilegible: no contiene palabras clave conocidas
+            if (!esFactura && !pideMateriales && !pideEmpresas && request.Mensaje.Length < 20)
+            {
+                return Ok(new MensajeResponse
+                {
+                    Success = true,
+                    Error = null,
+                    Data = new { mensaje = "Lo siento, no entiendo tu mensaje. ¿Puedes reformularlo?" }
+                });
+            }
+
+            // Si es factura, genera la factura y luego ofrece opciones
             if (esFactura)
             {
-                // Puedes ajustar la URL base según tu despliegue
+                // Aquí podrías generar la factura real y devolverla en la respuesta
+                // Para ejemplo, solo devuelvo un mensaje y las opciones
                 var pdfUrl = "/api/chatboxia/factura/pdf";
                 return Ok(new MensajeResponse
                 {
                     Success = true,
                     Error = null,
                     Data = new {
-                        mensaje = "¿Quieres descargar la factura o recibirla por email?",
+                        mensaje = "Aquí tienes tu factura. ¿Quieres descargarla o recibirla por email?",
                         pdfUrl = pdfUrl,
                         puedeEnviarEmail = true
                     }
                 });
+            }
+
+            // Llama al servicio con el historial limitado
+            var respuesta = await _assistantService.ProcesarMensajeAsync(request.Mensaje, historial);
+
+            // Si pide materiales, filtra la respuesta para evitar empresas
+            if (pideMateriales && !esFactura)
+            {
+                // Si la respuesta contiene la palabra 'empresa' pero no 'material', muestra solo materiales
+                if (respuesta.ToLower().Contains("empresa") && !respuesta.ToLower().Contains("material"))
+                {
+                    return Ok(new MensajeResponse
+                    {
+                        Success = true,
+                        Error = null,
+                        Data = new { mensaje = "Aquí tienes los materiales disponibles." }
+                    });
+                }
+            }
+            // Si pide empresas, filtra la respuesta para evitar materiales
+            if (pideEmpresas && !esFactura)
+            {
+                if (respuesta.ToLower().Contains("material") && !respuesta.ToLower().Contains("empresa"))
+                {
+                    return Ok(new MensajeResponse
+                    {
+                        Success = true,
+                        Error = null,
+                        Data = new { mensaje = "Aquí tienes las empresas disponibles." }
+                    });
+                }
             }
 
             return Ok(new MensajeResponse

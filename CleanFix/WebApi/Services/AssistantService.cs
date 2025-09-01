@@ -65,7 +65,6 @@ Pregunta: {{$pregunta}}";
 
         public async Task<string> ProcesarMensajeAsync(string mensaje, List<string> historial = null)
         {
-            // LOG para depuración
             Debug.WriteLine($"[AssistantService] Pregunta recibida: {mensaje}");
             Debug.WriteLine($"[AssistantService] Empresas JSON: {_empresasJson}");
             Debug.WriteLine($"[AssistantService] Materiales JSON: {_materialesJson}");
@@ -76,11 +75,12 @@ Pregunta: {{$pregunta}}";
             if (mensaje.Contains("lista materiales") || mensaje.Contains("todos los materiales") || mensaje.Trim().ToLower() == "materiales")
                 return _materialesJson;
 
-            // 2. Usa el historial si está presente
+            // 2. Usa el historial si está presente y limita a los últimos 3 mensajes
             string contexto = string.Empty;
             if (historial != null && historial.Count > 0)
             {
-                contexto = string.Join("\n", historial) + "\nUsuario: " + mensaje;
+                var ultimos = historial.Count > 3 ? historial.Skip(historial.Count - 3).ToList() : historial;
+                contexto = string.Join("\n", ultimos) + "\nUsuario: " + mensaje;
             }
             else
             {
