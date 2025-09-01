@@ -67,8 +67,25 @@ namespace WebApi.Controllers
                 var empresasResponse = dbPlugin.GetAllEmpresas();
                 var empresas = empresasResponse.Data ?? new List<CompanyIa>();
 
-                // 1. Buscar por ID de empresa (CompanyIa.Number)
-                var empresaIdMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"empresa\s*(\d+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                // 1. Buscar por nombre exacto de empresa (prioridad)
+                var empresaNombreMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"empresa\s+([a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (empresaNombreMatch.Success)
+                {
+                    var nombre = empresaNombreMatch.Groups[1].Value.Trim();
+                    var empresa = empresas.FirstOrDefault(e => e.Name.Equals(nombre, StringComparison.OrdinalIgnoreCase));
+                    if (empresa != null)
+                    {
+                        return Ok(new MensajeResponse
+                        {
+                            Success = true,
+                            Error = null,
+                            Data = new { mensaje = $"Empresa encontrada: {empresa.Name} (ID: {empresa.Number}, Tipo: {empresa.IssueTypeId}, Precio: €{empresa.Price:F2})" }
+                        });
+                    }
+                }
+
+                // 2. Buscar por ID de empresa (CompanyIa.Number) solo si no se encontró por nombre
+                var empresaIdMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"empresa\s*(\d+)$", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                 if (empresaIdMatch.Success)
                 {
                     var empresaId = empresaIdMatch.Groups[1].Value.Trim();
@@ -89,23 +106,6 @@ namespace WebApi.Controllers
                             Success = true,
                             Error = null,
                             Data = new { mensaje = $"No se encontró la empresa con ID {empresaId}." }
-                        });
-                    }
-                }
-
-                // 2. Buscar por nombre de empresa
-                var empresaNombreMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"empresa\s+([a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                if (empresaNombreMatch.Success)
-                {
-                    var nombre = empresaNombreMatch.Groups[1].Value.Trim();
-                    var empresa = empresas.FirstOrDefault(e => e.Name.Equals(nombre, StringComparison.OrdinalIgnoreCase));
-                    if (empresa != null)
-                    {
-                        return Ok(new MensajeResponse
-                        {
-                            Success = true,
-                            Error = null,
-                            Data = new { mensaje = $"Empresa encontrada: {empresa.Name} (ID: {empresa.Number}, Tipo: {empresa.IssueTypeId}, Precio: €{empresa.Price:F2})" }
                         });
                     }
                 }
