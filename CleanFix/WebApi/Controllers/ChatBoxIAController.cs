@@ -66,56 +66,80 @@ namespace WebApi.Controllers
                 var issueTypeRepo = new Infrastructure.Repositories.IssueTypeRepository(_connectionString);
                 var issueTypes = await issueTypeRepo.GetAllAsync();
 
-                // Detectar si pide todas las empresas de un tipo concreto por nombre (ej: "problema electrico")
-                var tipoMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"tipo\\s*([a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                int? tipoInt = null;
-                string tipoTexto = null;
-                if (tipoMatch.Success)
+                // Buscar todos los tipos mencionados (números o nombres, separados por 'y', ',' o 'o')
+                var tipoMatches = System.Text.RegularExpressions.Regex.Matches(request.Mensaje, @"tipo\\s*([a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                var tiposSolicitados = new HashSet<int>();
+                var tiposTexto = new List<string>();
+                foreach (System.Text.RegularExpressions.Match match in tipoMatches)
                 {
-                    var tipo = tipoMatch.Groups[1].Value.Trim();
-                    tipoTexto = tipo;
+                    var tipo = match.Groups[1].Value.Trim();
                     if (int.TryParse(tipo, out int tipoNum))
                     {
-                        tipoInt = tipoNum;
+                        tiposSolicitados.Add(tipoNum);
+                        tiposTexto.Add(tipoNum.ToString());
                     }
                     else
                     {
-                        // Buscar por nombre de tipo (IssueType)
                         var tipoPorNombre = issueTypes.FirstOrDefault(it => it.Name.Equals(tipo, StringComparison.OrdinalIgnoreCase));
                         if (tipoPorNombre != null)
-                            tipoInt = tipoPorNombre.Id;
+                        {
+                            tiposSolicitados.Add(tipoPorNombre.Id);
+                            tiposTexto.Add(tipoPorNombre.Name);
+                        }
                     }
                 }
-                else
+                // También buscar por nombres de tipo en todo el mensaje (por si no usan 'tipo X')
+                foreach (var issue in issueTypes)
                 {
-                    // Buscar por nombre de tipo en todo el mensaje
-                    var tipoPorNombre = issueTypes.FirstOrDefault(it => request.Mensaje.Contains(it.Name, StringComparison.OrdinalIgnoreCase));
-                    if (tipoPorNombre != null)
+                    if (request.Mensaje.Contains(issue.Name, StringComparison.OrdinalIgnoreCase))
                     {
-                        tipoInt = tipoPorNombre.Id;
-                        tipoTexto = tipoPorNombre.Name;
+                        tiposSolicitados.Add(issue.Id);
+                        if (!tiposTexto.Contains(issue.Name))
+                            tiposTexto.Add(issue.Name);
                     }
                 }
-
-                if (tipoInt.HasValue)
+                // Si no se encontró ningún tipo, intentar buscar un solo tipo como antes
+                if (tiposSolicitados.Count == 0)
+                {
+                    var tipoMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"tipo\\s*([a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    if (tipoMatch.Success)
+                    {
+                        var tipo = tipoMatch.Groups[1].Value.Trim();
+                        if (int.TryParse(tipo, out int tipoNum))
+                        {
+                            tiposSolicitados.Add(tipoNum);
+                            tiposTexto.Add(tipoNum.ToString());
+                        }
+                        else
+                        {
+                            var tipoPorNombre = issueTypes.FirstOrDefault(it => it.Name.Equals(tipo, StringComparison.OrdinalIgnoreCase));
+                            if (tipoPorNombre != null)
+                            {
+                                tiposSolicitados.Add(tipoPorNombre.Id);
+                                tiposTexto.Add(tipoPorNombre.Name);
+                            }
+                        }
+                    }
+                }
+                if (tiposSolicitados.Count > 0)
                 {
                     var empresasResponse = dbPlugin.GetAllEmpresas();
-                    var empresasFiltradas = empresasResponse.Data?.Where(e => e.Type == tipoInt.Value).ToList() ?? new List<CompanyIa>();
+                    var empresasFiltradas = empresasResponse.Data?.Where(e => tiposSolicitados.Contains(e.Type)).ToList() ?? new List<CompanyIa>();
                     if (empresasFiltradas.Count == 0)
                     {
                         return Ok(new MensajeResponse
                         {
                             Success = true,
                             Error = null,
-                            Data = new { mensaje = $"No se encontraron empresas del tipo '{tipoTexto ?? tipoInt.Value.ToString()}'." }
+                            Data = new { mensaje = $"No se encontraron empresas de los tipos: {string.Join(", ", tiposTexto)}." }
                         });
                     }
-                    var listado = string.Join(", ", empresasFiltradas.Select(e => $"{e.Name} (Precio: €{e.Price:F2})"));
+                    var listado = string.Join(", ", empresasFiltradas.Select(e => $"{e.Name} (Precio: €{e.Price:F2}, Tipo: {e.Type})"));
                     return Ok(new MensajeResponse
                     {
                         Success = true,
                         Error = null,
-                        Data = new { mensaje = $"Empresas de tipo '{tipoTexto ?? tipoInt.Value.ToString()}': {listado}" }
+                        Data = new { mensaje = $"Empresas de tipo {string.Join(", ", tiposTexto)}: {listado}" }
                     });
                 }
                 // Si pide todas las empresas sin tipo
