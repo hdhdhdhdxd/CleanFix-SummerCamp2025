@@ -205,28 +205,27 @@ namespace WebApi.Controllers
             // Si es factura, intenta extraer empresa y materiales y usa la lógica real
             if (esFactura)
             {
-                // Extracción simple de empresa y materiales por ID o nombre (mejorable con NLP)
+                // Extracción robusta de empresa y materiales por nombre (igual que materiales)
                 string empresaNombre = null;
                 var materialesNombres = new List<string>();
-                var empresaMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"empresa\s*(\d+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                if (empresaMatch.Success)
+
+                // Buscar empresa: busca la última ocurrencia de 'empresa' seguida de cualquier texto hasta el final o hasta 'material'
+                var empresaRegex = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"empresa\s+([a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ ]+?)(?=\s+material|$)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (empresaRegex.Success)
                 {
-                    empresaNombre = $"Empresa {empresaMatch.Groups[1].Value}";
+                    empresaNombre = empresaRegex.Groups[1].Value.Trim();
                 }
-                else
+
+                // Buscar materiales: permite varios materiales separados por 'y', ',' o 'material'
+                var materialesRegex = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"material(?:es)?\s+([a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ ,y]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (materialesRegex.Success)
                 {
-                    // Busca por nombre si no hay ID
-                    var nombreMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"empresa ([a-zA-Z0-9 ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                    if (nombreMatch.Success)
-                        empresaNombre = nombreMatch.Groups[1].Value.Trim();
-                }
-                // Materiales por nombre o id
-                var materialesMatches = System.Text.RegularExpressions.Regex.Matches(request.Mensaje, @"material(?:es)?\s*([a-zA-Z0-9 ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                foreach (System.Text.RegularExpressions.Match mat in materialesMatches)
-                {
-                    var nombre = mat.Groups[1].Value.Trim();
-                    if (!string.IsNullOrEmpty(nombre))
-                        materialesNombres.Add(nombre);
+                    var nombres = materialesRegex.Groups[1].Value
+                        .Split(new[] {',', 'y'}, StringSplitOptions.RemoveEmptyEntries)
+                        .Select(x => x.Trim())
+                        .Where(x => !string.IsNullOrWhiteSpace(x))
+                        .ToList();
+                    materialesNombres.AddRange(nombres);
                 }
 
                 // Si no se encuentra empresa, fallback a AssistantService
