@@ -7,3 +7,8 @@ dotnet ef migrations add "InitialCreate" --project Infrastructure --startup-proj
 ```
 dotnet ef database update --project Infrastructure --startup-project WebApi
 ```
+
+### Web URL
+```
+https://clean-fix-summer-camp2025-pljxvbe3r-eimarramos-projects.vercel.app/
+```
