@@ -56,6 +56,57 @@ namespace WebApi.Controllers
             var mensajeLower = request.Mensaje.ToLowerInvariant();
             bool esFactura = mensajeLower.Contains("factura") || mensajeLower.Contains("pdf") || mensajeLower.Contains("enviar factura") || mensajeLower.Contains("descargar factura");
 
+            // --- FLUJO: Descargar factura PDF tras mostrarla ---
+            if (mensajeLower.Contains("descargar") && historial != null && historial.Any(h => h.ToLower().Contains("factura")))
+            {
+                // Se asume que la última factura generada es la que quiere descargar
+                // (En un sistema real, se debería guardar el contexto de la última factura generada)
+                return Ok(new MensajeResponse
+                {
+                    Success = true,
+                    Error = null,
+                    Data = new {
+                        mensaje = "Puedes descargar tu factura aquí: [Descargar PDF](/api/chatboxia/factura/pdf)",
+                        pdfUrl = "/api/chatboxia/factura/pdf"
+                    }
+                });
+            }
+
+            // --- FLUJO: Enviar por Gmail ---
+            if ((mensajeLower.Contains("enviar por gmail") || mensajeLower.Contains("enviamela por correo") || mensajeLower.Contains("enviármela por correo") || mensajeLower.Contains("enviamela al correo") || mensajeLower.Contains("enviarmela al correo")) && historial != null && historial.Any(h => h.ToLower().Contains("factura")))
+            {
+                // Pide el email al usuario
+                return Ok(new MensajeResponse
+                {
+                    Success = true,
+                    Error = null,
+                    Data = new {
+                        mensaje = "Por favor, indícame tu correo electrónico para enviarte la factura por Gmail.",
+                        requiereEmail = true
+                    }
+                });
+            }
+
+            // --- FLUJO: El usuario introduce un email tras pedir envío por Gmail ---
+            if (historial != null && historial.Any(h => h.ToLower().Contains("enviarte la factura por gmail")) &&
+                !string.IsNullOrWhiteSpace(request.Mensaje) &&
+                System.Text.RegularExpressions.Regex.IsMatch(request.Mensaje.Trim(), @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                // Recuperar la última factura del historial (en un sistema real, se debería guardar el contexto de la factura)
+                // Aquí solo se simula el flujo
+                var emailDestino = request.Mensaje.Trim();
+                // Se requiere que el frontend envíe los datos de la factura en el siguiente mensaje para poder enviarla correctamente
+                return Ok(new MensajeResponse
+                {
+                    Success = true,
+                    Error = null,
+                    Data = new {
+                        mensaje = $"Factura enviada correctamente a {emailDestino} (simulado).",
+                        email = emailDestino
+                    }
+                });
+            }
+
             // --- FILTRO: empresas de tipo X ---
             if ((mensajeLower.Contains("empresa") || mensajeLower.Contains("empresas")) && mensajeLower.Contains("tipo"))
             {
