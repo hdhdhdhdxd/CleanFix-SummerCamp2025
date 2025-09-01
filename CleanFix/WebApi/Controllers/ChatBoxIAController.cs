@@ -58,6 +58,59 @@ namespace WebApi.Controllers
             bool pideMateriales = mensajeLower.Contains("material") || mensajeLower.Contains("materiales");
             bool pideEmpresas = mensajeLower.Contains("empresa") || mensajeLower.Contains("empresas");
 
+            // --- NUEVO: Manejo de empresas por tipo ---
+            if (pideEmpresas)
+            {
+                // Detectar si pide todas las empresas de un tipo concreto
+                var tipoMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"tipo\s*([a-zA-Z0-9]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (tipoMatch.Success)
+                {
+                    var tipo = tipoMatch.Groups[1].Value.Trim();
+                    if (int.TryParse(tipo, out int tipoInt))
+                    {
+                        var dbPlugin = new DBPluginTestPG(_connectionString);
+                        var empresasResponse = dbPlugin.GetAllEmpresas();
+                        var empresasFiltradas = empresasResponse.Data?.Where(e => e.Type == tipoInt).ToList() ?? new List<CompanyIa>();
+                        if (empresasFiltradas.Count == 0)
+                        {
+                            return Ok(new MensajeResponse
+                            {
+                                Success = true,
+                                Error = null,
+                                Data = new { mensaje = $"No se encontraron empresas del tipo '{tipo}'." }
+                            });
+                        }
+                        var listado = string.Join(", ", empresasFiltradas.Select(e => $"{e.Name} (Precio: €{e.Price:F2})"));
+                        return Ok(new MensajeResponse
+                        {
+                            Success = true,
+                            Error = null,
+                            Data = new { mensaje = $"Empresas de tipo '{tipo}': {listado}" }
+                        });
+                    }
+                    else
+                    {
+                        return Ok(new MensajeResponse
+                        {
+                            Success = true,
+                            Error = null,
+                            Data = new { mensaje = $"El tipo debe ser un número. Ejemplo: 'tipo 2'" }
+                        });
+                    }
+                }
+                // Si pide todas las empresas sin tipo
+                if (mensajeLower.Contains("todas las empresas") || mensajeLower.Trim() == "empresas" || mensajeLower.Trim() == "dame todas las empresas")
+                {
+                    return Ok(new MensajeResponse
+                    {
+                        Success = true,
+                        Error = null,
+                        Data = new { mensaje = "No puedo darte todas las empresas pero sí puedo darte las que sean de un tipo concreto. ¿De qué tipo quieres que te muestre las empresas?" }
+                    });
+                }
+            }
+            // --- FIN NUEVO ---
+
             // Mensaje ilegible: no contiene palabras clave conocidas
             if (!esFactura && !pideMateriales && !pideEmpresas && request.Mensaje.Length < 20)
             {
