@@ -145,8 +145,8 @@ namespace WebApi.Controllers
                         Data = new { mensaje = $"Empresas de tipo {string.Join(", ", tiposTexto)}: {listado}" }
                     });
                 }
-                // Si pide todas las empresas sin tipo
-                if (mensajeLower.Contains("todas las empresas") || mensajeLower.Trim() == "empresas" || mensajeLower.Trim() == "dame todas las empresas")
+                // Si pide todas las empresas sin tipo (solo si no hay ningún filtro de tipo ni nombre)
+                if ((mensajeLower.Contains("todas las empresas") || mensajeLower.Trim() == "empresas" || mensajeLower.Trim() == "dame todas las empresas") && tiposSolicitados.Count == 0 && empresaNombreMatch.Success == false)
                 {
                     var listado = string.Join(", ", empresas.Select(e => $"{e.Name} (ID: {e.Number}, Precio: €{e.Price:F2}, Tipo: {e.IssueTypeId})"));
                     return Ok(new MensajeResponse
