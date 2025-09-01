@@ -10,5 +10,5 @@ dotnet ef database update --project Infrastructure --startup-project WebApi
 
 ### Web URL
 
-[Link to CleanFix](https://clean-fix-summer-camp2025-pljxvbe3r-eimarramos-projects.vercel.app)
+[Enlace a la página web](https://clean-fix-summer-camp2025-pljxvbe3r-eimarramos-projects.vercel.app){:target="_blank"}
 
