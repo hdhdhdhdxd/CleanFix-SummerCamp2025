@@ -9,6 +9,17 @@
         <div class="message" [ngClass]="msg.from">
           <ng-container *ngIf="msg.from === 'bot'; else userText">
             <span [innerHTML]="msg.text"></span>
+            <ng-container *ngIf="showDownloadButton() && facturaData()">
+              <div class="mt-2 flex justify-end">
+                <button
+                  type="button"
+                  class="rounded bg-brand-700 px-4 py-2 text-white hover:bg-brand-900"
+                  (click)="descargarFactura()"
+                >
+                  Descargar factura
+                </button>
+              </div>
+            </ng-container>
           </ng-container>
           <ng-template #userText>{{ msg.text }}</ng-template>
         </div>
