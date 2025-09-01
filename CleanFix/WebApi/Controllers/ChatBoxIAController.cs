@@ -61,42 +61,62 @@ namespace WebApi.Controllers
             // --- NUEVO: Manejo de empresas por tipo ---
             if (pideEmpresas)
             {
-                // Detectar si pide todas las empresas de un tipo concreto
-                var tipoMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"tipo\s*([a-zA-Z0-9]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                // Obtener todos los tipos de problema (IssueType) para asociar nombre a tipo
+                var dbPlugin = new DBPluginTestPG(_connectionString);
+                var issueTypeRepo = new Infrastructure.Repositories.IssueTypeRepository(_connectionString);
+                var issueTypes = await issueTypeRepo.GetAllAsync();
+
+                // Detectar si pide todas las empresas de un tipo concreto por nombre (ej: "problema electrico")
+                var tipoMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"tipo\\s*([a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                int? tipoInt = null;
+                string tipoTexto = null;
                 if (tipoMatch.Success)
                 {
                     var tipo = tipoMatch.Groups[1].Value.Trim();
-                    if (int.TryParse(tipo, out int tipoInt))
+                    tipoTexto = tipo;
+                    if (int.TryParse(tipo, out int tipoNum))
                     {
-                        var dbPlugin = new DBPluginTestPG(_connectionString);
-                        var empresasResponse = dbPlugin.GetAllEmpresas();
-                        var empresasFiltradas = empresasResponse.Data?.Where(e => e.Type == tipoInt).ToList() ?? new List<CompanyIa>();
-                        if (empresasFiltradas.Count == 0)
-                        {
-                            return Ok(new MensajeResponse
-                            {
-                                Success = true,
-                                Error = null,
-                                Data = new { mensaje = $"No se encontraron empresas del tipo '{tipo}'." }
-                            });
-                        }
-                        var listado = string.Join(", ", empresasFiltradas.Select(e => $"{e.Name} (Precio: €{e.Price:F2})"));
-                        return Ok(new MensajeResponse
-                        {
-                            Success = true,
-                            Error = null,
-                            Data = new { mensaje = $"Empresas de tipo '{tipo}': {listado}" }
-                        });
+                        tipoInt = tipoNum;
                     }
                     else
                     {
+                        // Buscar por nombre de tipo (IssueType)
+                        var tipoPorNombre = issueTypes.FirstOrDefault(it => it.Name.Equals(tipo, StringComparison.OrdinalIgnoreCase));
+                        if (tipoPorNombre != null)
+                            tipoInt = tipoPorNombre.Id;
+                    }
+                }
+                else
+                {
+                    // Buscar por nombre de tipo en todo el mensaje
+                    var tipoPorNombre = issueTypes.FirstOrDefault(it => request.Mensaje.Contains(it.Name, StringComparison.OrdinalIgnoreCase));
+                    if (tipoPorNombre != null)
+                    {
+                        tipoInt = tipoPorNombre.Id;
+                        tipoTexto = tipoPorNombre.Name;
+                    }
+                }
+
+                if (tipoInt.HasValue)
+                {
+                    var empresasResponse = dbPlugin.GetAllEmpresas();
+                    var empresasFiltradas = empresasResponse.Data?.Where(e => e.Type == tipoInt.Value).ToList() ?? new List<CompanyIa>();
+                    if (empresasFiltradas.Count == 0)
+                    {
                         return Ok(new MensajeResponse
                         {
                             Success = true,
                             Error = null,
-                            Data = new { mensaje = $"El tipo debe ser un número. Ejemplo: 'tipo 2'" }
+                            Data = new { mensaje = $"No se encontraron empresas del tipo '{tipoTexto ?? tipoInt.Value.ToString()}'." }
                         });
                     }
+                    var listado = string.Join(", ", empresasFiltradas.Select(e => $"{e.Name} (Precio: €{e.Price:F2})"));
+                    return Ok(new MensajeResponse
+                    {
+                        Success = true,
+                        Error = null,
+                        Data = new { mensaje = $"Empresas de tipo '{tipoTexto ?? tipoInt.Value.ToString()}': {listado}" }
+                    });
                 }
                 // Si pide todas las empresas sin tipo
                 if (mensajeLower.Contains("todas las empresas") || mensajeLower.Trim() == "empresas" || mensajeLower.Trim() == "dame todas las empresas")
@@ -108,6 +128,13 @@ namespace WebApi.Controllers
                         Data = new { mensaje = "No puedo darte todas las empresas pero sí puedo darte las que sean de un tipo concreto. ¿De qué tipo quieres que te muestre las empresas?" }
                     });
                 }
+                // Si no se reconoce el tipo
+                return Ok(new MensajeResponse
+                {
+                    Success = true,
+                    Error = null,
+                    Data = new { mensaje = "El tipo debe ser un número o un nombre de problema válido (por ejemplo: 'eléctrico', 'fontanería', etc.)." }
+                });
             }
             // --- FIN NUEVO ---
 
