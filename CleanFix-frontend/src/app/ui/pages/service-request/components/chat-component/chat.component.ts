@@ -41,6 +41,7 @@ export class ChatComponent {
     this.messages.update((msgs: { from: 'user' | 'bot'; text: string }[]) => [
       ...msgs,
       { from: 'user', text: userMessage },
+      { from: 'bot', text: 'Escribiendo...' },
     ])
     this.scrollToBottom()
     this.newMessage = ''
@@ -57,15 +58,17 @@ export class ChatComponent {
         ) {
           botText = res.data.mensaje
         }
+        // Reemplazar el último mensaje 'Escribiendo...' por la respuesta real
         this.messages.update((msgs: { from: 'user' | 'bot'; text: string }[]) => [
-          ...msgs,
+          ...msgs.slice(0, -1),
           { from: 'bot', text: botText },
         ])
         this.scrollToBottom()
       },
       error: () => {
+        // Reemplazar el último mensaje 'Escribiendo...' por el error
         this.messages.update((msgs: { from: 'user' | 'bot'; text: string }[]) => [
-          ...msgs,
+          ...msgs.slice(0, -1),
           { from: 'bot', text: 'Ocurrió un error al procesar tu mensaje.' },
         ])
         this.scrollToBottom()
