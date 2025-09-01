@@ -19,6 +19,11 @@ export type TableColumn<T> =
 export class Table<T> {
   items = input<T[]>([])
   tableColumns = input.required<TableColumn<T>[]>()
+  isLoading = input<boolean>(false)
+  hasError = input<boolean>(false)
+  errorMessage = input<string>('')
+  emptyMessage = input<string>('No se encontraron resultados')
+  searchTerm = input<string>('')
   rowClick = output<T>()
 
   handleRowClick(item: T): void {

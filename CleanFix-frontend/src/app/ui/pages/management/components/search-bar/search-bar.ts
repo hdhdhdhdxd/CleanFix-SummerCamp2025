@@ -1,13 +1,21 @@
-import { Component, output, signal } from '@angular/core'
+import { Component, output, signal, input, OnInit } from '@angular/core'
 
 @Component({
   selector: 'app-search-bar',
   imports: [],
   templateUrl: './search-bar.html',
 })
-export class SearchBar {
+export class SearchBar implements OnInit {
   searchChange = output<string>()
+  initialValue = input<string>('')
   value = signal('')
+
+  ngOnInit(): void {
+    const initial = this.initialValue()
+    if (initial) {
+      this.value.set(initial)
+    }
+  }
 
   onInput(event: Event): void {
     const input = event.target as HTMLInputElement

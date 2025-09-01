@@ -10,6 +10,7 @@
         [value]="value()"
         (input)="onInput($event)"
         (search)="onSearch($event)"
+        (keydown.enter)="onSubmit($event)"
         aria-label="Buscar documentos"
       />
     </div>
