@@ -34,7 +34,7 @@ namespace WebApi.Services
             );
 
             // PROMPT MEJORADO: Natural para preguntas generales, estricto para facturas y errores
-            _promptTemplate = @"Eres CleanFixBot, un asistente para mantenimiento y reparaciones.
+            _promptTemplate = @"Eres CleanFixBot, un asistente experto en mantenimiento y reparaciones. Responde de manera natural y profesional, usando la información de empresas y materiales disponible.
 
 - Si el usuario pide una factura, responde SOLO con el desglose: empresa, materiales, IVA, total con IVA. Ejemplo:
 Factura:
