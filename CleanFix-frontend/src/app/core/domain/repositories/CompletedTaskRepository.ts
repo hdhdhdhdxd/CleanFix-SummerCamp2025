@@ -1,3 +1,4 @@
+import { CompletedTask } from '../models/CompletedTask'
 import { CompletedTaskBrief } from '../models/CompletedTaskBrief'
 import { PaginatedData } from '../models/PaginatedData'
 
@@ -10,4 +11,5 @@ export interface CompletedTaskRepository {
     MaterialIds: number[],
   ): Promise<void>
   getPaginated(pageNumber: number, pageSize: number): Promise<PaginatedData<CompletedTaskBrief>>
+  getById(id: string): Promise<CompletedTask>
 }

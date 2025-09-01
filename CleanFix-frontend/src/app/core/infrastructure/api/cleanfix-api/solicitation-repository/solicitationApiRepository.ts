@@ -12,7 +12,7 @@ const getPaginated = async (
   pageSize: number,
 ): Promise<PaginatedData<SolicitationBrief>> => {
   const response = await fetch(
-    environment.baseUrl + `solicitations/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+    environment.baseUrl + `/solicitations/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
   )
   if (!response.ok) {
     throw new Error('Error al obtener las empresas')
@@ -37,7 +37,7 @@ const getPaginated = async (
 }
 
 const getById = async (id: number): Promise<Solicitation> => {
-  const response = await fetch(environment.baseUrl + `solicitations/${id}`)
+  const response = await fetch(environment.baseUrl + `/solicitations/${id}`)
   if (!response.ok) {
     throw new Error('Error al obtener la solicitud')
   }

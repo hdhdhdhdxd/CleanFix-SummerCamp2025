@@ -1,1 +1,196 @@
-<p>incidence-dialog works!</p>
+<dialog
+  #dialog
+  tabindex="0"
+  class="fixed inset-0 z-50 m-0 h-screen max-h-none w-screen max-w-none bg-transparent p-0 sm:flex sm:items-center sm:justify-center"
+  (close)="closeModal()"
+  (click)="handleBackdropClick($event)"
+  (keydown.escape)="closeModal()"
+>
+  <div
+    #dialogContent
+    class="dialog-content flex h-full w-full flex-col bg-brand-0 sm:h-auto sm:max-h-[85vh] sm:w-auto sm:max-w-2xl sm:min-w-[500px] sm:rounded-xl sm:shadow-2xl"
+  >
+    <header
+      class="flex shrink-0 items-center justify-between bg-primary-500 px-4 py-3 text-brand-0 sm:px-6 sm:py-4"
+    >
+      <h1 class="text-lg font-semibold sm:text-xl">Detalles de la Incidencia</h1>
+      <form method="dialog" id="solicitation-dialog-form">
+        <button
+          class="rounded-full p-1 transition-colors hover:bg-brand-600"
+          aria-label="Cerrar dialog"
+        >
+          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </form>
+    </header>
+
+    <div class="scrollbar-hide flex-1 overflow-y-auto p-4 sm:p-6">
+      <div class="grid grid-cols-2 gap-3 sm:gap-4">
+        @if (incidence()) {
+          <div class="col-span-2 flex flex-col">
+            <span class="text-sm font-medium text-brand-600">Dirección</span>
+            <p class="text-base text-brand-800 sm:text-lg">{{ incidence()!.address }}</p>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="text-sm font-medium text-brand-600">Fecha</span>
+            <p class="text-base text-brand-800 sm:text-lg">
+              {{ incidence()!.date | date: 'dd/MM/yyyy HH:mm' }}
+            </p>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-sm font-medium text-brand-600">Tipo</span>
+            <p class="text-base font-semibold text-brand-800 sm:text-lg">
+              {{ incidence()!.issueType.name }}
+            </p>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-sm font-medium text-brand-600">Superficie</span>
+            <p class="text-base text-brand-800 sm:text-lg">{{ incidence()!.surface }} m²</p>
+          </div>
+          <div class="col-span-2 flex flex-col">
+            <span class="text-sm font-medium text-brand-600">Descripción</span>
+            <p class="text-base text-brand-800 sm:text-lg">
+              {{ incidence()!.description }}
+            </p>
+          </div>
+        }
+
+        <div class="col-span-2 flex flex-col">
+          <span class="mb-1 text-sm font-medium text-brand-600">Empresa</span>
+          <div class="flex items-center gap-2">
+            <select
+              class="w-full rounded border border-brand-200 px-3 py-2 text-brand-800 focus:ring-2 focus:ring-brand-500 focus:outline-none"
+              (change)="onCompanyChange($event)"
+              [value]="selectedCompanyId() ?? ''"
+            >
+              <option value="" disabled selected>Selecciona una empresa</option>
+              @for (company of companies(); track $index) {
+                <option [value]="company.id">
+                  {{ company.name }}
+                </option>
+              }
+            </select>
+          </div>
+        </div>
+        @if (selectedCompany) {
+          <div
+            class="col-span-2 mt-4 flex flex-col gap-2 rounded-lg border border-brand-200 bg-brand-50 p-4"
+          >
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-brand-700">Nombre:</span>
+              <span class="text-brand-900">{{ selectedCompany!.name }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-brand-700">Email:</span>
+              <span class="text-brand-900">{{ selectedCompany!.email }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-brand-700">Teléfono:</span>
+              <span class="text-brand-900">{{ selectedCompany!.number }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-brand-700">Tipo de incidencia:</span>
+              <span class="text-brand-900">{{ selectedCompany!.issueType }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-semibold text-brand-700">Precio:</span>
+              <span class="text-brand-900">{{
+                selectedCompany!.price | currency: 'EUR' : 'symbol' : '1.2-2'
+              }}</span>
+            </div>
+          </div>
+        }
+        @if (selectedCompany && incidence()) {
+          <div class="col-span-2 mt-6 flex flex-col">
+            <span class="mb-1 text-sm font-medium text-brand-600">Coste de la empresa</span>
+            <div class="rounded bg-brand-50 px-4 py-2 text-xs text-brand-800">
+              <span>
+                Coste fijo de la empresa:<br />
+                <b>{{ totalCompanyCost | currency: 'EUR' : 'symbol' : '1.2-2' }}</b>
+              </span>
+            </div>
+          </div>
+        }
+        @if (materials().length) {
+          <div class="col-span-2 mt-4 flex flex-col">
+            <span class="mb-1 text-sm font-medium text-brand-600">Materiales asignados</span>
+            <ul class="space-y-2">
+              @for (material of materials(); track $index) {
+                <li class="rounded border border-brand-200 bg-brand-50 px-3 py-2">
+                  <div class="font-semibold">{{ material.name }}</div>
+                  <div class="text-xs text-brand-700">
+                    Costo por m²:
+                    {{ material.costPerSquareMeter | currency: 'EUR' : 'symbol' : '1.2-2' }}
+                  </div>
+                  <div
+                    class="text-xs"
+                    [ngClass]="{
+                      'text-success-500': material.available,
+                      'text-warning-500': !material.available,
+                    }"
+                  >
+                    {{ material.available ? 'Disponible' : 'No disponible' }}
+                  </div>
+                  <div class="mt-1 text-xs font-medium text-brand-800">
+                    Total para {{ surfaceValue }} m²:
+                    <span class="font-bold">{{
+                      material.costPerSquareMeter * surfaceValue
+                        | currency: 'EUR' : 'symbol' : '1.2-2'
+                    }}</span>
+                  </div>
+                </li>
+              }
+            </ul>
+            <div class="mt-4 rounded bg-brand-50 px-4 py-2 text-xs text-brand-800">
+              <div class="space-y-1">
+                <div class="flex justify-between">
+                  <span>Coste empresa (fijo):</span>
+                  <span class="font-medium">{{
+                    totalCompanyCost | currency: 'EUR' : 'symbol' : '1.2-2'
+                  }}</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Coste materiales ({{ surfaceValue }} m²):</span>
+                  <span class="font-medium">{{
+                    totalMaterialsCost | currency: 'EUR' : 'symbol' : '1.2-2'
+                  }}</span>
+                </div>
+                <hr class="border-brand-300" />
+              </div>
+            </div>
+            <div class="mt-2 rounded bg-brand-100 px-4 py-2 text-right font-bold text-brand-900">
+              Total del trabajo:
+              <span>
+                {{ totalJobCost | currency: 'EUR' : 'symbol' : '1.2-2' }}
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <footer
+      class="flex shrink-0 justify-end gap-3 border-t border-brand-200 bg-brand-50 px-4 py-3 sm:px-6 sm:py-4"
+    >
+      <button
+        class="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-brand-0 transition-colors hover:bg-brand-600 disabled:cursor-not-allowed disabled:bg-brand-200 disabled:text-brand-400 sm:text-base"
+        [disabled]="!selectedCompany || !materials().length"
+        [attr.title]="
+          !selectedCompany || !materials().length
+            ? 'Selecciona una empresa y materiales para continuar'
+            : null
+        "
+        (click)="createTask()"
+      >
+        Iniciar Trabajo
+      </button>
+    </footer>
+  </div>
+</dialog>

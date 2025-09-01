@@ -7,10 +7,11 @@ import { SearchBar } from '../search-bar/search-bar'
 import { Pagination } from '../pagination/pagination'
 import { PaginatedData } from '@/core/domain/models/PaginatedData'
 import { IncidenceBrief } from '@/core/domain/models/IncidenceBrief'
+import { IncidenceDialog } from '../incidence-dialog/incidence-dialog'
 
 @Component({
   selector: 'app-incidences',
-  imports: [Table, SearchBar, Pagination],
+  imports: [Table, SearchBar, Pagination, IncidenceDialog],
   templateUrl: './incidences.html',
 })
 export class Incidences implements OnInit {
@@ -26,6 +27,9 @@ export class Incidences implements OnInit {
 
   pageSize = signal<number>(10)
   pageNumber = signal<number>(1)
+
+  incidenceId: number | null = null
+  showDialog = signal<boolean>(false)
 
   columns: TableColumn<IncidenceBrief>[] = [
     { key: 'address', label: 'Dirección', type: 'text' },
@@ -83,5 +87,19 @@ export class Incidences implements OnInit {
     this.pageNumber.set(1)
     this.updateUrl()
     this.loadIncidences(1, $event)
+  }
+
+  handleRowClick(item: IncidenceBrief): void {
+    this.incidenceId = item.id
+    this.showDialog.set(true)
+  }
+
+  handleCloseDialog(): void {
+    this.incidenceId = null
+    this.showDialog.set(false)
+  }
+
+  handleTaskCreated(): void {
+    this.loadIncidences(this.pageNumber(), this.pageSize())
   }
 }

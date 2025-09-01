@@ -1,10 +1,11 @@
+import { IssueType } from './IssueType'
+
 export interface Incidence {
   id: number
-  type: string
+  issueType: IssueType
   date: Date
-  status: string
   description: string
-  apartmentId: number
+  address: string
   surface: number
   priority: string
 }

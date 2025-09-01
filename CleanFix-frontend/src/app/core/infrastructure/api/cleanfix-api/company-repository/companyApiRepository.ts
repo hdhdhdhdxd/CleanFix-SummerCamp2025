@@ -15,7 +15,7 @@ const getPaginated = async (
     .set('pageSize', pageSize.toString())
     .set('typeIssueId', typeIssueId != null ? typeIssueId.toString() : '0')
 
-  const response = await fetch(environment.baseUrl + `companies/paginated?${queryParams}`)
+  const response = await fetch(environment.baseUrl + `/companies/paginated?${queryParams}`)
 
   if (!response.ok) {
     throw new Error('Error al obtener las empresas')
@@ -28,6 +28,7 @@ const getPaginated = async (
       id: companyDto.id,
       name: companyDto.name,
       number: companyDto.number,
+      price: companyDto.price,
       email: companyDto.email,
       issueType: companyDto.issueType,
     })),

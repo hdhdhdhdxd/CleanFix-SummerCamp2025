@@ -10,6 +10,8 @@ public class CreateMaterialDto
     [Required]
     public decimal Cost { get; set; }
     [Required]
+    public decimal CostPerSquareMeter { get; set; }
+    [Required]
     public bool Available { get; set; }
     [Required]
     public int IssueTypeId { get; set; }

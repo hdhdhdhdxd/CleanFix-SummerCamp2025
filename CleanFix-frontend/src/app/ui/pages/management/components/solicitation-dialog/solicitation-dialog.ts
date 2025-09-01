@@ -40,6 +40,7 @@ export class SolicitationDialog implements AfterViewInit, OnInit {
   materials = signal<Material[]>([])
 
   closeDialog = output<void>()
+  taskCreated = output<void>() // Nuevo evento para cuando se crea una tarea
   @ViewChild('dialog') dialog!: ElementRef<HTMLDialogElement>
   @ViewChild('dialogContent') dialogContent!: ElementRef<HTMLElement>
 
@@ -114,10 +115,10 @@ export class SolicitationDialog implements AfterViewInit, OnInit {
   }
 
   get totalCompanyCost(): number {
-    const count = this.apartmentAmountValue
-    const solicitation = this.solicitation()
-    const maintenance = solicitation ? solicitation.maintenanceCost || 0 : 0
-    return maintenance * count
+    const company = this.selectedCompany
+    if (!company) return 0
+    // Usar el precio real de la empresa
+    return company.price
   }
 
   get totalJobCost(): number {
@@ -134,7 +135,7 @@ export class SolicitationDialog implements AfterViewInit, OnInit {
     this.completedTaskService
       .create(
         solicitation.id,
-        solicitation.issueType.id,
+        0,
         company.id,
         true,
         materials.map((m) => m.id),
@@ -142,6 +143,7 @@ export class SolicitationDialog implements AfterViewInit, OnInit {
       .subscribe({
         next: () => {
           this.snackbarService.show('Tarea creada con éxito', true)
+          this.taskCreated.emit() // Emitir evento de tarea creada
           this.closeModal()
         },
         error: (err) => {

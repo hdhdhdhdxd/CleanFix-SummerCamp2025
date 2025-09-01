@@ -5,7 +5,11 @@
 
   <div class="mx-7 mb-5 flex min-h-0 flex-grow flex-col">
     <div class="min-h-0 flex-grow">
-      <app-table [items]="completedTasks()" [tableColumns]="columns" />
+      <app-table
+        [items]="completedTasks()"
+        [tableColumns]="columns"
+        (rowClick)="handleRowClick($event)"
+      />
     </div>
     <div>
       <app-pagination
@@ -22,4 +26,11 @@
       />
     </div>
   </div>
+
+  @if (showDialog() && completedTaskId) {
+    <app-completed-task-dialog
+      [completedTaskId]="completedTaskId"
+      (closeDialog)="handleCloseDialog()"
+    />
+  }
 </div>
