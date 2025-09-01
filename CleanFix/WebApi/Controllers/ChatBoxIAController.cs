@@ -456,19 +456,26 @@ namespace WebApi.Controllers
         private string FormatearFactura(FacturaDetalleDto factura)
         {
             var sb = new System.Text.StringBuilder();
-            sb.AppendLine($"Factura:");
-            sb.AppendLine($"Empresa: {factura.Empresa.Nombre} - €{factura.Empresa.Coste:F2}");
+            sb.AppendLine("==============================");
+            sb.AppendLine("         FACTURA CLEANFIX      ");
+            sb.AppendLine("==============================");
+            sb.AppendLine($"Empresa: {factura.Empresa.Nombre}");
+            sb.AppendLine($"Coste empresa:         €{factura.Empresa.Coste,8:F2}");
+            sb.AppendLine("------------------------------");
             if (factura.Materiales != null && factura.Materiales.Count > 0)
             {
-                sb.Append("Materiales: ");
-                sb.Append(string.Join(", ", factura.Materiales.Select(m => $"{m.Nombre} - €{m.Coste:F2}")));
-                sb.AppendLine();
+                sb.AppendLine("Materiales:");
+                foreach (var m in factura.Materiales)
+                {
+                    sb.AppendLine($"  - {m.Nombre,-20} €{m.Coste,8:F2}");
+                }
+                sb.AppendLine("------------------------------");
                 decimal iva = 0.21m;
                 decimal ivaEmpresa = factura.Empresa.Coste * iva;
                 decimal ivaMateriales = factura.Materiales?.Sum(m => m.Coste) * iva ?? 0;
                 decimal totalIva = ivaEmpresa + ivaMateriales;
-                sb.AppendLine($"IVA: €{totalIva:F2}");
-                sb.AppendLine($"Total con IVA: €{factura.TotalConIVA:F2}");
+                sb.AppendLine($"IVA (21%):            €{totalIva,8:F2}");
+                sb.AppendLine($"TOTAL CON IVA:        €{factura.TotalConIVA,8:F2}");
             }
             else
             {
@@ -476,9 +483,13 @@ namespace WebApi.Controllers
                 var dbPlugin = new DBPluginTestPG(_connectionString);
                 var materialesResponse = dbPlugin.GetAllMaterials();
                 var sugeridos = materialesResponse.Data?.Take(4).ToList() ?? new List<MaterialIa>();
-                sb.Append("Debes añadir algún material, te recomiendo estos: Materiales: ");
-                sb.Append(string.Join(", ", sugeridos.Select(m => $"{m.Name} - €{m.Cost:F2}")));
+                sb.AppendLine("Debes añadir algún material, te recomiendo estos:");
+                foreach (var m in sugeridos)
+                {
+                    sb.AppendLine($"  - {m.Name,-20} €{m.Cost,8:F2}");
+                }
             }
+            sb.AppendLine("==============================");
             return sb.ToString();
         }
     }
