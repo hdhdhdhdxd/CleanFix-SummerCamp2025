@@ -114,6 +114,23 @@ namespace WebApi.Controllers
                     });
                 }
 
+                // Si hay empresa pero NO hay materiales, sugerir materiales y NO generar factura
+                if (materialesNombres.Count == 0)
+                {
+                    var dbPlugin = new DBPluginTestPG(_connectionString);
+                    var materialesResponse = dbPlugin.GetAllMaterials();
+                    var sugeridos = materialesResponse.Data?.Take(4).ToList() ?? new List<MaterialIa>();
+                    var sugerencia = $"No has seleccionado materiales, te recomiendo estos: Materiales: " + string.Join(", ", sugeridos.Select(m => $"{m.Name} - €{m.Cost:F2}"));
+                    return Ok(new MensajeResponse
+                    {
+                        Success = true,
+                        Error = null,
+                        Data = new {
+                            mensaje = $"Factura:\nEmpresa: {empresaNombre}\n{sugerencia}"
+                        }
+                    });
+                }
+
                 // Llama a la lógica real de generación de factura
                 var facturaRequest = new FacturaRequest { EmpresaNombre = empresaNombre, MaterialesNombres = materialesNombres };
                 var facturaResult = GenerarFactura(facturaRequest) as OkObjectResult;
