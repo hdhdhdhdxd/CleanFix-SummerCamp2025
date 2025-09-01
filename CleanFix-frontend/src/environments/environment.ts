@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  baseUrl: 'https://localhost:7096/api',
+  baseUrl: 'https://devdemoapi2.azurewebsites.net',
 }
