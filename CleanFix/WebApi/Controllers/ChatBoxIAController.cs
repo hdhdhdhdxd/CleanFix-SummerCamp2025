@@ -56,6 +56,48 @@ namespace WebApi.Controllers
             var mensajeLower = request.Mensaje.ToLowerInvariant();
             bool esFactura = mensajeLower.Contains("factura") || mensajeLower.Contains("pdf") || mensajeLower.Contains("enviar factura") || mensajeLower.Contains("descargar factura");
 
+            // --- FILTRO: empresas de tipo X ---
+            if ((mensajeLower.Contains("empresa") || mensajeLower.Contains("empresas")) && mensajeLower.Contains("tipo"))
+            {
+                var tipoMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"tipo\s*(\d+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (tipoMatch.Success && int.TryParse(tipoMatch.Groups[1].Value, out int tipoId))
+                {
+                    var dbPlugin = new DBPluginTestPG(_connectionString);
+                    var empresasResponse = dbPlugin.GetAllEmpresas();
+                    var empresas = empresasResponse.Data?.Where(e => e.IssueTypeId == tipoId).ToList() ?? new List<CompanyIa>();
+                    if (empresas.Count == 0)
+                    {
+                        return Ok(new MensajeResponse
+                        {
+                            Success = true,
+                            Error = null,
+                            Data = new { mensaje = $"No se encontraron empresas de tipo {tipoId}." }
+                        });
+                    }
+                    var listado = string.Join(", ", empresas.Select(e => $"{e.Name} (ID: {e.Number}, Precio: €{e.Price:F2}, Tipo: {e.IssueTypeId})"));
+                    return Ok(new MensajeResponse
+                    {
+                        Success = true,
+                        Error = null,
+                        Data = new { mensaje = $"Empresas de tipo {tipoId}: {listado}" }
+                    });
+                }
+            }
+
+            // --- 1. TODAS LAS EMPRESAS: Mensaje personalizado ---
+            if (
+                (mensajeLower.Contains("todas las empresas") || mensajeLower.Trim() == "empresas" || mensajeLower.Contains("lista de empresas") || mensajeLower.Contains("dame todas las empresas"))
+                && !esFactura
+            )
+            {
+                return Ok(new MensajeResponse
+                {
+                    Success = true,
+                    Error = null,
+                    Data = new { mensaje = "No puedo darte todas las empresas, pero puedo mostrarte las de un tipo concreto. ¿Qué tipo quieres?" }
+                });
+            }
+
             // --- PRIORIDAD: FACTURA ---
             if (esFactura)
             {
@@ -87,15 +129,19 @@ namespace WebApi.Controllers
                 {
                     var respuesta = await _assistantService.ProcesarMensajeAsync(request.Mensaje, historial);
                     var pdfUrl = "/api/chatboxia/factura/pdf";
+                    // Añadir sugerencia si la respuesta parece una factura
+                    var mensajeFinal = respuesta;
+                    if (!string.IsNullOrWhiteSpace(respuesta) && respuesta.ToLower().Contains("factura"))
+                        mensajeFinal += "\n\n¿Quieres descargarla en formato PDF o prefieres que te la envíe por correo?";
                     return Ok(new MensajeResponse
                     {
                         Success = true,
                         Error = null,
                         Data = new {
-                            mensaje = respuesta,
+                            mensaje = mensajeFinal,
                             pdfUrl = pdfUrl,
                             puedeEnviarEmail = true,
-                            sugerencia = "¿Quieres descargarla o recibirla por email?"
+                            sugerencia = "¿Quieres descargarla en formato PDF o prefieres que te la envíe por correo?"
                         }
                     });
                 }
@@ -129,7 +175,8 @@ namespace WebApi.Controllers
                         Success = true,
                         Error = null,
                         Data = new {
-                            mensaje = $"Factura:\nEmpresa: {empresa.Name}\n{sugerencia}"
+                            mensaje = $"Factura:\nEmpresa: {empresa.Name}\n{sugerencia}\n\n¿Quieres descargarla en formato PDF o prefieres que te la envíe por correo?",
+                            sugerencia = "¿Quieres descargarla en formato PDF o prefieres que te la envíe por correo?"
                         }
                     });
                 }
@@ -141,15 +188,17 @@ namespace WebApi.Controllers
                 {
                     var desglose = FormatearFactura(facturaResponse.Factura);
                     var pdfUrl = "/api/chatboxia/factura/pdf";
+                    // --- 2. Añadir sugerencia tras mostrar la factura ---
+                    var mensajeFinal = desglose + "\n\n¿Quieres descargarla en formato PDF o prefieres que te la envíe por correo?";
                     return Ok(new MensajeResponse
                     {
                         Success = true,
                         Error = null,
                         Data = new {
-                            mensaje = desglose,
+                            mensaje = mensajeFinal,
                             pdfUrl = pdfUrl,
                             puedeEnviarEmail = true,
-                            sugerencia = "¿Quieres descargarla o recibirla por email?"
+                            sugerencia = "¿Quieres descargarla en formato PDF o prefieres que te la envíe por correo?"
                         }
                     });
                 }
@@ -158,44 +207,19 @@ namespace WebApi.Controllers
                     // Si no se puede generar, fallback
                     var respuesta = await _assistantService.ProcesarMensajeAsync(request.Mensaje, historial);
                     var pdfUrl = "/api/chatboxia/factura/pdf";
+                    var mensajeFinal = respuesta;
+                    if (!string.IsNullOrWhiteSpace(respuesta) && respuesta.ToLower().Contains("factura"))
+                        mensajeFinal += "\n\n¿Quieres descargarla en formato PDF o prefieres que te la envíe por correo?";
                     return Ok(new MensajeResponse
                     {
                         Success = true,
                         Error = null,
                         Data = new {
-                            mensaje = respuesta,
+                            mensaje = mensajeFinal,
                             pdfUrl = pdfUrl,
                             puedeEnviarEmail = true,
-                            sugerencia = "¿Quieres descargarla o recibirla por email?"
+                            sugerencia = "¿Quieres descargarla en formato PDF o prefieres que te la envíe por correo?"
                         }
-                    });
-                }
-            }
-
-            // --- FILTRO: empresas de tipo X ---
-            if ((mensajeLower.Contains("empresa") || mensajeLower.Contains("empresas")) && mensajeLower.Contains("tipo"))
-            {
-                var tipoMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"tipo\s*(\d+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                if (tipoMatch.Success && int.TryParse(tipoMatch.Groups[1].Value, out int tipoId))
-                {
-                    var dbPlugin = new DBPluginTestPG(_connectionString);
-                    var empresasResponse = dbPlugin.GetAllEmpresas();
-                    var empresas = empresasResponse.Data?.Where(e => e.IssueTypeId == tipoId).ToList() ?? new List<CompanyIa>();
-                    if (empresas.Count == 0)
-                    {
-                        return Ok(new MensajeResponse
-                        {
-                            Success = true,
-                            Error = null,
-                            Data = new { mensaje = $"No se encontraron empresas de tipo {tipoId}." }
-                        });
-                    }
-                    var listado = string.Join(", ", empresas.Select(e => $"{e.Name} (ID: {e.Number}, Precio: €{e.Price:F2}, Tipo: {e.IssueTypeId})"));
-                    return Ok(new MensajeResponse
-                    {
-                        Success = true,
-                        Error = null,
-                        Data = new { mensaje = $"Empresas de tipo {tipoId}: {listado}" }
                     });
                 }
             }
