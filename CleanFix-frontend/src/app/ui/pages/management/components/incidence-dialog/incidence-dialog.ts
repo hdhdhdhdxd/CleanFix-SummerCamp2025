@@ -44,6 +44,7 @@ export class IncidenceDialog implements OnInit, AfterViewInit {
   companies = signal<Company[]>([])
   selectedCompanyId = signal<number | null>(null)
   materials = signal<Material[]>([])
+  isLoading = signal<boolean>(true)
 
   ngOnInit(): void {
     this.fetchIncidenceAndCompanies()
@@ -65,15 +66,29 @@ export class IncidenceDialog implements OnInit, AfterViewInit {
   }
 
   private fetchIncidenceAndCompanies(): void {
-    this.incidenceService.getById(this.incidenceId()).subscribe((incidence) => {
-      this.incidence.set(incidence)
-      this.fetchCompanies(incidence.issueType.id)
+    this.isLoading.set(true)
+    this.incidenceService.getById(this.incidenceId()).subscribe({
+      next: (incidence) => {
+        this.incidence.set(incidence)
+        this.fetchCompanies(incidence.issueType.id)
+      },
+      error: (error) => {
+        console.error('Error loading incidence:', error)
+        this.isLoading.set(false)
+      },
     })
   }
 
   private fetchCompanies(issueTypeId: number): void {
-    this.companyService.getPaginated(1, 10, issueTypeId).subscribe((companies) => {
-      this.companies.set(companies.items)
+    this.companyService.getPaginated(1, 10, issueTypeId).subscribe({
+      next: (companies) => {
+        this.companies.set(companies.items)
+        this.isLoading.set(false)
+      },
+      error: (error) => {
+        console.error('Error loading companies:', error)
+        this.isLoading.set(false)
+      },
     })
   }
 
