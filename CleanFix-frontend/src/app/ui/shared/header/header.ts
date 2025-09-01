@@ -10,6 +10,7 @@ export class Header {
   isScrolled = signal(false)
   router = inject(Router)
   menuOpen = signal(false)
+  menuClosing = signal(false)
 
   @HostListener('window:scroll')
   onWindowScroll() {
@@ -30,6 +31,10 @@ export class Header {
   }
 
   closeMenu() {
-    this.menuOpen.set(false)
+    this.menuClosing.set(true)
+    setTimeout(() => {
+      this.menuOpen.set(false)
+      this.menuClosing.set(false)
+    }, 300) // Duración de la animación
   }
 }

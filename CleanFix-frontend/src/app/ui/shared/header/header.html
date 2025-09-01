@@ -1,9 +1,9 @@
 @if (isHome()) {
   <header
-    class="fixed z-10 flex w-screen items-center justify-between overflow-hidden px-10 py-5 transition-colors duration-300"
+    class="fixed z-10 flex w-screen items-center justify-between overflow-hidden px-4 py-5 transition-colors duration-300 lg:px-10"
     [class]="isScrolled() ? 'bg-primary-500' : 'bg-transparent'"
   >
-    <nav class="hidden md:block">
+    <nav class="hidden lg:block">
       <ul
         class="flex space-x-6 text-xl font-semibold text-brand-0 [&>li]:transition-transform [&>li]:duration-300 [&>li]:ease-linear [&>li]:hover:-translate-y-0.5"
       >
@@ -15,20 +15,40 @@
     </nav>
 
     <div
-      class="absolute top-1/2 left-4 flex -translate-y-1/2 flex-col items-start md:left-1/2 md:-translate-x-1/2 md:items-center"
+      class="flex flex-col items-start lg:absolute lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2 lg:items-center"
     >
-      <h1 class="text-2xl font-bold text-brand-0">CleanFix</h1>
-      <p class="text-base font-bold text-brand-200">Reformas y Mantenimientos</p>
+      <h1 class="text-xl font-bold text-brand-0 lg:text-2xl">CleanFix</h1>
+      <p class="text-sm font-bold text-brand-200 lg:text-base">Reformas y Mantenimientos</p>
     </div>
 
     <a
       href="/service-request"
-      class="hidden rounded-4xl border-2 border-brand-0 p-3 text-center text-xl font-semibold text-brand-0 transition-all duration-300 hover:scale-105 hover:border-accent-500 hover:text-accent-500 hover:shadow-md md:inline-block"
+      class="hidden items-center gap-2 rounded-4xl border-2 border-brand-0 p-3 text-center text-lg font-semibold text-brand-0 transition-all duration-300 hover:scale-105 hover:border-accent-500 hover:text-accent-500 hover:shadow-md lg:flex lg:text-xl"
     >
-      Solicitar servicio
+      <div class="relative">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+          />
+        </svg>
+        <div
+          class="absolute -top-1 -right-1 h-2 w-2 animate-pulse rounded-full bg-accent-500"
+        ></div>
+      </div>
+      <span class="hidden xl:inline">Asistente IA</span>
+      <span class="xl:hidden">Chat IA</span>
     </a>
 
-    <button class="z-20 ml-auto block md:hidden" (click)="toggleMenu()">
+    <button class="z-20 ml-auto block lg:hidden" (click)="toggleMenu()">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         class="h-8 w-8 text-brand-0"
@@ -46,9 +66,16 @@
     </button>
 
     @if (menuOpen()) {
-      <div class="fixed inset-0 z-30 flex">
+      <div
+        [class]="
+          'fixed inset-0 z-30 flex ' + (menuClosing() ? 'animate-fade-out' : 'animate-fade-in')
+        "
+      >
         <div
-          class="bg-opacity-40 flex-1 bg-brand-900/55"
+          [class]="
+            'bg-opacity-40 flex-1 bg-brand-900/55 ' +
+            (menuClosing() ? 'animate-fade-out' : 'animate-fade-in')
+          "
           tabindex="0"
           role="button"
           (click)="closeMenu()"
@@ -56,7 +83,10 @@
           aria-label="Cerrar menú"
         ></div>
         <aside
-          class="animate-slide-in-right flex h-full w-3/4 max-w-xs flex-col items-start bg-primary-500 p-8 shadow-lg"
+          [class]="
+            'flex h-full w-4/5 max-w-sm flex-col items-start bg-primary-500 p-6 shadow-lg sm:w-3/4 sm:max-w-xs sm:p-8 ' +
+            (menuClosing() ? 'animate-slide-out-right' : 'animate-slide-in-right')
+          "
         >
           <button class="mb-8 self-end" (click)="closeMenu()">
             <svg
@@ -74,12 +104,42 @@
               />
             </svg>
           </button>
-          <ul class="flex flex-col gap-8 text-2xl font-semibold text-brand-0">
+          <ul class="flex flex-col gap-6 text-xl font-semibold text-brand-0 sm:gap-8 sm:text-2xl">
             <li><a href="/#hero" (click)="closeMenu()">Inicio</a></li>
             <li><a href="/#services" (click)="closeMenu()">Servicios</a></li>
             <li><a href="/#footer" (click)="closeMenu()">Contacto</a></li>
             <li><a href="/management" (click)="closeMenu()">Administración</a></li>
           </ul>
+          <div class="mt-auto w-full space-y-4">
+            <div class="h-px bg-brand-300/30"></div>
+            <a
+              href="/service-request"
+              class="group flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-ai-500 to-ai-600 px-6 py-4 text-lg font-bold text-brand-0 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95"
+              (click)="closeMenu()"
+            >
+              <div class="relative">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 transition-transform duration-300 group-hover:scale-110"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                  />
+                </svg>
+                <div
+                  class="absolute -top-1 -right-1 h-2 w-2 animate-pulse rounded-full bg-accent-500"
+                ></div>
+              </div>
+              <span>Asistente IA</span>
+            </a>
+            <p class="text-center text-xs text-brand-200/80">💬 Chat inteligente disponible 24/7</p>
+          </div>
         </aside>
       </div>
     }
