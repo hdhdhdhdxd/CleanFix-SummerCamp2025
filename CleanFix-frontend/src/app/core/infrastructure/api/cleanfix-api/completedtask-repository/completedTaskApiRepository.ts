@@ -3,6 +3,8 @@ import { PaginatedData } from '@/core/domain/models/PaginatedData'
 import { environment } from 'src/environments/environment'
 import { PaginatedDataDto } from '../common/interfaces/PaginatedDataDto'
 import { CompletedTaskBriefDto } from './CompletedTaskBriefDto'
+import { CompletedTaskDto } from './completedTaksDto'
+import { CompletedTask } from '@/core/domain/models/CompletedTask'
 
 const create = async (
   solicitationId: number,
@@ -69,7 +71,41 @@ const getPaginated = async (
   }
 }
 
+const getById = async (id: string): Promise<CompletedTask> => {
+  const response = await fetch(`${environment.baseUrl}/completedtasks/${id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error('Error al obtener la tarea completada')
+  }
+
+  const data: CompletedTaskDto = await response.json()
+
+  return {
+    id: data.id,
+    address: data.address,
+    issueType: data.issueType,
+    isSolicitation: data.isSolicitation,
+    creationDate: new Date(data.creationDate),
+    completionDate: new Date(data.completionDate),
+    company: {
+      name: data.company.name,
+      address: data.company.address,
+      number: data.company.number,
+      email: data.company.email,
+    },
+    price: data.price,
+    surface: data.surface,
+    materials: data.materials,
+  }
+}
+
 export const completedTaskApiRepository = {
   create,
   getPaginated,
+  getById,
 }

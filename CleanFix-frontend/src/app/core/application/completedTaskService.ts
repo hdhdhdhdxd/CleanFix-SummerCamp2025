@@ -26,8 +26,13 @@ const getPaginated = async (pageNumber: number, pageSize: number) => {
   return completedTaskRepository.getPaginated(pageNumber, pageSize)
 }
 
+const getById = async (id: string) => {
+  return completedTaskRepository.getById(id)
+}
+
 export const completedTaskService = {
   init,
   create,
   getPaginated,
+  getById,
 }
