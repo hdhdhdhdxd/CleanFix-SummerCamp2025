@@ -1,7 +1,7 @@
 import { Router } from '@angular/router'
 // chat.component.ts
 import { CommonModule } from '@angular/common'
-import { Component, inject, signal } from '@angular/core'
+import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { ChatService } from 'src/app/ui/services/chat/chat.service'
 
@@ -12,6 +12,17 @@ import { ChatService } from 'src/app/ui/services/chat/chat.service'
   styleUrls: ['./chat.component.css'],
 })
 export class ChatComponent {
+  // Eliminar el efecto signal para evitar scroll al escribir
+  @ViewChild('chatScroll', { static: false }) chatScroll!: ElementRef<HTMLDivElement>
+  // ...existing code...
+
+  private scrollToBottom() {
+    if (this.chatScroll && this.chatScroll.nativeElement) {
+      setTimeout(() => {
+        this.chatScroll.nativeElement.scrollTop = this.chatScroll.nativeElement.scrollHeight
+      }, 0)
+    }
+  }
   messages = signal<{ from: 'user' | 'bot'; text: string }[]>([])
   newMessage = ''
 
@@ -31,6 +42,7 @@ export class ChatComponent {
       ...msgs,
       { from: 'user', text: userMessage },
     ])
+    this.scrollToBottom()
     this.newMessage = ''
 
     this.chatService.sendMessage(userMessage, historial).subscribe({
@@ -49,12 +61,14 @@ export class ChatComponent {
           ...msgs,
           { from: 'bot', text: botText },
         ])
+        this.scrollToBottom()
       },
       error: () => {
         this.messages.update((msgs: { from: 'user' | 'bot'; text: string }[]) => [
           ...msgs,
           { from: 'bot', text: 'Ocurrió un error al procesar tu mensaje.' },
         ])
+        this.scrollToBottom()
       },
     })
   }
