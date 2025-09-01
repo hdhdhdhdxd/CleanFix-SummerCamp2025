@@ -129,15 +129,19 @@ namespace WebApi.Controllers
                 {
                     var respuesta = await _assistantService.ProcesarMensajeAsync(request.Mensaje, historial);
                     var pdfUrl = "/api/chatboxia/factura/pdf";
+                    // Añadir sugerencia si la respuesta parece una factura
+                    var mensajeFinal = respuesta;
+                    if (!string.IsNullOrWhiteSpace(respuesta) && respuesta.ToLower().Contains("factura"))
+                        mensajeFinal += "\n\n¿Quieres descargarla en formato PDF o prefieres que te la envíe por correo?";
                     return Ok(new MensajeResponse
                     {
                         Success = true,
                         Error = null,
                         Data = new {
-                            mensaje = respuesta,
+                            mensaje = mensajeFinal,
                             pdfUrl = pdfUrl,
                             puedeEnviarEmail = true,
-                            sugerencia = "¿Quieres descargarla o recibirla por email?"
+                            sugerencia = "¿Quieres descargarla en formato PDF o prefieres que te la envíe por correo?"
                         }
                     });
                 }
@@ -171,7 +175,8 @@ namespace WebApi.Controllers
                         Success = true,
                         Error = null,
                         Data = new {
-                            mensaje = $"Factura:\nEmpresa: {empresa.Name}\n{sugerencia}"
+                            mensaje = $"Factura:\nEmpresa: {empresa.Name}\n{sugerencia}\n\n¿Quieres descargarla en formato PDF o prefieres que te la envíe por correo?",
+                            sugerencia = "¿Quieres descargarla en formato PDF o prefieres que te la envíe por correo?"
                         }
                     });
                 }
@@ -202,15 +207,18 @@ namespace WebApi.Controllers
                     // Si no se puede generar, fallback
                     var respuesta = await _assistantService.ProcesarMensajeAsync(request.Mensaje, historial);
                     var pdfUrl = "/api/chatboxia/factura/pdf";
+                    var mensajeFinal = respuesta;
+                    if (!string.IsNullOrWhiteSpace(respuesta) && respuesta.ToLower().Contains("factura"))
+                        mensajeFinal += "\n\n¿Quieres descargarla en formato PDF o prefieres que te la envíe por correo?";
                     return Ok(new MensajeResponse
                     {
                         Success = true,
                         Error = null,
                         Data = new {
-                            mensaje = respuesta,
+                            mensaje = mensajeFinal,
                             pdfUrl = pdfUrl,
                             puedeEnviarEmail = true,
-                            sugerencia = "¿Quieres descargarla o recibirla por email?"
+                            sugerencia = "¿Quieres descargarla en formato PDF o prefieres que te la envíe por correo?"
                         }
                     });
                 }
