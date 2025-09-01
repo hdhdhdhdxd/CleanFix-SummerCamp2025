@@ -7,10 +7,11 @@ import { PaginatedData } from '@/core/domain/models/PaginatedData'
 import { Location } from '@angular/common'
 import { SearchBar } from '../search-bar/search-bar'
 import { Pagination } from '../pagination/pagination'
+import { CompletedTaskDialog } from '../completed-task-dialog/completed-task-dialog'
 
 @Component({
   selector: 'app-completed-tasks',
-  imports: [SearchBar, Table, Pagination],
+  imports: [SearchBar, Table, Pagination, CompletedTaskDialog],
   templateUrl: './completed-tasks.html',
 })
 export class CompletedTasks implements OnInit {
@@ -26,6 +27,9 @@ export class CompletedTasks implements OnInit {
 
   pageSize = signal<number>(5)
   pageNumber = signal<number>(1)
+
+  completedTaskId: number | null = null
+  showDialog = signal<boolean>(false)
 
   columns: TableColumn<CompletedTaskBrief>[] = [
     {
@@ -97,5 +101,15 @@ export class CompletedTasks implements OnInit {
     this.pageNumber.set(1)
     this.updateUrl()
     this.loadCompletedTasks(1, $event)
+  }
+
+  handleRowClick(item: CompletedTaskBrief): void {
+    this.completedTaskId = item.id
+    this.showDialog.set(true)
+  }
+
+  handleCloseDialog(): void {
+    this.completedTaskId = null
+    this.showDialog.set(false)
   }
 }
