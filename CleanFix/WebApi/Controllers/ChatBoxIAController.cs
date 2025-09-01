@@ -55,162 +55,16 @@ namespace WebApi.Controllers
 
             var mensajeLower = request.Mensaje.ToLowerInvariant();
             bool esFactura = mensajeLower.Contains("factura") || mensajeLower.Contains("pdf") || mensajeLower.Contains("enviar factura") || mensajeLower.Contains("descargar factura");
-            bool pideMateriales = mensajeLower.Contains("material") || mensajeLower.Contains("materiales");
-            bool pideEmpresas = mensajeLower.Contains("empresa") || mensajeLower.Contains("empresas");
 
-            // --- NUEVO: Manejo de empresas igual que materiales ---
-            if (pideEmpresas)
-            {
-                var dbPlugin = new DBPluginTestPG(_connectionString);
-                var issueTypeRepo = new Infrastructure.Repositories.IssueTypeRepository(_connectionString);
-                var issueTypes = await issueTypeRepo.GetAllAsync();
-                var empresasResponse = dbPlugin.GetAllEmpresas();
-                var empresas = empresasResponse.Data ?? new List<CompanyIa>();
-
-                // 1. Buscar por nombre exacto de empresa
-                var empresaNombreMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"empresa\s+([a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                if (empresaNombreMatch.Success)
-                {
-                    var nombre = empresaNombreMatch.Groups[1].Value.Trim();
-                    var empresa = empresas.FirstOrDefault(e => e.Name.Equals(nombre, StringComparison.OrdinalIgnoreCase));
-                    if (empresa != null)
-                    {
-                        return Ok(new MensajeResponse
-                        {
-                            Success = true,
-                            Error = null,
-                            Data = new { mensaje = $"Empresa encontrada: {empresa.Name} (ID: {empresa.Number}, Tipo: {empresa.IssueTypeId}, Precio: €{empresa.Price:F2})" }
-                        });
-                    }
-                    else
-                    {
-                        return Ok(new MensajeResponse
-                        {
-                            Success = true,
-                            Error = null,
-                            Data = new { mensaje = $"No se encontró la empresa con nombre '{nombre}'." }
-                        });
-                    }
-                }
-
-                // 2. Buscar por tipo numérico o nombre de problema (IssueType)
-                int? tipoEmpresa = null;
-                var tipoMatches = System.Text.RegularExpressions.Regex.Matches(request.Mensaje, @"tipo\\s*([a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-                var tiposSolicitados = new HashSet<int>();
-                var tiposTexto = new List<string>();
-                foreach (System.Text.RegularExpressions.Match match in tipoMatches)
-                {
-                    var tipo = match.Groups[1].Value.Trim();
-                    if (int.TryParse(tipo, out int tipoNum))
-                    {
-                        tiposSolicitados.Add(tipoNum);
-                        tiposTexto.Add(tipoNum.ToString());
-                        tipoEmpresa = tipoNum;
-                    }
-                    else
-                    {
-                        var tipoPorNombre = issueTypes.FirstOrDefault(it => it.Name.Equals(tipo, StringComparison.OrdinalIgnoreCase));
-                        if (tipoPorNombre != null)
-                        {
-                            tiposSolicitados.Add(tipoPorNombre.Id);
-                            tiposTexto.Add(tipoPorNombre.Name);
-                            tipoEmpresa = tipoPorNombre.Id;
-                        }
-                    }
-                }
-                // También buscar por nombres de tipo en todo el mensaje
-                foreach (var issue in issueTypes)
-                {
-                    if (request.Mensaje.Contains(issue.Name, StringComparison.OrdinalIgnoreCase))
-                    {
-                        tiposSolicitados.Add(issue.Id);
-                        if (!tiposTexto.Contains(issue.Name))
-                            tiposTexto.Add(issue.Name);
-                        tipoEmpresa = issue.Id;
-                    }
-                }
-                // 3. Filtros adicionales: más barata/cara
-                bool masBarata = mensajeLower.Contains("más barata") || mensajeLower.Contains("mas barata");
-                bool masCara = mensajeLower.Contains("más cara") || mensajeLower.Contains("mas cara");
-                IEnumerable<CompanyIa> empresasFiltradas = empresas;
-                if (tipoEmpresa.HasValue)
-                    empresasFiltradas = empresasFiltradas.Where(e => e.IssueTypeId == tipoEmpresa.Value);
-                if (masBarata)
-                    empresasFiltradas = empresasFiltradas.OrderBy(e => e.Price).Take(1);
-                if (masCara)
-                    empresasFiltradas = empresasFiltradas.OrderByDescending(e => e.Price).Take(1);
-                if (tipoEmpresa.HasValue || masBarata || masCara)
-                {
-                    var lista = empresasFiltradas.ToList();
-                    if (lista.Count == 0)
-                    {
-                        return Ok(new MensajeResponse
-                        {
-                            Success = true,
-                            Error = null,
-                            Data = new { mensaje = "No se encontraron empresas con los criterios indicados." }
-                        });
-                    }
-                    var listado = string.Join(", ", lista.Select(e => $"{e.Name} (ID: {e.Number}, Precio: €{e.Price:F2}, Tipo: {e.IssueTypeId})"));
-                    return Ok(new MensajeResponse
-                    {
-                        Success = true,
-                        Error = null,
-                        Data = new { mensaje = $"Empresas encontradas: {listado}" }
-                    });
-                }
-                // 4. Todas las empresas solo si no hay filtro
-                if ((mensajeLower.Contains("todas las empresas") || mensajeLower.Trim() == "empresas" || mensajeLower.Trim() == "dame todas las empresas"))
-                {
-                    var listado = string.Join(", ", empresas.Select(e => $"{e.Name} (ID: {e.Number}, Precio: €{e.Price:F2}, Tipo: {e.IssueTypeId})"));
-                    return Ok(new MensajeResponse
-                    {
-                        Success = true,
-                        Error = null,
-                        Data = new { mensaje = $"Empresas disponibles: {listado}" }
-                    });
-                }
-                // Si no se reconoce el tipo
-                return Ok(new MensajeResponse
-                {
-                    Success = true,
-                    Error = null,
-                    Data = new { mensaje = "No se reconoce el tipo, nombre o criterio de empresa. Intenta especificar el nombre, tipo o si quieres la más barata/cara." }
-                });
-            }
-            // --- FIN NUEVO ---
-
-            // Mensaje ilegible: no contiene palabras clave conocidas
-            if (!esFactura && !pideMateriales && !pideEmpresas && request.Mensaje.Length < 20)
-            {
-                // Responder cordialmente a saludos o frases cortas
-                var saludos = new[] { "hola", "buenos dias", "buenas tardes", "buenas noches", "saludos" };
-                if (saludos.Any(s => mensajeLower.Contains(s)))
-                {
-                    return Ok(new MensajeResponse
-                    {
-                        Success = true,
-                        Error = null,
-                        Data = new { mensaje = "¡Hola! Soy CleanFixBot, ¿en qué puedo ayudarte?" }
-                    });
-                }
-                return Ok(new MensajeResponse
-                {
-                    Success = true,
-                    Error = null,
-                    Data = new { mensaje = "Lo siento, no entiendo tu mensaje. ¿Puedes reformularlo?" }
-                });
-            }
-
-            // Si es factura, intenta extraer empresa y materiales y usa la lógica real
+            // --- PRIORIDAD: FACTURA ---
             if (esFactura)
             {
                 // Extracción robusta de empresa y materiales por nombre (igual que materiales)
                 string empresaNombre = null;
                 var materialesNombres = new List<string>();
 
-                // Buscar empresa: busca la última ocurrencia de 'empresa' seguida de cualquier texto hasta el final o hasta 'material'
-                var empresaRegex = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"empresa\s+([a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ ]+?)(?=\s+material|$)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                // Buscar empresa: solo hasta 'y', ',', 'material' o final
+                var empresaRegex = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"empresa\s+([a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                 if (empresaRegex.Success)
                 {
                     empresaNombre = empresaRegex.Groups[1].Value.Trim();
@@ -246,10 +100,27 @@ namespace WebApi.Controllers
                     });
                 }
 
+                // Normaliza el nombre de empresa igual que en la búsqueda de empresas
+                string Normalizar(string s) => s.Trim().ToLower().Replace("empresa", "").Trim();
+                var dbPlugin = new DBPluginTestPG(_connectionString);
+                var empresasResponse = dbPlugin.GetAllEmpresas();
+                var empresa = empresasResponse.Data?.FirstOrDefault(e =>
+                    string.Equals(e.Name.Trim(), empresaNombre, StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(Normalizar(e.Name), Normalizar(empresaNombre), StringComparison.OrdinalIgnoreCase)
+                );
+                if (empresa == null)
+                {
+                    return Ok(new MensajeResponse
+                    {
+                        Success = false,
+                        Error = null,
+                        Data = new { mensaje = $"No se encontró ninguna empresa con el nombre '{empresaNombre}'." }
+                    });
+                }
+
                 // Si hay empresa pero NO hay materiales, sugerir materiales y NO generar factura
                 if (materialesNombres.Count == 0)
                 {
-                    var dbPlugin = new DBPluginTestPG(_connectionString);
                     var materialesResponse = dbPlugin.GetAllMaterials();
                     var sugeridos = materialesResponse.Data?.Take(4).ToList() ?? new List<MaterialIa>();
                     var sugerencia = $"No has seleccionado materiales, te recomiendo estos: Materiales: " + string.Join(", ", sugeridos.Select(m => $"{m.Name} - €{m.Cost:F2}"));
@@ -258,13 +129,13 @@ namespace WebApi.Controllers
                         Success = true,
                         Error = null,
                         Data = new {
-                            mensaje = $"Factura:\nEmpresa: {empresaNombre}\n{sugerencia}"
+                            mensaje = $"Factura:\nEmpresa: {empresa.Name}\n{sugerencia}"
                         }
                     });
                 }
 
                 // Llama a la lógica real de generación de factura
-                var facturaRequest = new FacturaRequest { EmpresaNombre = empresaNombre, MaterialesNombres = materialesNombres };
+                var facturaRequest = new FacturaRequest { EmpresaNombre = empresa.Name, MaterialesNombres = materialesNombres };
                 var facturaResult = GenerarFactura(facturaRequest) as OkObjectResult;
                 if (facturaResult?.Value is FacturaResponse facturaResponse && facturaResponse.Success && facturaResponse.Factura != null)
                 {
@@ -301,36 +172,36 @@ namespace WebApi.Controllers
                 }
             }
 
-            // Llama al servicio con el historial limitado
+            // --- FILTRO: empresas de tipo X ---
+            if ((mensajeLower.Contains("empresa") || mensajeLower.Contains("empresas")) && mensajeLower.Contains("tipo"))
+            {
+                var tipoMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"tipo\s*(\d+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (tipoMatch.Success && int.TryParse(tipoMatch.Groups[1].Value, out int tipoId))
+                {
+                    var dbPlugin = new DBPluginTestPG(_connectionString);
+                    var empresasResponse = dbPlugin.GetAllEmpresas();
+                    var empresas = empresasResponse.Data?.Where(e => e.IssueTypeId == tipoId).ToList() ?? new List<CompanyIa>();
+                    if (empresas.Count == 0)
+                    {
+                        return Ok(new MensajeResponse
+                        {
+                            Success = true,
+                            Error = null,
+                            Data = new { mensaje = $"No se encontraron empresas de tipo {tipoId}." }
+                        });
+                    }
+                    var listado = string.Join(", ", empresas.Select(e => $"{e.Name} (ID: {e.Number}, Precio: €{e.Price:F2}, Tipo: {e.IssueTypeId})"));
+                    return Ok(new MensajeResponse
+                    {
+                        Success = true,
+                        Error = null,
+                        Data = new { mensaje = $"Empresas de tipo {tipoId}: {listado}" }
+                    });
+                }
+            }
+
+            // --- RESTO: TODO AL ASSISTANTSERVICE ---
             var respuestaGeneral = await _assistantService.ProcesarMensajeAsync(request.Mensaje, historial);
-
-            // Si pide materiales, filtra la respuesta para evitar empresas
-            if (pideMateriales && !esFactura)
-            {
-                if (respuestaGeneral.ToLower().Contains("empresa") && !respuestaGeneral.ToLower().Contains("material"))
-                {
-                    return Ok(new MensajeResponse
-                    {
-                        Success = true,
-                        Error = null,
-                        Data = new { mensaje = "Aquí tienes los materiales disponibles." }
-                    });
-                }
-            }
-            // Si pide empresas, filtra la respuesta para evitar materiales
-            if (pideEmpresas && !esFactura)
-            {
-                if (respuestaGeneral.ToLower().Contains("material") && !respuestaGeneral.ToLower().Contains("empresa"))
-                {
-                    return Ok(new MensajeResponse
-                    {
-                        Success = true,
-                        Error = null,
-                        Data = new { mensaje = "Aquí tienes las empresas disponibles." }
-                    });
-                }
-            }
-
             return Ok(new MensajeResponse
             {
                 Success = true,
