@@ -69,32 +69,96 @@ namespace WebApi.Controllers
                 });
             }
 
-            // Si es factura, genera la factura y luego ofrece opciones
+            // Si es factura, intenta extraer empresa y materiales y usa la lógica real
             if (esFactura)
             {
-                // Aquí podrías generar la factura real y devolverla en la respuesta
-                // Para ejemplo, solo devuelvo un mensaje y las opciones
-                var pdfUrl = "/api/chatboxia/factura/pdf";
-                return Ok(new MensajeResponse
+                // Extracción simple de empresa y materiales por ID o nombre (mejorable con NLP)
+                string empresaNombre = null;
+                var materialesNombres = new List<string>();
+                var empresaMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"empresa\s*(\d+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (empresaMatch.Success)
                 {
-                    Success = true,
-                    Error = null,
-                    Data = new {
-                        mensaje = "Aquí tienes tu factura. ¿Quieres descargarla o recibirla por email?",
-                        pdfUrl = pdfUrl,
-                        puedeEnviarEmail = true
-                    }
-                });
+                    empresaNombre = $"Empresa {empresaMatch.Groups[1].Value}";
+                }
+                else
+                {
+                    // Busca por nombre si no hay ID
+                    var nombreMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"empresa ([a-zA-Z0-9 ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                    if (nombreMatch.Success)
+                        empresaNombre = nombreMatch.Groups[1].Value.Trim();
+                }
+                // Materiales por nombre o id
+                var materialesMatches = System.Text.RegularExpressions.Regex.Matches(request.Mensaje, @"material(?:es)?\s*([a-zA-Z0-9 ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                foreach (System.Text.RegularExpressions.Match mat in materialesMatches)
+                {
+                    var nombre = mat.Groups[1].Value.Trim();
+                    if (!string.IsNullOrEmpty(nombre))
+                        materialesNombres.Add(nombre);
+                }
+
+                // Si no se encuentra empresa, fallback a AssistantService
+                if (string.IsNullOrEmpty(empresaNombre))
+                {
+                    var respuesta = await _assistantService.ProcesarMensajeAsync(request.Mensaje, historial);
+                    var pdfUrl = "/api/chatboxia/factura/pdf";
+                    return Ok(new MensajeResponse
+                    {
+                        Success = true,
+                        Error = null,
+                        Data = new {
+                            mensaje = respuesta,
+                            pdfUrl = pdfUrl,
+                            puedeEnviarEmail = true,
+                            sugerencia = "¿Quieres descargarla o recibirla por email?"
+                        }
+                    });
+                }
+
+                // Llama a la lógica real de generación de factura
+                var facturaRequest = new FacturaRequest { EmpresaNombre = empresaNombre, MaterialesNombres = materialesNombres };
+                var facturaResult = GenerarFactura(facturaRequest) as OkObjectResult;
+                if (facturaResult?.Value is FacturaResponse facturaResponse && facturaResponse.Success && facturaResponse.Factura != null)
+                {
+                    var desglose = FormatearFactura(facturaResponse.Factura);
+                    var pdfUrl = "/api/chatboxia/factura/pdf";
+                    return Ok(new MensajeResponse
+                    {
+                        Success = true,
+                        Error = null,
+                        Data = new {
+                            mensaje = desglose,
+                            pdfUrl = pdfUrl,
+                            puedeEnviarEmail = true,
+                            sugerencia = "¿Quieres descargarla o recibirla por email?"
+                        }
+                    });
+                }
+                else
+                {
+                    // Si no se puede generar, fallback
+                    var respuesta = await _assistantService.ProcesarMensajeAsync(request.Mensaje, historial);
+                    var pdfUrl = "/api/chatboxia/factura/pdf";
+                    return Ok(new MensajeResponse
+                    {
+                        Success = true,
+                        Error = null,
+                        Data = new {
+                            mensaje = respuesta,
+                            pdfUrl = pdfUrl,
+                            puedeEnviarEmail = true,
+                            sugerencia = "¿Quieres descargarla o recibirla por email?"
+                        }
+                    });
+                }
             }
 
             // Llama al servicio con el historial limitado
-            var respuesta = await _assistantService.ProcesarMensajeAsync(request.Mensaje, historial);
+            var respuestaGeneral = await _assistantService.ProcesarMensajeAsync(request.Mensaje, historial);
 
             // Si pide materiales, filtra la respuesta para evitar empresas
             if (pideMateriales && !esFactura)
             {
-                // Si la respuesta contiene la palabra 'empresa' pero no 'material', muestra solo materiales
-                if (respuesta.ToLower().Contains("empresa") && !respuesta.ToLower().Contains("material"))
+                if (respuestaGeneral.ToLower().Contains("empresa") && !respuestaGeneral.ToLower().Contains("material"))
                 {
                     return Ok(new MensajeResponse
                     {
@@ -107,7 +171,7 @@ namespace WebApi.Controllers
             // Si pide empresas, filtra la respuesta para evitar materiales
             if (pideEmpresas && !esFactura)
             {
-                if (respuesta.ToLower().Contains("material") && !respuesta.ToLower().Contains("empresa"))
+                if (respuestaGeneral.ToLower().Contains("material") && !respuestaGeneral.ToLower().Contains("empresa"))
                 {
                     return Ok(new MensajeResponse
                     {
@@ -122,7 +186,7 @@ namespace WebApi.Controllers
             {
                 Success = true,
                 Error = null,
-                Data = new { mensaje = respuesta }
+                Data = new { mensaje = respuestaGeneral }
             });
         }
 
@@ -265,6 +329,35 @@ namespace WebApi.Controllers
         {
             await incidenciaService.ReportarIncidenciaAsync(request.Usuario, request.Descripcion, request.Tipo, request.Referencia);
             return Ok("Incidencia reportada correctamente");
+        }
+
+        // Formatea el desglose de la factura real
+        private string FormatearFactura(FacturaDetalleDto factura)
+        {
+            var sb = new System.Text.StringBuilder();
+            sb.AppendLine($"Factura:");
+            sb.AppendLine($"Empresa: {factura.Empresa.Nombre} - €{factura.Empresa.Coste:F2}");
+            if (factura.Materiales != null && factura.Materiales.Count > 0)
+            {
+                sb.Append("Materiales: ");
+                sb.Append(string.Join(", ", factura.Materiales.Select(m => $"{m.Nombre} - €{m.Coste:F2}")));
+                sb.AppendLine();
+            }
+            else
+            {
+                // Sugerir materiales si no hay ninguno en la factura
+                var dbPlugin = new DBPluginTestPG(_connectionString);
+                var materialesResponse = dbPlugin.GetAllMaterials();
+                var sugeridos = materialesResponse.Data?.Take(5).Select(m => m.Name).ToList() ?? new List<string>();
+                sb.AppendLine($"Necesitas añadir algún material para la factura. Te recomiendo estos: {string.Join(", ", sugeridos)}");
+            }
+            decimal iva = 0.21m;
+            decimal ivaEmpresa = factura.Empresa.Coste * iva;
+            decimal ivaMateriales = factura.Materiales?.Sum(m => m.Coste) * iva ?? 0;
+            decimal totalIva = ivaEmpresa + ivaMateriales;
+            sb.AppendLine($"IVA: €{totalIva:F2}");
+            sb.AppendLine($"Total con IVA: €{factura.TotalConIVA:F2}");
+            return sb.ToString();
         }
     }
 }
