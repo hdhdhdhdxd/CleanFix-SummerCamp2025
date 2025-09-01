@@ -3,6 +3,7 @@ import { Router } from '@angular/router'
 import { CommonModule } from '@angular/common'
 import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
+import { marked } from 'marked'
 import { ChatService } from 'src/app/ui/services/chat/chat.service'
 
 @Component({
@@ -58,10 +59,11 @@ export class ChatComponent {
         ) {
           botText = res.data.mensaje
         }
-        // Reemplazar el último mensaje 'Escribiendo...' por la respuesta real
+        // Convertir Markdown a HTML solo para mensajes del bot
+        const botHtml = String(marked.parse(botText))
         this.messages.update((msgs: { from: 'user' | 'bot'; text: string }[]) => [
           ...msgs.slice(0, -1),
-          { from: 'bot', text: botText },
+          { from: 'bot', text: botHtml },
         ])
         this.scrollToBottom()
       },

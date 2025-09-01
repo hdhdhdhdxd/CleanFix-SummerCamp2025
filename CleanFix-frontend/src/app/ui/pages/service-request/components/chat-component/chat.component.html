@@ -7,7 +7,10 @@
     <div *ngFor="let msg of messages()">
       <div [ngClass]="{ 'text-right': msg.from === 'user', 'text-left': msg.from === 'bot' }">
         <div class="message" [ngClass]="msg.from">
-          {{ msg.text }}
+          <ng-container *ngIf="msg.from === 'bot'; else userText">
+            <span [innerHTML]="msg.text"></span>
+          </ng-container>
+          <ng-template #userText>{{ msg.text }}</ng-template>
         </div>
       </div>
     </div>
