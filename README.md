@@ -7,7 +7,6 @@ dotnet ef migrations add "InitialCreate" --project Infrastructure --startup-proj
 ```
 dotnet ef database update --project Infrastructure --startup-project WebApi
 ```
-### Enlaces
+## 🚀 Página Web
 
-[Página web]([url](https://clean-fix-summer-camp2025-pljxvbe3r-eimarramos-projects.vercel.app)){:target="_blank"}
-
+<a href="https://clean-fix-summer-camp2025-pljxvbe3r-eimarramos-projects.vercel.app" target="_blank" rel="noopener noreferrer">**🌐 Visitar CleanFix**</a>
