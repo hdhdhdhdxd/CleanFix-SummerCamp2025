@@ -1,8 +1,8 @@
 <search>
-  <form class="flex space-x-2.5" (submit)="onSubmit($event)">
-    <div class="relative">
+  <form class="flex flex-wrap gap-2.5" (submit)="onSubmit($event)">
+    <div class="relative min-w-0 flex-1">
       <input
-        class="w-xs rounded-lg border border-brand-300 px-3 py-2 transition-all duration-200 hover:border-brand-500 hover:shadow-sm focus:border-brand-700 focus:ring-2 focus:ring-brand-200 focus:outline-none"
+        class="w-full rounded-lg border border-brand-300 px-3 py-2 transition-all duration-200 hover:border-brand-500 hover:shadow-sm focus:border-brand-700 focus:ring-2 focus:ring-brand-200 focus:outline-none"
         type="search"
         name="filter-text-input"
         placeholder="Buscar documentos..."
@@ -16,7 +16,7 @@
     </div>
     <button
       type="submit"
-      class="hover:bg-primary-600 active:bg-primary-700 focus:ring-primary-200 rounded-lg bg-primary-500 px-4 py-2 text-brand-0 transition-all duration-200 hover:shadow-md focus:ring-2 focus:outline-none active:scale-95"
+      class="hover:bg-primary-600 active:bg-primary-700 focus:ring-primary-200 flex-shrink-0 rounded-lg bg-primary-500 px-4 py-2 text-brand-0 transition-all duration-200 hover:shadow-md focus:ring-2 focus:outline-none active:scale-95"
       aria-label="Ejecutar búsqueda"
     >
       Buscar
