@@ -58,7 +58,7 @@ namespace WebApi.Controllers
             bool pideMateriales = mensajeLower.Contains("material") || mensajeLower.Contains("materiales");
             bool pideEmpresas = mensajeLower.Contains("empresa") || mensajeLower.Contains("empresas");
 
-            // --- NUEVO: Manejo de empresas por tipo, nombre, id, o problema ---
+            // --- NUEVO: Manejo de empresas igual que materiales ---
             if (pideEmpresas)
             {
                 var dbPlugin = new DBPluginTestPG(_connectionString);
@@ -67,7 +67,7 @@ namespace WebApi.Controllers
                 var empresasResponse = dbPlugin.GetAllEmpresas();
                 var empresas = empresasResponse.Data ?? new List<CompanyIa>();
 
-                // 1. Buscar por nombre exacto de empresa (prioridad)
+                // 1. Buscar por nombre exacto de empresa
                 var empresaNombreMatch = System.Text.RegularExpressions.Regex.Match(request.Mensaje, @"empresa\s+([a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                 if (empresaNombreMatch.Success)
                 {
@@ -94,6 +94,7 @@ namespace WebApi.Controllers
                 }
 
                 // 2. Buscar por tipo numérico o nombre de problema (IssueType)
+                int? tipoEmpresa = null;
                 var tipoMatches = System.Text.RegularExpressions.Regex.Matches(request.Mensaje, @"tipo\\s*([a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ]+)", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
                 var tiposSolicitados = new HashSet<int>();
                 var tiposTexto = new List<string>();
@@ -104,6 +105,7 @@ namespace WebApi.Controllers
                     {
                         tiposSolicitados.Add(tipoNum);
                         tiposTexto.Add(tipoNum.ToString());
+                        tipoEmpresa = tipoNum;
                     }
                     else
                     {
@@ -112,10 +114,11 @@ namespace WebApi.Controllers
                         {
                             tiposSolicitados.Add(tipoPorNombre.Id);
                             tiposTexto.Add(tipoPorNombre.Name);
+                            tipoEmpresa = tipoPorNombre.Id;
                         }
                     }
                 }
-                // También buscar por nombres de tipo en todo el mensaje (por si no usan 'tipo X')
+                // También buscar por nombres de tipo en todo el mensaje
                 foreach (var issue in issueTypes)
                 {
                     if (request.Mensaje.Contains(issue.Name, StringComparison.OrdinalIgnoreCase))
@@ -123,30 +126,41 @@ namespace WebApi.Controllers
                         tiposSolicitados.Add(issue.Id);
                         if (!tiposTexto.Contains(issue.Name))
                             tiposTexto.Add(issue.Name);
+                        tipoEmpresa = issue.Id;
                     }
                 }
-                if (tiposSolicitados.Count > 0)
+                // 3. Filtros adicionales: más barata/cara
+                bool masBarata = mensajeLower.Contains("más barata") || mensajeLower.Contains("mas barata");
+                bool masCara = mensajeLower.Contains("más cara") || mensajeLower.Contains("mas cara");
+                IEnumerable<CompanyIa> empresasFiltradas = empresas;
+                if (tipoEmpresa.HasValue)
+                    empresasFiltradas = empresasFiltradas.Where(e => e.IssueTypeId == tipoEmpresa.Value);
+                if (masBarata)
+                    empresasFiltradas = empresasFiltradas.OrderBy(e => e.Price).Take(1);
+                if (masCara)
+                    empresasFiltradas = empresasFiltradas.OrderByDescending(e => e.Price).Take(1);
+                if (tipoEmpresa.HasValue || masBarata || masCara)
                 {
-                    var empresasFiltradas = empresas.Where(e => tiposSolicitados.Contains(e.IssueTypeId)).ToList();
-                    if (empresasFiltradas.Count == 0)
+                    var lista = empresasFiltradas.ToList();
+                    if (lista.Count == 0)
                     {
                         return Ok(new MensajeResponse
                         {
                             Success = true,
                             Error = null,
-                            Data = new { mensaje = $"No se encontraron empresas de los tipos: {string.Join(", ", tiposTexto)}." }
+                            Data = new { mensaje = "No se encontraron empresas con los criterios indicados." }
                         });
                     }
-                    var listado = string.Join(", ", empresasFiltradas.Select(e => $"{e.Name} (ID: {e.Number}, Precio: €{e.Price:F2}, Tipo: {e.IssueTypeId})"));
+                    var listado = string.Join(", ", lista.Select(e => $"{e.Name} (ID: {e.Number}, Precio: €{e.Price:F2}, Tipo: {e.IssueTypeId})"));
                     return Ok(new MensajeResponse
                     {
                         Success = true,
                         Error = null,
-                        Data = new { mensaje = $"Empresas de tipo {string.Join(", ", tiposTexto)}: {listado}" }
+                        Data = new { mensaje = $"Empresas encontradas: {listado}" }
                     });
                 }
-                // Si pide todas las empresas sin tipo (solo si no hay ningún filtro de tipo ni nombre)
-                if ((mensajeLower.Contains("todas las empresas") || mensajeLower.Trim() == "empresas" || mensajeLower.Trim() == "dame todas las empresas") && tiposSolicitados.Count == 0 && empresaNombreMatch.Success == false)
+                // 4. Todas las empresas solo si no hay filtro
+                if ((mensajeLower.Contains("todas las empresas") || mensajeLower.Trim() == "empresas" || mensajeLower.Trim() == "dame todas las empresas"))
                 {
                     var listado = string.Join(", ", empresas.Select(e => $"{e.Name} (ID: {e.Number}, Precio: €{e.Price:F2}, Tipo: {e.IssueTypeId})"));
                     return Ok(new MensajeResponse
@@ -161,7 +175,7 @@ namespace WebApi.Controllers
                 {
                     Success = true,
                     Error = null,
-                    Data = new { mensaje = "No se reconoce el tipo, nombre o ID de empresa/material/problema. Intenta especificar el nombre o tipo correctamente." }
+                    Data = new { mensaje = "No se reconoce el tipo, nombre o criterio de empresa. Intenta especificar el nombre, tipo o si quieres la más barata/cara." }
                 });
             }
             // --- FIN NUEVO ---
