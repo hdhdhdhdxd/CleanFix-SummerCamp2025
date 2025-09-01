@@ -9,8 +9,12 @@ import { from, Observable } from 'rxjs'
   providedIn: 'root',
 })
 export class IncidenceService {
-  getPaginated(pageNumber: number, pageSize: number): Observable<PaginatedData<IncidenceBrief>> {
-    return from(incidenceService.getPaginated(pageNumber, pageSize))
+  getPaginated(
+    pageNumber: number,
+    pageSize: number,
+    filterString?: string,
+  ): Observable<PaginatedData<IncidenceBrief>> {
+    return from(incidenceService.getPaginated(pageNumber, pageSize, filterString))
   }
 
   getById(id: number): Observable<Incidence> {

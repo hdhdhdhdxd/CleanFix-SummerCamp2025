@@ -37,9 +37,19 @@ const create = async (
 const getPaginated = async (
   pageNumber: number,
   pageSize: number,
+  filterString?: string,
 ): Promise<PaginatedData<CompletedTaskBrief>> => {
+  const params = new URLSearchParams({
+    pageNumber: pageNumber.toString(),
+    pageSize: pageSize.toString(),
+  })
+
+  if (filterString) {
+    params.append('filterString', filterString)
+  }
+
   const response = await fetch(
-    `${environment.baseUrl}/completedtasks/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
+    `${environment.baseUrl}/completedtasks/paginated?${params.toString()}`,
     {
       method: 'GET',
       headers: {

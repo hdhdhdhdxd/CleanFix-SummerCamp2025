@@ -33,6 +33,7 @@ public class GetPaginatedCompletedTasksQueryHandler : IRequestHandler<GetPaginat
             query = query.Where(ct =>
                 (ct.Address != null && ct.Address.ToLower().Contains(filter)) ||
                 (ct.Company != null && ct.Company.Name.ToLower().Contains(filter)) ||
+                (ct.IssueType != null && ct.IssueType.Name.ToLower().Contains(filter)) ||
                 ct.CreationDate.ToString().ToLower().Contains(filter) ||
                 ct.CompletionDate.ToString().ToLower().Contains(filter) ||
                 (ct.IsSolicitation && "solicitud".Contains(filter)) ||

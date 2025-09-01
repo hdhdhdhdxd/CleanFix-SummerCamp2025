@@ -11,10 +11,18 @@ import { Incidence } from '@/core/domain/models/Incidence'
 const getPaginated = async (
   pageNumber: number,
   pageSize: number,
+  filterString?: string,
 ): Promise<PaginatedData<IncidenceBrief>> => {
-  const response = await fetch(
-    environment.baseUrl + `/incidences/paginated?pageNumber=${pageNumber}&pageSize=${pageSize}`,
-  )
+  const params = new URLSearchParams({
+    pageNumber: pageNumber.toString(),
+    pageSize: pageSize.toString(),
+  })
+
+  if (filterString) {
+    params.append('filterString', filterString)
+  }
+
+  const response = await fetch(`${environment.baseUrl}/incidences/paginated?${params.toString()}`)
   if (!response.ok) {
     throw new Error('Error al obtener las incidencias')
   }
