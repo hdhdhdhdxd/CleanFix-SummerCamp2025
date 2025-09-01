@@ -22,17 +22,32 @@ export class ChatComponent {
     const userMessage = this.newMessage.trim()
     if (!userMessage) return
 
+    // Construir historial solo con los textos enviados por el usuario
+    const historial = this.messages()
+      .filter((m) => m.from === 'user')
+      .map((m) => m.text)
+
     this.messages.update((msgs: { from: 'user' | 'bot'; text: string }[]) => [
       ...msgs,
       { from: 'user', text: userMessage },
     ])
     this.newMessage = ''
 
-    this.chatService.sendMessage(userMessage).subscribe({
+    this.chatService.sendMessage(userMessage, historial).subscribe({
       next: (res) => {
+        let botText = ''
+        if (typeof res.data === 'string') {
+          botText = res.data
+        } else if (
+          res.data &&
+          typeof res.data === 'object' &&
+          typeof res.data.mensaje === 'string'
+        ) {
+          botText = res.data.mensaje
+        }
         this.messages.update((msgs: { from: 'user' | 'bot'; text: string }[]) => [
           ...msgs,
-          { from: 'bot', text: res.data },
+          { from: 'bot', text: botText },
         ])
       },
       error: () => {

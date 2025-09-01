@@ -5,7 +5,10 @@ import { Observable } from 'rxjs'
 export interface ChatboxIAResponse {
   success: boolean
   error: string | null
-  data: string
+  data: {
+    mensaje: string
+    historial?: string[]
+  }
 }
 
 @Injectable({
@@ -16,7 +19,10 @@ export class ChatService {
 
   private http = inject(HttpClient)
 
-  sendMessage(message: string): Observable<ChatboxIAResponse> {
-    return this.http.post<ChatboxIAResponse>(this.apiUrl, { mensaje: message })
+  sendMessage(message: string, historial: string[] = []): Observable<ChatboxIAResponse> {
+    return this.http.post<ChatboxIAResponse>(this.apiUrl, {
+      mensaje: message,
+      historial: historial,
+    })
   }
 }
