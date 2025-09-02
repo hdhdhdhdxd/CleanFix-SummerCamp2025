@@ -1,3 +1,10 @@
+// Tipo para la respuesta del bot que puede incluir pdfUrl
+interface BotResponse {
+  mensaje: string
+  pdfUrl?: string
+  historial?: string[]
+}
+
 import { Router } from '@angular/router'
 // chat.component.ts
 import { CommonModule } from '@angular/common'
@@ -15,6 +22,7 @@ import { ChatService } from 'src/app/ui/services/chat/chat.service'
 export class ChatComponent {
   showDownloadButton = signal(false)
   facturaData = signal<{ empresaNombre: string; materialesNombres: string[] } | null>(null)
+  pdfUrl: string | null = null
   // Eliminar el efecto signal para evitar scroll al escribir
   @ViewChild('chatScroll', { static: false }) chatScroll!: ElementRef<HTMLDivElement>
   // ...existing code...
@@ -60,9 +68,13 @@ export class ChatComponent {
         } else if (
           res.data &&
           typeof res.data === 'object' &&
-          typeof res.data.mensaje === 'string'
+          typeof (res.data as BotResponse).mensaje === 'string'
         ) {
-          botText = res.data.mensaje
+          const botRes = res.data as BotResponse
+          botText = botRes.mensaje
+          if (botRes.pdfUrl) {
+            this.pdfUrl = botRes.pdfUrl
+          }
         }
         // Convertir Markdown a HTML solo para mensajes del bot
         const botHtml = String(marked.parse(botText))
@@ -76,7 +88,10 @@ export class ChatComponent {
         if (
           botText.toLowerCase().includes('descargar factura') ||
           botText.toLowerCase().includes('descargar la factura') ||
-          botText.toLowerCase().includes('aquí tienes el resumen de la factura')
+          botText.toLowerCase().includes('aquí tienes el resumen de la factura') ||
+          botText.toLowerCase().includes('descargar pdf') ||
+          botText.toLowerCase().includes('descargar el pdf') ||
+          botText.toLowerCase().includes('aquí tienes el resumen del pdf')
         ) {
           // Extraer datos de la factura del último mensaje del usuario
           const empresaNombre = this.extractEmpresaNombre()
@@ -97,21 +112,29 @@ export class ChatComponent {
   }
 
   private extractEmpresaNombre(): string {
-    const lastUserMsg =
-      this.messages()
-        .filter((m) => m.from === 'user')
-        .slice(-1)[0]?.text || ''
-    const match = lastUserMsg.match(/empresa\s+([\w\d]+)/i)
-    return match ? match[1] : ''
+    // Buscar en todos los mensajes del usuario, desde el más antiguo al más reciente
+    const userMsgs = this.messages()
+      .filter((m) => m.from === 'user')
+      .map((m) => m.text)
+    for (let i = userMsgs.length - 1; i >= 0; i--) {
+      const match = userMsgs[i].match(/empresa\s+([\w\d]+)/i)
+      if (match) return match[1]
+    }
+    return ''
   }
 
   private extractMaterialesNombres(): string[] {
-    const lastUserMsg =
-      this.messages()
-        .filter((m) => m.from === 'user')
-        .slice(-1)[0]?.text || ''
-    const matches = [...lastUserMsg.matchAll(/material\s+([\w\d]+)/gi)]
-    return matches.map((m) => m[1])
+    // Buscar en todos los mensajes del usuario, desde el más antiguo al más reciente
+    const userMsgs = this.messages()
+      .filter((m) => m.from === 'user')
+      .map((m) => m.text)
+    const materiales: string[] = []
+    for (let i = userMsgs.length - 1; i >= 0; i--) {
+      const matches = [...userMsgs[i].matchAll(/material\s+([\w\d]+)/gi)]
+      materiales.push(...matches.map((m) => m[1]))
+    }
+    // Eliminar duplicados
+    return Array.from(new Set(materiales))
   }
 
   goHome() {
@@ -120,8 +143,8 @@ export class ChatComponent {
 
   descargarFactura() {
     const data = this.facturaData()
-    if (!data) return
-    fetch('https://localhost:7096/api/chatboxia/factura/pdf', {
+    if (!data || !this.pdfUrl) return
+    fetch(this.pdfUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -130,15 +153,30 @@ export class ChatComponent {
     })
       .then(async (response) => {
         if (!response.ok) throw new Error('Error al descargar la factura')
-        const blob = await response.blob()
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = 'factura.pdf'
-        document.body.appendChild(a)
-        a.click()
-        a.remove()
-        window.URL.revokeObjectURL(url)
+        // Si el endpoint devuelve datos de la factura, actualiza el mensaje del bot
+        const contentType = response.headers.get('Content-Type')
+        if (contentType && contentType.includes('application/json')) {
+          const facturaInfo = await response.json()
+          if (facturaInfo && facturaInfo.mensaje) {
+            const botHtml = String(marked.parse(facturaInfo.mensaje))
+            this.messages.update((msgs: { from: 'user' | 'bot'; text: string }[]) => [
+              ...msgs,
+              { from: 'bot', text: botHtml },
+            ])
+            this.scrollToBottom()
+          }
+        } else {
+          // Si es PDF, descarga el archivo
+          const blob = await response.blob()
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = 'factura.pdf'
+          document.body.appendChild(a)
+          a.click()
+          a.remove()
+          window.URL.revokeObjectURL(url)
+        }
       })
       .catch(() => {
         alert('No se pudo descargar la factura')
