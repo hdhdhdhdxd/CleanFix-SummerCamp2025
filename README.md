@@ -7,3 +7,7 @@
 
 <!--Documentación-->
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/hdhdhdhdxd/CleanFix-SummerCamp2025)
+
+<!--Cuenta CleanFix para iniciar sesión-->
+Correo: CleanFixBot@gmail.com
+Contraseña: CleanF1xB0t*
