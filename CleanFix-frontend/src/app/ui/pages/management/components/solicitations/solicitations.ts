@@ -1,23 +1,25 @@
 import { SolicitationService } from '@/ui/services/solicitation/solicitation-service'
-import { Component, inject, OnInit, signal } from '@angular/core'
+import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { Location } from '@angular/common'
 import { Pagination } from '../pagination/pagination'
 import { SearchBar } from '../search-bar/search-bar'
 import { SolicitationDialog } from '../solicitation-dialog/solicitation-dialog'
 import { Table, TableColumn } from '../table/table'
 import { PaginatedData } from '@/core/domain/models/PaginatedData'
 import { SolicitationBrief } from '@/core/domain/models/SolicitationBrief'
+import { PaginationPersistence } from '../../services/pagination-persistence'
 
 @Component({
   selector: 'app-solicitations',
   imports: [SearchBar, Table, SolicitationDialog, Pagination],
   templateUrl: './solicitations.html',
 })
-export class Solicitations implements OnInit {
+export class Solicitations implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute)
-  private location = inject(Location)
   private solicitationService = inject(SolicitationService)
+  private paginationPersistence = inject(PaginationPersistence)
+
+  private readonly ROUTE_KEY = '/management/solicitations'
 
   solicitations = signal<SolicitationBrief[]>([])
   totalPages = signal<number>(0)
@@ -43,36 +45,57 @@ export class Solicitations implements OnInit {
   ]
 
   ngOnInit() {
-    const currentParams = this.route.snapshot.queryParams
-    const initialPageSize = +(currentParams['pageSize'] || 10)
-    const initialPageNumber = +(currentParams['pageNumber'] || 1)
-    const initialSearchTerm = currentParams['search'] || ''
+    // Primero verificar si hay estado guardado
+    const savedState = this.paginationPersistence.getPageState(this.ROUTE_KEY)
 
-    this.pageSize.set(initialPageSize)
-    this.pageNumber.set(initialPageNumber)
-    this.searchTerm.set(initialSearchTerm)
+    if (savedState) {
+      // Usar estado guardado
+      this.setInitialValues(savedState.pageSize, savedState.pageNumber, savedState.searchTerm)
+    } else {
+      // Usar parámetros de URL o valores por defecto
+      const queryParams = this.route.snapshot.queryParams
+      const pageSize = +(queryParams['pageSize'] || 10)
+      const pageNumber = +(queryParams['pageNumber'] || 1)
+      const searchTerm = queryParams['search'] || ''
 
-    const hasParams =
-      currentParams['pageSize'] || currentParams['pageNumber'] || currentParams['search']
-    if (!hasParams) {
+      this.setInitialValues(pageSize, pageNumber, searchTerm)
+    }
+
+    // Solo actualizar URL si no tiene parámetros completos
+    const queryParams = this.route.snapshot.queryParams
+    if (!this.paginationPersistence.hasCompleteUrlParams(queryParams)) {
       this.updateUrl()
     }
 
     this.loadSolicitations(this.pageNumber(), this.pageSize(), this.searchTerm())
   }
 
+  ngOnDestroy() {
+    this.saveCurrentState()
+  }
+
+  private setInitialValues(pageSize: number, pageNumber: number, searchTerm: string): void {
+    this.pageSize.set(pageSize)
+    this.pageNumber.set(pageNumber)
+    this.searchTerm.set(searchTerm)
+  }
+
+  private saveCurrentState(): void {
+    this.paginationPersistence.savePageState(
+      this.ROUTE_KEY,
+      this.pageNumber(),
+      this.pageSize(),
+      this.searchTerm(),
+    )
+  }
+
   private updateUrl(): void {
-    const queryParams = new URLSearchParams()
-    queryParams.set('pageSize', this.pageSize().toString())
-    queryParams.set('pageNumber', this.pageNumber().toString())
-
-    const searchValue = this.searchTerm().trim()
-    if (searchValue) {
-      queryParams.set('search', searchValue)
-    }
-
-    const url = `${this.location.path().split('?')[0]}?${queryParams.toString()}`
-    this.location.replaceState(url)
+    this.paginationPersistence.updateCurrentUrl(
+      this.ROUTE_KEY,
+      this.pageNumber(),
+      this.pageSize(),
+      this.searchTerm(),
+    )
   }
 
   private loadSolicitations(page: number, pageSize: number, searchTerm?: string) {
@@ -109,6 +132,7 @@ export class Solicitations implements OnInit {
   setPageNumber($event: number) {
     this.pageNumber.set($event)
     this.updateUrl()
+    this.saveCurrentState()
     this.loadSolicitations($event, this.pageSize(), this.searchTerm())
   }
 
@@ -116,6 +140,7 @@ export class Solicitations implements OnInit {
     this.pageSize.set($event)
     this.pageNumber.set(1)
     this.updateUrl()
+    this.saveCurrentState()
     this.loadSolicitations(1, $event, this.searchTerm())
   }
 
@@ -124,6 +149,7 @@ export class Solicitations implements OnInit {
     this.searchTerm.set(trimmedTerm)
     this.pageNumber.set(1)
     this.updateUrl()
+    this.saveCurrentState()
     this.loadSolicitations(1, this.pageSize(), trimmedTerm || undefined)
   }
 

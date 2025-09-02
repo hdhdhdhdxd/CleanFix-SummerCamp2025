@@ -1,23 +1,25 @@
 import { CompletedTaskBrief } from '@/core/domain/models/CompletedTaskBrief'
 import { CompletedTaskService } from '@/ui/services/completedtask/completed-task-service'
-import { Component, inject, OnInit, signal } from '@angular/core'
+import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { TableColumn, Table } from '../table/table'
 import { PaginatedData } from '@/core/domain/models/PaginatedData'
-import { Location } from '@angular/common'
 import { SearchBar } from '../search-bar/search-bar'
 import { Pagination } from '../pagination/pagination'
 import { CompletedTaskDialog } from '../completed-task-dialog/completed-task-dialog'
+import { PaginationPersistence } from '../../services/pagination-persistence'
 
 @Component({
   selector: 'app-completed-tasks',
   imports: [SearchBar, Table, Pagination, CompletedTaskDialog],
   templateUrl: './completed-tasks.html',
 })
-export class CompletedTasks implements OnInit {
+export class CompletedTasks implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute)
-  private location = inject(Location)
   private completedTaskService = inject(CompletedTaskService)
+  private paginationPersistence = inject(PaginationPersistence)
+
+  private readonly ROUTE_KEY = '/management/completed-tasks'
 
   completedTasks = signal<CompletedTaskBrief[]>([])
   totalPages = signal<number>(0)
@@ -58,37 +60,56 @@ export class CompletedTasks implements OnInit {
   ]
 
   ngOnInit() {
-    const currentParams = this.route.snapshot.queryParams
-    const initialPageSize = +(currentParams['pageSize'] || 5)
-    const initialPageNumber = +(currentParams['pageNumber'] || 1)
-    const initialSearchTerm = currentParams['search'] || ''
+    // Primero verificar si hay estado guardado
+    const savedState = this.paginationPersistence.getPageState(this.ROUTE_KEY)
 
-    this.pageSize.set(initialPageSize)
-    this.pageNumber.set(initialPageNumber)
-    this.searchTerm.set(initialSearchTerm)
+    if (savedState) {
+      // Usar estado guardado
+      this.setInitialValues(savedState.pageSize, savedState.pageNumber, savedState.searchTerm)
+    } else {
+      // Usar parámetros de URL o valores por defecto
+      const queryParams = this.route.snapshot.queryParams
+      const pageSize = +(queryParams['pageSize'] || 5)
+      const pageNumber = +(queryParams['pageNumber'] || 1)
+      const searchTerm = queryParams['search'] || ''
 
-    // Solo actualizar URL si no hay parámetros en la URL
-    const hasParams =
-      currentParams['pageSize'] || currentParams['pageNumber'] || currentParams['search']
-    if (!hasParams) {
-      this.updateUrl()
+      this.setInitialValues(pageSize, pageNumber, searchTerm)
+
+      // Solo actualizar URL si no tiene parámetros completos
+      if (!this.paginationPersistence.hasCompleteUrlParams(queryParams)) {
+        this.updateUrl()
+      }
     }
 
     this.loadCompletedTasks(this.pageNumber(), this.pageSize(), this.searchTerm())
   }
 
+  ngOnDestroy() {
+    this.saveCurrentState()
+  }
+
+  private setInitialValues(pageSize: number, pageNumber: number, searchTerm: string): void {
+    this.pageSize.set(pageSize)
+    this.pageNumber.set(pageNumber)
+    this.searchTerm.set(searchTerm)
+  }
+
+  private saveCurrentState(): void {
+    this.paginationPersistence.savePageState(
+      this.ROUTE_KEY,
+      this.pageNumber(),
+      this.pageSize(),
+      this.searchTerm(),
+    )
+  }
+
   private updateUrl(): void {
-    const queryParams = new URLSearchParams()
-    queryParams.set('pageSize', this.pageSize().toString())
-    queryParams.set('pageNumber', this.pageNumber().toString())
-
-    const searchValue = this.searchTerm().trim()
-    if (searchValue) {
-      queryParams.set('search', searchValue)
-    }
-
-    const url = `${this.location.path().split('?')[0]}?${queryParams.toString()}`
-    this.location.replaceState(url)
+    this.paginationPersistence.updateCurrentUrl(
+      this.ROUTE_KEY,
+      this.pageNumber(),
+      this.pageSize(),
+      this.searchTerm(),
+    )
   }
 
   private loadCompletedTasks(page: number, pageSize: number, searchTerm?: string) {
@@ -128,6 +149,7 @@ export class CompletedTasks implements OnInit {
     this.pageNumber.set($event)
     this.updateUrl()
     this.loadCompletedTasks($event, this.pageSize(), this.searchTerm())
+    this.saveCurrentState()
   }
 
   setPageSize($event: number) {
@@ -135,6 +157,7 @@ export class CompletedTasks implements OnInit {
     this.pageNumber.set(1)
     this.updateUrl()
     this.loadCompletedTasks(1, $event, this.searchTerm())
+    this.saveCurrentState()
   }
 
   onSearchChange(searchTerm: string) {
@@ -143,6 +166,7 @@ export class CompletedTasks implements OnInit {
     this.pageNumber.set(1) // Reset to first page when searching
     this.updateUrl()
     this.loadCompletedTasks(1, this.pageSize(), trimmedTerm || undefined)
+    this.saveCurrentState()
   }
 
   handleRowClick(item: CompletedTaskBrief): void {
