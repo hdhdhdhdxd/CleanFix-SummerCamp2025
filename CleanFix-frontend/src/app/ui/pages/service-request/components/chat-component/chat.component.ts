@@ -20,6 +20,16 @@ import { ChatService } from 'src/app/ui/services/chat/chat.service'
   styleUrls: ['./chat.component.css'],
 })
 export class ChatComponent {
+  // Devuelve true si el mensaje en el índice i es el último mensaje del bot
+  isLastBotMessage(index: number): boolean {
+    const msgs = this.messages()
+    for (let i = msgs.length - 1; i >= 0; i--) {
+      if (msgs[i].from === 'bot') {
+        return i === index
+      }
+    }
+    return false
+  }
   showDownloadButton = signal(false)
   facturaData = signal<{ empresaNombre: string; materialesNombres: string[] } | null>(null)
   pdfUrl: string | null = null
