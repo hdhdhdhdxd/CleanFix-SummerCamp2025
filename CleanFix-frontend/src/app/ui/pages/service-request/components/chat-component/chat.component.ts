@@ -33,6 +33,8 @@ export class ChatComponent {
   showDownloadButton = signal(false)
   facturaData = signal<{ empresaNombre: string; materialesNombres: string[] } | null>(null)
   pdfUrl: string | null = null
+  mostrarEmailInput = false
+  emailDestino = ''
   // Eliminar el efecto signal para evitar scroll al escribir
   @ViewChild('chatScroll', { static: false }) chatScroll!: ElementRef<HTMLDivElement>
   // ...existing code...
@@ -199,6 +201,34 @@ export class ChatComponent {
       })
       .catch(() => {
         alert('No se pudo descargar la factura')
+      })
+  }
+
+  enviarFacturaPorEmail() {
+    const data = this.facturaData()
+    if (!data || !this.emailDestino) {
+      alert('Debes introducir un email válido')
+      return
+    }
+    fetch('https://localhost:7096/api/chatboxia/factura/gmail', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        empresaNombre: data.empresaNombre,
+        materialesNombres: data.materialesNombres,
+        emailDestino: this.emailDestino,
+      }),
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Error al enviar la factura por email')
+        alert('Factura enviada correctamente')
+        this.mostrarEmailInput = false
+        this.emailDestino = ''
+      })
+      .catch(() => {
+        alert('No se pudo enviar la factura por email')
       })
   }
 }
