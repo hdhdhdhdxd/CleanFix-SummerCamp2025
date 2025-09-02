@@ -59,15 +59,15 @@ namespace WebApi.Controllers
             // --- FLUJO: Descargar factura PDF tras mostrarla ---
             if (mensajeLower.Contains("descargar") && historial != null && historial.Any(h => h.ToLower().Contains("factura")))
             {
-                // Se asume que la última factura generada es la que quiere descargar
-                // (En un sistema real, se debería guardar el contexto de la última factura generada)
+                // Construir URL absoluta para el PDF
+                var pdfUrl = $"{Request.Scheme}://{Request.Host}/api/chatboxia/factura/pdf";
                 return Ok(new MensajeResponse
                 {
                     Success = true,
                     Error = null,
                     Data = new {
-                        mensaje = "Puedes descargar tu factura aquí: [Descargar PDF](/api/chatboxia/factura/pdf)",
-                        pdfUrl = "/api/chatboxia/factura/pdf"
+                        mensaje = $"Puedes descargar tu factura aquí: [Descargar PDF]({pdfUrl})",
+                        pdfUrl = pdfUrl
                     }
                 });
             }
