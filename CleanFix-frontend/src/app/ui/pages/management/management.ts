@@ -6,6 +6,7 @@ import { AlertIcon } from '@/ui/shared/Icons/alert-icon'
 import { WrenchIcon } from '@/ui/shared/Icons/wrench-icon'
 import { RouterOutlet } from '@angular/router'
 import { HomeIcon } from '@/ui/shared/Icons/home-icon'
+import { PaginationPersistence } from './services/pagination-persistence'
 
 @Component({
   selector: 'app-management',
@@ -14,6 +15,9 @@ import { HomeIcon } from '@/ui/shared/Icons/home-icon'
 })
 export class Management implements OnInit, AfterViewInit {
   @ViewChild('tabsContainer', { static: false }) tabsContainer!: ElementRef
+
+  private router = inject(Router)
+  private paginationPersistence = inject(PaginationPersistence)
 
   tabs = [
     {
@@ -33,7 +37,6 @@ export class Management implements OnInit, AfterViewInit {
     },
   ]
 
-  router = inject(Router)
   currentRoute = ''
   activeTabIndex = 0
 
@@ -58,7 +61,13 @@ export class Management implements OnInit, AfterViewInit {
 
   navigate(route: string, event: Event): void {
     event.preventDefault()
-    this.router.navigate([route])
+
+    // Intentar navegar al estado guardado, si no existe, navegar normalmente
+    const wasRestored = this.paginationPersistence.navigateToSavedState(route)
+
+    if (!wasRestored) {
+      this.router.navigate([route])
+    }
   }
 
   private updateActiveTab(): void {

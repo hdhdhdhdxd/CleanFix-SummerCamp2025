@@ -1,23 +1,25 @@
-import { Component, inject, OnInit, signal } from '@angular/core'
+import { Component, inject, OnInit, signal, OnDestroy } from '@angular/core'
 import { Table, TableColumn } from '../table/table'
 import { IncidenceService } from '@/ui/services/incidence/incidence-service'
 import { ActivatedRoute } from '@angular/router'
-import { Location } from '@angular/common'
 import { SearchBar } from '../search-bar/search-bar'
 import { Pagination } from '../pagination/pagination'
 import { PaginatedData } from '@/core/domain/models/PaginatedData'
 import { IncidenceBrief } from '@/core/domain/models/IncidenceBrief'
 import { IncidenceDialog } from '../incidence-dialog/incidence-dialog'
+import { PaginationPersistence } from '../../services/pagination-persistence'
 
 @Component({
   selector: 'app-incidences',
   imports: [Table, SearchBar, Pagination, IncidenceDialog],
   templateUrl: './incidences.html',
 })
-export class Incidences implements OnInit {
+export class Incidences implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute)
-  private location = inject(Location)
   private incidenceService = inject(IncidenceService)
+  private paginationPersistence = inject(PaginationPersistence)
+
+  private readonly ROUTE_KEY = '/management/incidences'
 
   incidences = signal<IncidenceBrief[]>([])
   totalPages = signal<number>(0)
@@ -44,37 +46,57 @@ export class Incidences implements OnInit {
   ]
 
   ngOnInit() {
-    const currentParams = this.route.snapshot.queryParams
-    const initialPageSize = +(currentParams['pageSize'] || 10)
-    const initialPageNumber = +(currentParams['pageNumber'] || 1)
-    const initialSearchTerm = currentParams['search'] || ''
+    // Primero verificar si hay estado guardado
+    const savedState = this.paginationPersistence.getPageState(this.ROUTE_KEY)
 
-    this.pageSize.set(initialPageSize)
-    this.pageNumber.set(initialPageNumber)
-    this.searchTerm.set(initialSearchTerm)
+    if (savedState) {
+      // Usar estado guardado
+      this.setInitialValues(savedState.pageSize, savedState.pageNumber, savedState.searchTerm)
+    } else {
+      // Usar parámetros de URL o valores por defecto
+      const queryParams = this.route.snapshot.queryParams
+      const pageSize = +(queryParams['pageSize'] || 10)
+      const pageNumber = +(queryParams['pageNumber'] || 1)
+      const searchTerm = queryParams['search'] || ''
 
-    // Solo actualizar URL si no hay parámetros en la URL
-    const hasParams =
-      currentParams['pageSize'] || currentParams['pageNumber'] || currentParams['search']
-    if (!hasParams) {
+      this.setInitialValues(pageSize, pageNumber, searchTerm)
+    }
+
+    // Solo actualizar URL si no tiene parámetros completos
+    const queryParams = this.route.snapshot.queryParams
+    if (!this.paginationPersistence.hasCompleteUrlParams(queryParams)) {
       this.updateUrl()
     }
 
     this.loadIncidences(this.pageNumber(), this.pageSize(), this.searchTerm())
   }
 
+  ngOnDestroy() {
+    this.saveCurrentState()
+  }
+
+  private setInitialValues(pageSize: number, pageNumber: number, searchTerm: string): void {
+    this.pageSize.set(pageSize)
+    this.pageNumber.set(pageNumber)
+    this.searchTerm.set(searchTerm)
+  }
+
+  private saveCurrentState(): void {
+    this.paginationPersistence.savePageState(
+      this.ROUTE_KEY,
+      this.pageNumber(),
+      this.pageSize(),
+      this.searchTerm(),
+    )
+  }
+
   private updateUrl(): void {
-    const queryParams = new URLSearchParams()
-    queryParams.set('pageSize', this.pageSize().toString())
-    queryParams.set('pageNumber', this.pageNumber().toString())
-
-    const searchValue = this.searchTerm().trim()
-    if (searchValue) {
-      queryParams.set('search', searchValue)
-    }
-
-    const url = `${this.location.path().split('?')[0]}?${queryParams.toString()}`
-    this.location.replaceState(url)
+    this.paginationPersistence.updateCurrentUrl(
+      this.ROUTE_KEY,
+      this.pageNumber(),
+      this.pageSize(),
+      this.searchTerm(),
+    )
   }
 
   private loadIncidences(page: number, pageSize: number, searchTerm?: string) {
@@ -112,6 +134,7 @@ export class Incidences implements OnInit {
     this.pageNumber.set($event)
     this.updateUrl()
     this.loadIncidences($event, this.pageSize(), this.searchTerm())
+    this.saveCurrentState()
   }
 
   setPageSize($event: number) {
@@ -119,14 +142,16 @@ export class Incidences implements OnInit {
     this.pageNumber.set(1)
     this.updateUrl()
     this.loadIncidences(1, $event, this.searchTerm())
+    this.saveCurrentState()
   }
 
   onSearchChange(searchTerm: string) {
     const trimmedTerm = searchTerm.trim()
     this.searchTerm.set(trimmedTerm)
-    this.pageNumber.set(1) // Reset to first page when searching
+    this.pageNumber.set(1)
     this.updateUrl()
     this.loadIncidences(1, this.pageSize(), trimmedTerm || undefined)
+    this.saveCurrentState()
   }
 
   handleRowClick(item: IncidenceBrief): void {
