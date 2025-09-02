@@ -12,8 +12,8 @@ using WebApi.BaseDatos;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250829073618_IncidendeDeleteStatus")]
-    partial class IncidendeDeleteStatus
+    [Migration("20250902085628_inicial")]
+    partial class inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -168,8 +168,8 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
-                    b.Property<int>("Surface")
-                        .HasColumnType("int")
+                    b.Property<double>("Surface")
+                        .HasColumnType("float")
                         .HasComment("Superficie del apartamento");
 
                     b.Property<int?>("UserId")
@@ -196,9 +196,9 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ApartmentId")
-                        .HasColumnType("int")
-                        .HasComment("Id del apartamento asociado");
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2")
@@ -225,12 +225,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("rowversion");
 
                     b.Property<int>("Surface")
-                        .HasColumnType("int")
-                        .HasComment("Superficie del apartamento");
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApartmentId");
 
                     b.HasIndex("IssueTypeId");
 
@@ -275,6 +272,9 @@ namespace Infrastructure.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)")
                         .HasComment("Costo del material");
+
+                    b.Property<decimal>("CostPerSquareMeter")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("IssueTypeId")
                         .HasColumnType("int")
@@ -338,11 +338,6 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
-
-                    b.Property<string>("Status")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasComment("Estado de la solicitud");
 
                     b.HasKey("Id");
 
@@ -414,19 +409,11 @@ namespace Infrastructure.Migrations
 
             modelBuilder.Entity("Domain.Entities.Incidence", b =>
                 {
-                    b.HasOne("Domain.Entities.Apartment", "Apartment")
-                        .WithMany()
-                        .HasForeignKey("ApartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Domain.Entities.IssueType", "IssueType")
                         .WithMany()
                         .HasForeignKey("IssueTypeId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Apartment");
 
                     b.Navigation("IssueType");
                 });

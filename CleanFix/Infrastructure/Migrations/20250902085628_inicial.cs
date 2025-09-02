@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -95,10 +95,9 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     IssueTypeId = table.Column<int>(type: "int", nullable: false, comment: "Id del tipo de incidencia"),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false, comment: "Fecha de la incidencia"),
-                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, comment: "Estado de la incidencia"),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false, comment: "Descripción de la incidencia"),
-                    ApartmentId = table.Column<int>(type: "int", nullable: false, comment: "Id del apartamento asociado"),
-                    Surface = table.Column<int>(type: "int", nullable: false, comment: "Superficie del apartamento"),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Surface = table.Column<int>(type: "int", nullable: false),
                     Priority = table.Column<int>(type: "int", nullable: false, comment: "Prioridad de la incidencia"),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
@@ -122,9 +121,10 @@ namespace Infrastructure.Migrations
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true, comment: "Descripción de la solicitud"),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false, comment: "Fecha de la solicitud"),
                     Address = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false, comment: "Dirección donde se solicita el servicio"),
-                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true, comment: "Estado de la solicitud"),
                     MaintenanceCost = table.Column<double>(type: "float(18)", precision: 18, scale: 2, nullable: false, comment: "Costo de mantenimiento asociado a la solicitud"),
                     IssueTypeId = table.Column<int>(type: "int", nullable: false, comment: "Id del tipo de incidencia"),
+                    ApartmentAmount = table.Column<int>(type: "int", nullable: false),
+                    RequestId = table.Column<int>(type: "int", nullable: false),
                     RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
@@ -145,20 +145,25 @@ namespace Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Address = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false, comment: "Dirección de la tarea completada"),
-                    ApartmentId = table.Column<int>(type: "int", nullable: false, comment: "Id del apartamento asociado"),
+                    ApartmentId = table.Column<int>(type: "int", nullable: true, comment: "Id del apartamento asociado"),
                     CompanyId = table.Column<int>(type: "int", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false, comment: "Fecha de la tarea completada"),
                     CompletionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Price = table.Column<double>(type: "float(18)", precision: 18, scale: 2, nullable: false, comment: "Precio de la tarea completada"),
                     IssueTypeId = table.Column<int>(type: "int", nullable: false, comment: "Id del tipo de incidencia de la tarea"),
                     IsSolicitation = table.Column<bool>(type: "bit", nullable: false, comment: "Indica si la tarea fue solicitada"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    Surface = table.Column<int>(type: "int", nullable: false, comment: "Superficie del apartamento"),
-                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false)
+                    Surface = table.Column<double>(type: "float", nullable: false, comment: "Superficie del apartamento"),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CompletedTasks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CompletedTasks_Apartments_ApartmentId",
+                        column: x => x.ApartmentId,
+                        principalTable: "Apartments",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_CompletedTasks_Companies_CompanyId",
                         column: x => x.CompanyId,
@@ -175,8 +180,7 @@ namespace Infrastructure.Migrations
                         name: "FK_CompletedTasks_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -187,6 +191,7 @@ namespace Infrastructure.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false, comment: "Nombre del material"),
                     Cost = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false, comment: "Costo del material"),
+                    CostPerSquareMeter = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Available = table.Column<bool>(type: "bit", nullable: false, comment: "Disponibilidad del material"),
                     IssueTypeId = table.Column<int>(type: "int", nullable: false, comment: "Id del tipo de incidencia"),
                     CompletedTaskId = table.Column<int>(type: "int", nullable: true)
@@ -211,6 +216,11 @@ namespace Infrastructure.Migrations
                 name: "IX_Companies_IssueTypeId",
                 table: "Companies",
                 column: "IssueTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CompletedTasks_ApartmentId",
+                table: "CompletedTasks",
+                column: "ApartmentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CompletedTasks_CompanyId",
