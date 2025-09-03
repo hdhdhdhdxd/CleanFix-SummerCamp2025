@@ -4,6 +4,7 @@ using Application.Incidences.Commands.UpdateIncidence;
 using Application.Incidences.Queries.GetIncidence;
 using Application.Incidences.Queries.GetPaginatedIncidences;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers
@@ -21,6 +22,7 @@ namespace WebApi.Controllers
 
         // GET: api/Incidences/paginated
         [HttpGet("paginated")]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<GetPaginatedIncidenceDto>>> GetPaginatedIncidences(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,

@@ -1,7 +1,7 @@
 using Bogus;
 using Domain.Entities;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using WebApi.BaseDatos;
 using WebApi.CoreBot;
 using WebApi.Services;
 
@@ -12,6 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddInfrastructureServices();
 builder.AddApplicationServices();
+
+builder.Services.AddHttpContextAccessor();
 
 // Servicios bot
 builder.Services.AddControllers();
