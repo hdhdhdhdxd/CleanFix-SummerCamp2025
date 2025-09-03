@@ -431,7 +431,9 @@ namespace WebApi.Controllers
         {
             var sb = new System.Text.StringBuilder();
             sb.AppendLine("==============================");
+            sb.AppendLine();
             sb.AppendLine("         FACTURA CLEANFIX      ");
+            sb.AppendLine();
             sb.AppendLine("==============================");
             sb.AppendLine($"Empresa: {factura.Empresa.Nombre}");
             sb.AppendLine($"Coste empresa:         €{factura.Empresa.Coste,8:F2}");
