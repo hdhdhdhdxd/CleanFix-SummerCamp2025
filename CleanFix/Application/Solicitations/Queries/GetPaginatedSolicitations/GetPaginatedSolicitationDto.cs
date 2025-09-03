@@ -9,7 +9,6 @@ public class GetPaginatedSolicitationDto
     public string IssueType { get; set; }
     public int IssueTypeId { get; set; } // Identificador del tipo de incidencia
     public string Address { get; set; }
-    public string BuildingCode { get; set; } // Código del edificio
     private class Mapping : Profile
     {
         public Mapping()

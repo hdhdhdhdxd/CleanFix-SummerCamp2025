@@ -1,6 +1,5 @@
 using Application.Solicitations.Commands.CreateSolicitation;
 using Application.Solicitations.Commands.DeleteSolicitation;
-using Application.Solicitations.Commands.UpdateSolicitation;
 using Application.Solicitations.Queries.GetPaginatedSolicitations;
 using Application.Solicitations.Queries.GetSolicitation;
 using MediatR;
@@ -53,32 +52,7 @@ namespace WebApi.Controllers
             );
         }
 
-        // PUT: api/solicitations/{id}
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutSolicitation(int id, [FromBody] UpdateSolicitationDto solicitationDto)
-        {
-            if (solicitationDto.Id != default && solicitationDto.Id != id)
-                return BadRequest("El id de la ruta y el del cuerpo no coinciden.");
-            solicitationDto.Id = id;
-            var command = new UpdateSolicitationCommand { Solicitation = solicitationDto };
-            try
-            {
-                await _sender.Send(command);
-                return NoContent();
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message.Contains("Conflicto de concurrencia"))
-                {
-                    return Conflict(new ProblemDetails
-                    {
-                        Title = "Conflicto de concurrencia",
-                        Detail = "La solicitud ha sido modificada por otro usuario"
-                    });
-                }
-                throw;
-            }
-        }
+
 
         // DELETE: api/solicitations/{id}
         [HttpDelete("{id}")]
