@@ -33,6 +33,8 @@ export class ChatComponent {
   showDownloadButton = signal(false)
   facturaData = signal<{ empresaNombre: string; materialesNombres: string[] } | null>(null)
   pdfUrl: string | null = null
+  mostrarEmailInput = false
+  emailDestino = ''
   // Eliminar el efecto signal para evitar scroll al escribir
   @ViewChild('chatScroll', { static: false }) chatScroll!: ElementRef<HTMLDivElement>
   // ...existing code...
@@ -94,14 +96,11 @@ export class ChatComponent {
         ])
         this.scrollToBottom()
 
-        // Detectar si el mensaje del bot incluye la opción de descargar factura
+        // Detectar si el mensaje del bot incluye la opción de factura (descargar o enviar por email)
         if (
-          botText.toLowerCase().includes('descargar factura') ||
-          botText.toLowerCase().includes('descargar la factura') ||
-          botText.toLowerCase().includes('aquí tienes el resumen de la factura') ||
-          botText.toLowerCase().includes('descargar pdf') ||
-          botText.toLowerCase().includes('descargar el pdf') ||
-          botText.toLowerCase().includes('aquí tienes el resumen del pdf')
+          /descargar( la)? factura|descargar pdf|descargar el pdf|aquí tienes el resumen (de la factura|del pdf)|¿quieres descargarla en formato pdf|prefieres que te la envíe por correo|¿quieres descargarla|¿prefieres que te la envíe por correo/i.test(
+            botText,
+          )
         ) {
           // Extraer datos de la factura del último mensaje del usuario
           const empresaNombre = this.extractEmpresaNombre()
@@ -163,12 +162,17 @@ export class ChatComponent {
   descargarFactura() {
     const data = this.facturaData()
     if (!data || !this.pdfUrl) return
-    fetch(this.pdfUrl, {
+    const pdfUrl = this.pdfUrl.startsWith('http')
+      ? this.pdfUrl
+      : `https://localhost:7096${this.pdfUrl}`
+    const jsonBody = JSON.stringify(data)
+    console.log('JSON enviado a descargarFactura:', jsonBody)
+    fetch(pdfUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: jsonBody,
     })
       .then(async (response) => {
         if (!response.ok) throw new Error('Error al descargar la factura')
@@ -199,6 +203,34 @@ export class ChatComponent {
       })
       .catch(() => {
         alert('No se pudo descargar la factura')
+      })
+  }
+
+  enviarFacturaPorEmail() {
+    const data = this.facturaData()
+    if (!data || !this.emailDestino) {
+      alert('Debes introducir un email válido')
+      return
+    }
+    fetch('https://localhost:7096/api/chatboxia/factura/gmail', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        empresaNombre: data.empresaNombre,
+        materialesNombres: data.materialesNombres,
+        emailDestino: this.emailDestino,
+      }),
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('Error al enviar la factura por email')
+        alert('Factura enviada correctamente')
+        this.mostrarEmailInput = false
+        this.emailDestino = ''
+      })
+      .catch(() => {
+        alert('No se pudo enviar la factura por email')
       })
   }
 }
