@@ -435,8 +435,11 @@ namespace WebApi.Controllers
             sb.AppendLine("         FACTURA CLEANFIX      ");
             sb.AppendLine();
             sb.AppendLine("==============================");
+            sb.AppendLine();
             sb.AppendLine($"Empresa: {factura.Empresa.Nombre}");
+            sb.AppendLine();
             sb.AppendLine($"Coste empresa:         €{factura.Empresa.Coste,8:F2}");
+            sb.AppendLine();
             sb.AppendLine("------------------------------");
             if (factura.Materiales != null && factura.Materiales.Count > 0)
             {
