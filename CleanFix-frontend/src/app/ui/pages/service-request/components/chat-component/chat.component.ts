@@ -98,7 +98,7 @@ export class ChatComponent {
 
         // Detectar si el mensaje del bot incluye la opción de factura (descargar o enviar por email)
         if (
-          /descargar( la)? factura|descargar pdf|descargar el pdf|aquí tienes el resumen (de la factura|del pdf)|¿quieres descargarla en formato pdf|prefieres que te la envíe por correo|¿quieres descargarla|¿prefieres que te la envíe por correo/i.test(
+          /descargar( la)? descargarla|factura|descargar pdf|descargar el pdf|aquí tienes el resumen (de la factura|del pdf)|¿quieres descargarla en formato pdf|prefieres que te la envíe por correo|¿quieres descargarla|¿prefieres que te la envíe por correo/i.test(
             botText,
           )
         ) {
