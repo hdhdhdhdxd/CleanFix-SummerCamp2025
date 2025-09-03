@@ -64,7 +64,8 @@ using (var scope = app.Services.CreateScope())
             new IssueType { Name = "Carpintería" },
             new IssueType { Name = "Pintura" },
             new IssueType { Name = "Suelos" },
-            new IssueType { Name = "Limpieza" }
+            new IssueType { Name = "Limpieza" },
+            new IssueType { Name = "Mantenimiento General"}
         };
     /*
     // Seeding de IssueTypes SIEMPRE si la tabla está vacía
