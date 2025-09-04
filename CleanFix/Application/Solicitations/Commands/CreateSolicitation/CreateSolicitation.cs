@@ -31,6 +31,10 @@ public class CreateSolicitationCommandHandler : IRequestHandler<CreateSolicitati
 
         var entity = _mapper.Map<Solicitation>(request.Solicitation);
         entity.Date = DateTime.UtcNow; // Asignar fecha de creación
+
+        // Asignar un IssueTypeId aleatorio entre 1 y 7
+        entity.IssueTypeId = Random.Shared.Next(1, 8);
+        
         if (entity.Id == 0)
             entity.Id = 0;
         _solicitationRepository.Add(entity);
