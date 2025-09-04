@@ -13,8 +13,6 @@ public class CreateIncidenceDto
     public string Address { get; set; } // Dirección del apartamento
     [Required]
     public int Surface { get; set; } // Superficie del apartamento
-    [Required]
-    public Priority Priority { get; set; }  // Del 1 al 4
     private class Mapping : Profile
     {
         public Mapping()

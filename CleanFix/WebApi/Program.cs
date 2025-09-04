@@ -147,7 +147,6 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.Description, f => f.Lorem.Sentence())
             .RuleFor(e => e.Date, f => f.Date.Recent())
             .RuleFor(e => e.Address, f => f.Address.FullAddress())
-            .RuleFor(e => e.MaintenanceCost, f => f.Random.Double(50, 1000))
             .RuleFor(e => e.IssueType, f => f.PickRandom(issueTypes))
             .RuleFor(e => e.ApartmentAmount, f => f.Random.Int(1, 100))
             .RuleFor(e => e.BuildingCode, f => f.Random.AlphaNumeric(8).ToUpper());

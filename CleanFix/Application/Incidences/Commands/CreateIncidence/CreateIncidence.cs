@@ -28,8 +28,12 @@ public class CreateIncidenceCommandHandler : IRequestHandler<CreateIncidenceComm
         // Normalización antes de mapear y guardar
         if (request.Incidence.Description != null)
             request.Incidence.Description = Normalizer.NormalizarNombre(request.Incidence.Description);
-
         var entity = _mapper.Map<Incidence>(request.Incidence);
+        
+        // Asignar una prioridad aleatoria
+        var priorities = Enum.GetValues<Priority>();
+        entity.Priority = priorities[Random.Shared.Next(priorities.Length)];
+        
         entity.Date = DateTime.UtcNow; // Asignar fecha de creación
         if (entity.Id == 0)
             entity.Id = 0;
