@@ -2,11 +2,14 @@
 using Domain.Common.Interfaces;
 using Domain.Entities;
 using Infrastructure.Common.Interfaces;
+using Infrastructure.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace WebApi.BaseDatos;
+namespace Infrastructure.Data;
 
-public class DatabaseContext : DbContext, IDatabaseContext
+public class DatabaseContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>, IDatabaseContext
 {
     public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
     {

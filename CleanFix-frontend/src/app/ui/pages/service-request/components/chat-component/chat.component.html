@@ -11,7 +11,7 @@
             <span [innerHTML]="msg.text"></span>
             <!-- Mostrar el botón solo en el último mensaje del bot -->
             <ng-container *ngIf="showDownloadButton() && facturaData() && isLastBotMessage(i)">
-              <div class="mt-2 flex flex-col items-end gap-2">
+              <div class="mt-2 flex w-full flex-row items-center justify-between">
                 <button
                   type="button"
                   class="rounded bg-brand-700 px-4 py-2 text-white hover:bg-brand-900"
@@ -19,29 +19,31 @@
                 >
                   Descargar factura
                 </button>
-                <button
-                  type="button"
-                  class="rounded bg-brand-700 px-4 py-2 text-white hover:bg-brand-900"
-                  (click)="mostrarEmailInput = true"
-                  *ngIf="!mostrarEmailInput"
-                >
-                  Enviar por email
-                </button>
-                <div *ngIf="mostrarEmailInput" class="flex items-center gap-2">
-                  <input
-                    type="email"
-                    [(ngModel)]="emailDestino"
-                    placeholder="Introduce tu email"
-                    class="rounded-lg border border-brand-900 px-3 py-2 text-black"
-                    style="background: var(--color-brand-100); color: black"
-                  />
+                <div class="ml-auto flex items-center gap-2">
                   <button
                     type="button"
                     class="rounded bg-brand-700 px-4 py-2 text-white hover:bg-brand-900"
-                    (click)="enviarFacturaPorEmail()"
+                    (click)="mostrarEmailInput = true"
+                    *ngIf="!mostrarEmailInput"
                   >
-                    Enviar
+                    Enviar por email
                   </button>
+                  <div *ngIf="mostrarEmailInput" class="flex items-center gap-2">
+                    <input
+                      type="email"
+                      [(ngModel)]="emailDestino"
+                      placeholder="Introduce tu email"
+                      class="rounded-lg border border-brand-900 px-3 py-2 text-black"
+                      style="background: var(--color-brand-100); color: black"
+                    />
+                    <button
+                      type="button"
+                      class="rounded bg-brand-700 px-4 py-2 text-white hover:bg-brand-900"
+                      (click)="enviarFacturaPorEmail()"
+                    >
+                      Enviar
+                    </button>
+                  </div>
                 </div>
               </div>
             </ng-container>

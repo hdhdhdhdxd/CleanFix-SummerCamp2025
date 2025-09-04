@@ -8,12 +8,10 @@ public class GetSolicitationDto
     public string? Description { get; set; }
     public DateTime Date { get; set; }
     public string Address { get; set; }
-    public string? Status { get; set; }
-    public double MaintenanceCost { get; set; }
     public int IssueTypeId { get; set; } // Identificador del tipo de incidencia
     public IssueType IssueType { get; set; } // Nuevo campo para el nombre
     public int ApartmentAmount { get; set; } // Código del edificio
-    public int RequestId { get; set; } // Código del request de speculab
+    public string BuildingCode { get; set; } // Código del edificio de speculab
     private class Mapping : Profile
     {
         public Mapping()

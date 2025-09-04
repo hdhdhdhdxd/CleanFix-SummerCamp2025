@@ -1,7 +1,7 @@
 using Bogus;
 using Domain.Entities;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using WebApi.BaseDatos;
 using WebApi.CoreBot;
 using WebApi.Services;
 
@@ -12,6 +12,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddInfrastructureServices();
 builder.AddApplicationServices();
+
+builder.Services.AddHttpContextAccessor();
 
 // Servicios bot
 builder.Services.AddControllers();
@@ -62,7 +64,8 @@ using (var scope = app.Services.CreateScope())
             new IssueType { Name = "Carpintería" },
             new IssueType { Name = "Pintura" },
             new IssueType { Name = "Suelos" },
-            new IssueType { Name = "Limpieza" }
+            new IssueType { Name = "Limpieza" },
+            new IssueType { Name = "Mantenimiento General"}
         };
     /*
     // Seeding de IssueTypes SIEMPRE si la tabla está vacía
@@ -147,7 +150,7 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.MaintenanceCost, f => f.Random.Double(50, 1000))
             .RuleFor(e => e.IssueType, f => f.PickRandom(issueTypes))
             .RuleFor(e => e.ApartmentAmount, f => f.Random.Int(1, 100))
-            .RuleFor(e => e.RequestId, f => f.Random.Int(1, 9999));
+            .RuleFor(e => e.BuildingCode, f => f.Random.AlphaNumeric(8).ToUpper());
         var solicitations = solicitationFaker.Generate(30);
         db.Solicitations.AddRange(solicitations);
         db.SaveChanges();

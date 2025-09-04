@@ -13,13 +13,15 @@ public class CreateSolicitationDto
     public double MaintenanceCost { get; set; }
     [Required]
     public int IssueTypeId { get; set; } // <-- Que sea un numero entre 1 y 7
-    public int RequestId { get; set; } 
+    [Required]
+    public string BuildingCode { get; set; } 
     public int ApartmentAmount { get; set; } // Nuevo campo solicitado
     private class Mapping : Profile
     {
         public Mapping()
         {
-            CreateMap<CreateSolicitationDto, Solicitation>();
+            CreateMap<CreateSolicitationDto, Solicitation>()
+                .ForMember(dest => dest.BuildingCode, opt => opt.MapFrom(src => src.BuildingCode));
         }
     }
 }

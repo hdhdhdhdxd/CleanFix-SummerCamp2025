@@ -4,6 +4,7 @@ using Application.Incidences.Commands.UpdateIncidence;
 using Application.Incidences.Queries.GetIncidence;
 using Application.Incidences.Queries.GetPaginatedIncidences;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers

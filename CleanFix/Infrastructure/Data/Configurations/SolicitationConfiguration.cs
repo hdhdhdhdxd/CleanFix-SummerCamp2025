@@ -29,6 +29,11 @@ public class SolicitationConfiguration : IEntityTypeConfiguration<Solicitation>
             .IsRequired()
             .HasComment("Id del tipo de incidencia");
 
+        builder.Property(s => s.BuildingCode)
+            .IsRequired()
+            .HasMaxLength(50)
+            .HasComment("Código del edificio de speculab");
+
         builder.HasOne(s => s.IssueType)
             .WithMany()
             .HasForeignKey(s => s.IssueTypeId)
