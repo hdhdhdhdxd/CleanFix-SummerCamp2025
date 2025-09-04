@@ -5,9 +5,9 @@ namespace Application.Common.Interfaces;
 
 public interface IIdentityService
 {
-    Task LoginAsync(string email, string password);
+    Task<Result> LoginAsync(string email, string password);
 
-    Task RegisterAsync(string email, string password);
+    Task<Result> RegisterAsync(string email, string password);
 
     Task<string?> GetUserNameAsync(Guid userId);
 

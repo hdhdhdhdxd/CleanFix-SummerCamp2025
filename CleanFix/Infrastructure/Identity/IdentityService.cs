@@ -22,18 +22,15 @@ public class IdentityService : IIdentityService
         _authTokenProcessor = authTokenProcessor;
     }
 
-    public async Task RegisterAsync(string email, string password)
+    public async Task<Result> RegisterAsync(string email, string password)
     {
         var user = ApplicationUser.Create(email);
         var result = await _userManager.CreateAsync(user, password);
 
-        if (!result.Succeeded)
-        {
-            throw new RegistrationFailedException(result.Errors.Select(x => x.Description));
-        }
+        return result.ToApplicationResult();
     }
 
-    public async Task LoginAsync(string email, string password)
+    public async Task<Result> LoginAsync(string email, string password)
     {
         ApplicationUser? user = await _userManager.FindByEmailAsync(email);
 
@@ -44,7 +41,7 @@ public class IdentityService : IIdentityService
 
         if (user == null || !await _userManager.CheckPasswordAsync(user, password))
         {
-            throw new LoginFailedException(email);
+            return Result.Failure(new[] { $"Invalid login attempt for email: {email}" });
         }
 
         var (jwtToken, expirationDateInUtc) = _authTokenProcessor.GenerateJwtToken(user);
@@ -55,11 +52,17 @@ public class IdentityService : IIdentityService
         user.RefreshToken = refreshTokenValue;
         user.RefreshTokenExpiresAtUtc = refreshTokenExpirationDateInUtc;
 
-        await _userManager.UpdateAsync(user);
+        var updateResult = await _userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+        {
+            return updateResult.ToApplicationResult();
+        }
 
         // Solo configurar cookies - no retornar tokens
         _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie("ACCESS_TOKEN", jwtToken, expirationDateInUtc);
         _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie("REFRESH_TOKEN", user.RefreshToken, refreshTokenExpirationDateInUtc);
+
+        return Result.Success();
     }
 
     public async Task RefreshTokenAsync(string? refreshToken)

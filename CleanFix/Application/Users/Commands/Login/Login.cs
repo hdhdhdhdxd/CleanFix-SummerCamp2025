@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common.Exceptions;
+using Application.Common.Interfaces;
 using Ardalis.GuardClauses;
 using MediatR;
 
@@ -22,7 +23,12 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand>
         Guard.Against.NullOrEmpty(request.Email, nameof(request.Email));
         Guard.Against.NullOrEmpty(request.Password, nameof(request.Password));
 
-        await _identityService.LoginAsync(request.Email, request.Password);
+        var result = await _identityService.LoginAsync(request.Email, request.Password);
+        
+        if (!result.Succeeded)
+        {
+            throw new LoginFailedException(request.Email!);
+        }
     }
 }
 

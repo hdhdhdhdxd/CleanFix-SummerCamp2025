@@ -1,7 +1,7 @@
-﻿
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Ardalis.GuardClauses;
 using MediatR;
+using RegistrationFailedException = Application.Common.Exceptions.RegistrationFailedException;
 
 namespace Application.Users.Commands.Register;
 public record RegisterCommand : IRequest
@@ -24,6 +24,11 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand>
         Guard.Against.NullOrEmpty(request.Email, nameof(request.Email));
         Guard.Against.NullOrEmpty(request.Password, nameof(request.Password));
 
-        await _identityService.RegisterAsync(request.Email, request.Password);
+        var result = await _identityService.RegisterAsync(request.Email, request.Password);
+        
+        if (!result.Succeeded)
+        {
+            throw new RegistrationFailedException(result.Errors);
+        }
     }
 }
