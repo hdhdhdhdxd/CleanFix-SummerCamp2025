@@ -112,6 +112,8 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
         foreach (var material in completedTask.Materials)
             total += material.Cost * apartmentCount;
 
+        total += company.Price;
+
         completedTask.Address = solicitation.Address ?? string.Empty;
         completedTask.IssueTypeId = solicitation.IssueTypeId;
         completedTask.IssueType = solicitation.IssueType;
