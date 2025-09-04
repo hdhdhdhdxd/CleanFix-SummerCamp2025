@@ -144,13 +144,8 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
         completedTask.Surface = incidence.Surface;
         completedTask.Address = incidence.Address;
 
-        // Use the injected RequestRepository for incidences as well
-        var result = await _requestRepository.UpdateRequestCost(incidence.Id.ToString(), total);
-        
-        if (!result.Succeeded)
-        {
-            throw new ExternalServiceException(incidence.Id.ToString(), result.Errors);
-        }
+        // Implement Put to external service to update incidence cost
+
 
         _incidenceRepository.Remove(incidence);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

@@ -6,6 +6,7 @@ namespace Domain.Entities;
 public class Incidence : IEntity
 {
     public int Id { get; set; } // Identificador único de la incidencia
+    public int IncidenceId { get; set; } // Id de CozyHouse
     public int IssueTypeId { get; set; }
     public IssueType IssueType { get; set; } // Tipo de incidencia (Id)
     public DateTime Date { get; set; } // Fecha de la incidencia
