@@ -13,7 +13,7 @@ public class Solicitation : IEntity
     public int IssueTypeId { get; set; }
     public int ApartmentAmount { get; set; }
     public IssueType IssueType { get; set; } // Id del tipo de incidencia asociada a la solicitud
-    public int RequestId { get; set; } // Código del request de speculab
+    public string BuildingCode { get; set; } // Código del edificio de speculab
     [Timestamp]
     public byte[] RowVersion { get; set; } // Propiedad para controlar la concurrencia
 }

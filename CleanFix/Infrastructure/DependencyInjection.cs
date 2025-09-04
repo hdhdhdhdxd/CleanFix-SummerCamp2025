@@ -33,6 +33,20 @@ public static class DependencyInjection
         builder.Services.AddScoped<IIncidenceRepository, IncidenceService>();
         builder.Services.AddScoped<ICompletedTaskRepository, CompletedTaskService>();
 
+        // Configure HttpClient for external API requests
+        var externalApiBaseUrl = builder.Configuration["Speculab:BaseUrl"] ?? "https://api.example.com/";
+        var externalApiTimeout = builder.Configuration.GetValue<int>("Speculab:Timeout", 30);
+
+        builder.Services.AddHttpClient<IRequestRepository, RequestService>(client =>
+        {
+            client.BaseAddress = new Uri(externalApiBaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(externalApiTimeout);
+            client.DefaultRequestHeaders.Add("User-Agent", "CleanFix-App/1.0");
+        });
+
+        // Register RequestService as scoped service
+        builder.Services.AddScoped<IRequestRepository, RequestService>();
+
         // Authentication & Authorization
         builder.Services.AddScoped<IAuthTokenProcessor, AuthTokenProcessor>();
 

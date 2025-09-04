@@ -150,7 +150,7 @@ using (var scope = app.Services.CreateScope())
             .RuleFor(e => e.MaintenanceCost, f => f.Random.Double(50, 1000))
             .RuleFor(e => e.IssueType, f => f.PickRandom(issueTypes))
             .RuleFor(e => e.ApartmentAmount, f => f.Random.Int(1, 100))
-            .RuleFor(e => e.RequestId, f => f.Random.Int(1, 9999));
+            .RuleFor(e => e.BuildingCode, f => f.Random.AlphaNumeric(8).ToUpper());
         var solicitations = solicitationFaker.Generate(30);
         db.Solicitations.AddRange(solicitations);
         db.SaveChanges();

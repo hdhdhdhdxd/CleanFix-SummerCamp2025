@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Application.Common.Exceptions;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
@@ -17,6 +18,7 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
     private readonly ISolicitationRepository _solicitationRepository;
     private readonly IIncidenceRepository _incidenceRepository;
     private readonly ICompanyRepository _companyRepository;
+    private readonly IRequestRepository _requestRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
@@ -27,13 +29,15 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
         IIncidenceRepository incidenceRepository,
         ICompanyRepository companyRepository,
         IUnitOfWork unitOfWork,
-        IMapper mapper)
+        IMapper mapper,
+        IRequestRepository requestRepository)
     {
         _completedTaskRepository = completedTaskRepository;
         _materialRepository = materialRepository;
         _solicitationRepository = solicitationRepository;
         _incidenceRepository = incidenceRepository;
         _companyRepository = companyRepository;
+        _requestRepository = requestRepository;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
@@ -112,10 +116,13 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
         completedTask.IssueTypeId = solicitation.IssueTypeId;
         completedTask.IssueType = solicitation.IssueType;
 
-        var putData = new SolicitationPutData { IdRequest = solicitation.RequestId, Total = (double)total };
-        var putResult = await SimulatePutToExternalApiAsync($"https://api.solicitations.com/solicitations/{solicitation.RequestId}", putData);
-        if (putResult != "OK")
-            throw new InvalidOperationException($"PUT externo falló para Solicitation con RequestId {solicitation.RequestId}");
+        // Use the injected RequestRepository to update the external request cost
+        var result = await _requestRepository.UpdateRequestCost(solicitation.BuildingCode, total);
+        
+        if (!result.Succeeded)
+        {
+            throw new ExternalServiceException<string>(solicitation.BuildingCode, result.Errors);
+        }
 
         _solicitationRepository.Remove(solicitation);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -137,37 +144,16 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
         completedTask.Surface = incidence.Surface;
         completedTask.Address = incidence.Address;
 
-        var putResult = await SimulatePutToExternalApiAsync($"https://api.incidences.com/incidences/{incidence.Id}", incidence.Id);
-        if (putResult != "OK")
-            throw new InvalidOperationException($"PUT externo falló para Incidence con Id {incidence.Id}");
+        // Use the injected RequestRepository for incidences as well
+        var result = await _requestRepository.UpdateRequestCost(incidence.Id.ToString(), total);
+        
+        if (!result.Succeeded)
+        {
+            throw new ExternalServiceException(incidence.Id.ToString(), result.Errors);
+        }
 
         _incidenceRepository.Remove(incidence);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return total;
-    }
-
-    private Task<string> SimulatePutToExternalApiAsync(string url, object data)
-    {
-        try
-        {
-            if (data is int id && id < 0)
-                return Task.FromResult("ERROR");
-            if (data is SolicitationPutData solicitationData)
-            {
-                if (solicitationData.IdRequest < 0)
-                    return Task.FromResult("ERROR");
-            }
-            return Task.FromResult("OK");
-        }
-        catch
-        {
-            return Task.FromResult("ERROR");
-        }
-    }
-
-    private class SolicitationPutData
-    {
-        public int IdRequest { get; set; }
-        public double Total { get; set; }
     }
 }

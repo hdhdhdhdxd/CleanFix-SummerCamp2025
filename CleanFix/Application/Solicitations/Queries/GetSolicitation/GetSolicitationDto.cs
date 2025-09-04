@@ -11,6 +11,7 @@ public class GetSolicitationDto
     public int IssueTypeId { get; set; } // Identificador del tipo de incidencia
     public IssueType IssueType { get; set; } // Nuevo campo para el nombre
     public int ApartmentAmount { get; set; } // Código del edificio
+    public string BuildingCode { get; set; } // Código del edificio de speculab
     private class Mapping : Profile
     {
         public Mapping()

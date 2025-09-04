@@ -20,7 +20,8 @@ public class CreateSolicitationDto
     {
         public Mapping()
         {
-            CreateMap<CreateSolicitationDto, Solicitation>();
+            CreateMap<CreateSolicitationDto, Solicitation>()
+                .ForMember(dest => dest.BuildingCode, opt => opt.MapFrom(src => src.BuildingCode));
         }
     }
 }
