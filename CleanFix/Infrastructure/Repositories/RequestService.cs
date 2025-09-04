@@ -34,27 +34,27 @@ public class RequestService : IRequestRepository
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                return Result.Failure(new[] { 
-                    $"External API request failed with status {response.StatusCode}: {errorContent}" 
+                return Result.Failure(new[] {
+                    $"External API request failed with status {response.StatusCode}: {errorContent}"
                 });
             }
         }
         catch (HttpRequestException ex)
         {
-            return Result.Failure(new[] { 
-                $"Network error while updating request cost: {ex.Message}" 
+            return Result.Failure(new[] {
+                $"Network error while updating request cost: {ex.Message}"
             });
         }
         catch (TaskCanceledException ex)
         {
-            return Result.Failure(new[] { 
-                $"Request timeout while updating request cost: {ex.Message}" 
+            return Result.Failure(new[] {
+                $"Request timeout while updating request cost: {ex.Message}"
             });
         }
         catch (Exception ex)
         {
-            return Result.Failure(new[] { 
-                $"Unexpected error while updating request cost: {ex.Message}" 
+            return Result.Failure(new[] {
+                $"Unexpected error while updating request cost: {ex.Message}"
             });
         }
     }
