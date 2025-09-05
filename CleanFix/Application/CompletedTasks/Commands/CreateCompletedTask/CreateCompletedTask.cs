@@ -19,6 +19,7 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
     private readonly IIncidenceRepository _incidenceRepository;
     private readonly ICompanyRepository _companyRepository;
     private readonly IRequestRepository _requestRepository;
+    private readonly IExternalIncidenceRepository _externalIncidenceRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
@@ -28,6 +29,7 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
         ISolicitationRepository solicitationRepository,
         IIncidenceRepository incidenceRepository,
         ICompanyRepository companyRepository,
+        IExternalIncidenceRepository externalIncidenceRepository,
         IUnitOfWork unitOfWork,
         IMapper mapper,
         IRequestRepository requestRepository)
@@ -38,6 +40,7 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
         _incidenceRepository = incidenceRepository;
         _companyRepository = companyRepository;
         _requestRepository = requestRepository;
+        _externalIncidenceRepository = externalIncidenceRepository;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
@@ -146,8 +149,14 @@ public class CreateCompletedTaskCommandHandler : IRequestHandler<CreateCompleted
         completedTask.Surface = incidence.Surface;
         completedTask.Address = incidence.Address;
 
-        // Implement Put to external service to update incidence cost
+        // Use the injected ExternalIncidenceRepository to update the external incidence 
 
+        var result = await _externalIncidenceRepository.UpdateIncidenceCost(incidence.IncidenceId, company.Name);
+
+        if (!result.Succeeded)
+        {
+            throw new ExternalServiceException<int>(incidence.IncidenceId, result.Errors);
+        }
 
         _incidenceRepository.Remove(incidence);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

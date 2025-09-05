@@ -35,15 +35,27 @@ public static class DependencyInjection
         builder.Services.AddScoped<ICompletedTaskRepository, CompletedTaskService>();
 
         // Configure HttpClient for external API requests
-        var externalApiBaseUrl = builder.Configuration["Speculab:BaseUrl"];
-        var externalApiTimeout = builder.Configuration.GetValue<int>("Speculab:Timeout", 30);
-        Guard.Against.NullOrEmpty(externalApiBaseUrl);
-        Guard.Against.NegativeOrZero(externalApiTimeout);
+        var speculabApiBaseUrl = builder.Configuration["Speculab:BaseUrl"];
+        var speculabApiTimeout = builder.Configuration.GetValue<int>("Speculab:Timeout", 30);
+        Guard.Against.NullOrEmpty(speculabApiBaseUrl);
+        Guard.Against.NegativeOrZero(speculabApiTimeout);
 
         builder.Services.AddHttpClient<IRequestRepository, RequestService>(client =>
         {
-            client.BaseAddress = new Uri(externalApiBaseUrl);
-            client.Timeout = TimeSpan.FromSeconds(externalApiTimeout);
+            client.BaseAddress = new Uri(speculabApiBaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(speculabApiTimeout);
+            client.DefaultRequestHeaders.Add("User-Agent", "CleanFix-App/1.0");
+        });
+
+        var cozyHouseApiBaseUrl = builder.Configuration["CozyHouse:BaseUrl"];
+        var cozyHouseApiTimeout = builder.Configuration.GetValue<int>("CozyHouse:Timeout", 30);
+        Guard.Against.NullOrEmpty(cozyHouseApiBaseUrl);
+        Guard.Against.NegativeOrZero(cozyHouseApiTimeout);
+
+        builder.Services.AddHttpClient<IExternalIncidenceRepository, ExternalIncidenceService>(client =>
+        {
+            client.BaseAddress = new Uri(cozyHouseApiBaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(cozyHouseApiTimeout);
             client.DefaultRequestHeaders.Add("User-Agent", "CleanFix-App/1.0");
         });
 
