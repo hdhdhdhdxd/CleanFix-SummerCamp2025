@@ -12,7 +12,8 @@ public class CreateSolicitationDto
     [Required]
     public int IssueTypeId { get; set; } // <-- Que sea un numero entre 1 y 7
     [Required]
-    public string BuildingCode { get; set; } 
+    public string BuildingCode { get; set; }
+    [Required]
     public int ApartmentAmount { get; set; } // Nuevo campo solicitado
     private class Mapping : Profile
     {
