@@ -1,8 +1,10 @@
+using Application.Common.Interfaces;
 using Bogus;
 using Domain.Entities;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using WebApi.CoreBot;
+using WebApi.Infrastructure;
 using WebApi.Services;
 
 // Añadir licencia Community para QuestPDF
@@ -27,6 +29,10 @@ builder.Services.AddScoped<WebApi.Services.IAssistantService, WebApi.Services.As
 builder.Services.AddScoped<IFacturaPdfService, FacturaPdfService>();
 builder.Services.AddScoped<IIncidenciaService, IncidenciaService>();
 
+builder.Services.AddScoped<IUser, CurrentUser>();
+
+builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+
 // Configuración de CORS 
 builder.Services.AddCors(options =>
 {
@@ -46,10 +52,6 @@ builder.Services.AddSwaggerGen();
 
 
 var app = builder.Build();
-
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
 
 // Seeding de datos de Apartamento, Edificio y Distrito, y migración automática solo en desarrollo
 using (var scope = app.Services.CreateScope())
@@ -192,6 +194,8 @@ if (app.Environment.IsDevelopment())
 }
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
-app.UseAuthorization();
+
+app.UseExceptionHandler(options => { });
+
 app.MapControllers();
 app.Run();
