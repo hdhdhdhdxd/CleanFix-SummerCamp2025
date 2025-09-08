@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable, inject } from '@angular/core'
 import { Observable } from 'rxjs'
+import { environment } from 'src/environments/environment'
 
 export interface ChatboxIAResponse {
   success: boolean
@@ -15,7 +16,7 @@ export interface ChatboxIAResponse {
   providedIn: 'root',
 })
 export class ChatService {
-  private apiUrl = 'https://localhost:7096/api/chatboxia'
+  private apiUrl = `${environment.baseUrl}/chatboxia`
 
   private http = inject(HttpClient)
 
