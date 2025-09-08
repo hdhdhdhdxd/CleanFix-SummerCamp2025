@@ -1,16 +1,23 @@
 import { CommonModule } from '@angular/common'
-import { Component } from '@angular/core'
-import { FormsModule } from '@angular/forms'
+import { Component, inject } from '@angular/core'
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
 
 @Component({
   selector: 'app-login',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, ReactiveFormsModule],
   templateUrl: './login.html',
 })
 export class Login {
+  private formBuilder = inject(FormBuilder)
+
   username = ''
   password = ''
   showPassword = false
+
+  loginForm = this.formBuilder.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required]],
+  })
 
   onSubmit() {
     // Aquí iría la lógica de autenticación
