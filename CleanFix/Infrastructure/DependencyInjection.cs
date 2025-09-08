@@ -25,6 +25,9 @@ public static class DependencyInjection
 
         builder.Services.AddScoped<IDatabaseContext>(provider => provider.GetRequiredService<DatabaseContext>());
 
+        // Register DatabaseContextInitialiser
+        builder.Services.AddScoped<DatabaseContextInitialiser>();
+
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         builder.Services.AddScoped<IApartmentRepository, ApartmentService>();
@@ -110,6 +113,7 @@ public static class DependencyInjection
             opt.Password.RequiredLength = 8;
             opt.User.RequireUniqueEmail = true;
         }).AddRoles<IdentityRole<Guid>>()
+        .AddRoleManager<RoleManager<IdentityRole<Guid>>>()
         .AddEntityFrameworkStores<DatabaseContext>();
 
         builder.Services.AddTransient<IIdentityService, IdentityService>();
