@@ -2,6 +2,7 @@
 using Application.Common.Interfaces;
 using Application.Common.Models;
 using Infrastructure.Identity.Abstracts;
+using Infrastructure.Identity.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -59,29 +60,29 @@ public class IdentityService : IIdentityService
         }
 
         // Solo configurar cookies - no retornar tokens
-        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie("ACCESS_TOKEN", jwtToken, expirationDateInUtc);
-        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie("REFRESH_TOKEN", user.RefreshToken, refreshTokenExpirationDateInUtc);
+        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie(AuthCookieNames.AccessToken, jwtToken, expirationDateInUtc);
+        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie(AuthCookieNames.RefreshToken, user.RefreshToken, refreshTokenExpirationDateInUtc);
 
         return Result.Success();
     }
 
-    public async Task RefreshTokenAsync(string? refreshToken)
+    public async Task<Result> RefreshTokenAsync(string? refreshToken)
     {
         if (string.IsNullOrEmpty(refreshToken))
         {
-            throw new RefreshTokenException("Refresh token is missing.");
+            return Result.Failure(["Refresh token is missing."]);
         }
 
         var user = await _userManager.Users.FirstOrDefaultAsync(x => x.RefreshToken == refreshToken);
 
         if (user == null)
         {
-            throw new RefreshTokenException("Unable to retrieve user for refresh token");
+            return Result.Failure(["Unable to retrieve user for refresh token"]);
         }
 
         if (user.RefreshTokenExpiresAtUtc < DateTime.UtcNow)
         {
-            throw new RefreshTokenException("Refresh token is expired.");
+            return Result.Failure(["Refresh token is expired."]);
         }
 
         var (jwtToken, expirationDateInUtc) = _authTokenProcessor.GenerateJwtToken(user);
@@ -92,10 +93,16 @@ public class IdentityService : IIdentityService
         user.RefreshToken = refreshTokenValue;
         user.RefreshTokenExpiresAtUtc = refreshTokenExpirationDateInUtc;
 
-        await _userManager.UpdateAsync(user);
+        var updateResult = await _userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
+        {
+            return updateResult.ToApplicationResult();
+        }
 
-        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie("ACCESS_TOKEN", jwtToken, expirationDateInUtc);
-        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie("REFRESH_TOKEN", user.RefreshToken, refreshTokenExpirationDateInUtc);
+        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie(AuthCookieNames.AccessToken, jwtToken, expirationDateInUtc);
+        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie(AuthCookieNames.RefreshToken, user.RefreshToken, refreshTokenExpirationDateInUtc);
+
+        return Result.Success();
     }
 
     public async Task<string?> GetUserNameAsync(Guid userId)

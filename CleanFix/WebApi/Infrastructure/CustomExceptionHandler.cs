@@ -19,7 +19,8 @@ public class CustomExceptionHandler : IExceptionHandler
                 { typeof(ForbiddenAccessException), HandleForbiddenAccessException },
                 { typeof(UserAlreadyExistsException), HandleUserAlreadyExistsException },
                 { typeof(RegistrationFailedException), HandleRegistrationFailedException },
-                { typeof(LoginFailedException),  HandleLoginFailedException}
+                { typeof(LoginFailedException),  HandleLoginFailedException},
+                { typeof(RefreshTokenException), HandleRefreshTokenException }
             };
     }
 
@@ -44,6 +45,19 @@ public class CustomExceptionHandler : IExceptionHandler
         {
             Status = StatusCodes.Status400BadRequest,
             Title = "Login failed",
+            Detail = exception.Message,
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+        });
+    }
+
+    private async Task HandleRefreshTokenException(HttpContext httpContext, Exception ex)
+    {
+        var exception = (RefreshTokenException)ex;
+        httpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+        await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
+        {
+            Status = StatusCodes.Status400BadRequest,
+            Title = "Refresh token failed",
             Detail = exception.Message,
             Type = "https://tools.ietf.org/html/rfc7231#section-6.5.1"
         });

@@ -21,6 +21,7 @@ namespace WebApi.Controllers
         }
 
         // GET: api/Incidences/paginated
+        [Authorize]
         [HttpGet("paginated")]
         public async Task<ActionResult<IEnumerable<GetPaginatedIncidenceDto>>> GetPaginatedIncidences(
             [FromQuery] int pageNumber = 1,

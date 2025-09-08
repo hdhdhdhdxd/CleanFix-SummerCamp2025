@@ -1,5 +1,7 @@
 ﻿using Application.Users.Commands.Login;
+using Application.Users.Commands.Refresh;
 using Application.Users.Commands.Register;
+using Infrastructure.Identity.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -33,5 +35,20 @@ public class UsersController : ControllerBase
         await _sender.Send(query);
 
         return TypedResults.Created();
+    }
+
+    [HttpPost]
+    [Route("refresh")]
+    public async Task<Results<NoContent, BadRequest<string>>> Refresh()
+    {
+        var refreshToken = HttpContext.Request.Cookies[AuthCookieNames.RefreshToken];
+
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            return TypedResults.BadRequest("Refresh token is missing in cookies.");
+        }
+
+        await _sender.Send(new RefreshCommand(refreshToken));
+        return TypedResults.NoContent();
     }
 }

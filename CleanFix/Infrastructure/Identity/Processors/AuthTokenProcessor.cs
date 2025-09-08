@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Infrastructure.Identity.Abstracts;
+using Infrastructure.Identity.Constants;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -59,17 +60,22 @@ public class AuthTokenProcessor : IAuthTokenProcessor
         return Convert.ToBase64String(randomNumber);
     }
 
-    public void WriteAuthTokenAsHttpOnlyCookie(string cookieName, string token,
-        DateTime expiration)
+    public void WriteAuthTokenAsHttpOnlyCookie(string cookieName, string token, DateTime expiration)
     {
-        _httpContextAccessor.HttpContext!.Response.Cookies.Append(cookieName,
-            token, new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = expiration,
-                IsEssential = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict
-            });
+        var options = new CookieOptions
+        {
+            HttpOnly = true,
+            Expires = expiration,
+            IsEssential = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict
+        };
+
+        if (cookieName == AuthCookieNames.RefreshToken)
+        {
+            options.Path = "/api/users/refresh";
+        }
+
+        _httpContextAccessor.HttpContext!.Response.Cookies.Append(cookieName, token, options);
     }
 }
