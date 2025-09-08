@@ -33,11 +33,16 @@ builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 // Configuración de CORS 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
+        policy.WithOrigins(
+            "https://clean-fix-summer-camp2025.vercel.app",
+            "http://localhost:4200",
+            "https://cozyhousesc25.netlify.app/",
+            "https://speculab.netlify.app"
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod();
     });
 });
 
@@ -61,7 +66,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+app.UseCors("AllowFrontend");
 
 app.UseExceptionHandler(options => { });
 
