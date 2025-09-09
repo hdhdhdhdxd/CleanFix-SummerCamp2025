@@ -20,7 +20,7 @@ namespace WebApi.CoreBot
 
         public CleanFixBotService(IConfiguration config)
         {
-            _connectionString = config.GetConnectionString("CleanFixDB");
+            _connectionString = config.GetConnectionString("DefaultConnection");
 
             _plugins = new Dictionary<string, IPlugin>
             {

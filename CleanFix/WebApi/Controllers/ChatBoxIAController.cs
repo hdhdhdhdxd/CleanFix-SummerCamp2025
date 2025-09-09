@@ -25,7 +25,7 @@ namespace WebApi.Controllers
             _assistantService = assistantService;
             _facturaPdfService = facturaPdfService;
             _config = config;
-            _connectionString = config.GetConnectionString("CleanFixDB");
+            _connectionString = config.GetConnectionString("DefaultConnection");
         }
 
         public class MensajeResponse

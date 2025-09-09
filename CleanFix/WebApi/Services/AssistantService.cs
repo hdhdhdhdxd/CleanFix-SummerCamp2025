@@ -52,7 +52,7 @@ Tienes la siguiente información de materiales (materials) en JSON: {{$materiales
 Pregunta: {{$pregunta}}";
 
             // Inicializa plugins y kernel
-            var dbPlugin = new DBPluginTestPG(config.GetConnectionString("CleanFixDB"));
+            var dbPlugin = new DBPluginTestPG(config.GetConnectionString("DefaultConnection"));
             var empresasResponse = dbPlugin.GetAllEmpresas();
             var materialesResponse = dbPlugin.GetAllMaterials();
 
