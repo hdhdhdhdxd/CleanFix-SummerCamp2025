@@ -11,18 +11,12 @@ import { RouterLink } from '@angular/router'
 export class Login {
   private formBuilder = inject(FormBuilder)
 
-  username = ''
-  password = ''
-  showPassword = false
-
   loginForm = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]],
   })
 
   onSubmit() {
-    // Aquí iría la lógica de autenticación
-    console.log('Usuario:', this.username)
-    console.log('Contraseña:', this.password)
+    console.warn(this.loginForm.value)
   }
 }
