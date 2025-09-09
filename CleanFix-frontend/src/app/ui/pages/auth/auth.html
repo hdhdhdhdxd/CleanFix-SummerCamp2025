@@ -1,3 +1,33 @@
-<div>
-  <router-outlet></router-outlet>
+<div class="flex min-h-screen flex-col md:flex-row">
+  <!-- Columna izquierda: Formulario -->
+  <section class="flex w-full items-center justify-center bg-white p-8 md:w-4/7">
+    <router-outlet></router-outlet>
+  </section>
+  <section class="relative hidden min-h-screen md:block md:w-3/7">
+    <img
+      src="/images/login-image.webp"
+      alt="Login Image"
+      loading="lazy"
+      class="h-full w-full object-cover object-center"
+    />
+    <div
+      class="absolute inset-0 flex flex-col items-center justify-center space-y-7 bg-brand-800/80 px-10"
+    >
+      <header>
+        <h1 class="text-center text-4xl leading-snug font-bold text-white">
+          Transforma tu hogar con<br />
+          <span class="text-accent-300">CleanFix</span>
+        </h1>
+      </header>
+      <p class="text-center text-xl font-semibold text-pretty text-brand-200">
+        La plataforma profesional para gestionar reformas y proyectos de renovación con calidad y
+        confianza.
+      </p>
+      <a
+        routerLink="/"
+        class="mt-6 block text-center font-semibold text-brand-200 underline transition-colors hover:text-brand-300"
+        >Volver al inicio</a
+      >
+    </div>
+  </section>
 </div>

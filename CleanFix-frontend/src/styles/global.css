@@ -11,6 +11,7 @@
   --color-primary-500: oklch(0.2712 0.0493 251.09);
   --color-primary-300: oklch(0.3333 0.0572 251.09);
   --color-accent-500: oklch(0.8263 0.1634 90.12);
+  --color-accent-300: oklch(0.93 0.07 90.12);
 
   /* Colores para el botón Asistente IA */
   --color-ai-400: oklch(0.7 0.12 265);
