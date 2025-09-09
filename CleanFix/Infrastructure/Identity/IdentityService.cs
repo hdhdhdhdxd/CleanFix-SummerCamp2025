@@ -1,26 +1,30 @@
-﻿using Application.Common.Exceptions;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Application.Common.Models;
 using Infrastructure.Identity.Abstracts;
 using Infrastructure.Identity.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Identity;
 public class IdentityService : IIdentityService
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IAuthTokenProcessor _authTokenProcessor;
+    private readonly JwtOptions _jwtOptions;
+
 
     public IdentityService(
         UserManager<ApplicationUser> userManager,
         IUserClaimsPrincipalFactory<ApplicationUser> userClaimsPrincipalFactory,
         IAuthorizationService authorizationService,
-        IAuthTokenProcessor authTokenProcessor)
+        IAuthTokenProcessor authTokenProcessor,
+        IOptions<JwtOptions> jwtOptions)
     {
         _userManager = userManager;
         _authTokenProcessor = authTokenProcessor;
+        _jwtOptions = jwtOptions.Value;
     }
 
     public async Task<Result> RegisterAsync(string email, string password)
@@ -48,7 +52,7 @@ public class IdentityService : IIdentityService
         var (jwtToken, expirationDateInUtc) = _authTokenProcessor.GenerateJwtToken(user);
         var refreshTokenValue = _authTokenProcessor.GenerateRefreshToken();
 
-        var refreshTokenExpirationDateInUtc = DateTime.UtcNow.AddDays(7);
+        var refreshTokenExpirationDateInUtc = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpirationDays);
 
         user.RefreshToken = refreshTokenValue;
         user.RefreshTokenExpiresAtUtc = refreshTokenExpirationDateInUtc;
@@ -59,7 +63,6 @@ public class IdentityService : IIdentityService
             return updateResult.ToApplicationResult();
         }
 
-        // Solo configurar cookies - no retornar tokens
         _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie(AuthCookieNames.AccessToken, jwtToken, expirationDateInUtc);
         _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie(AuthCookieNames.RefreshToken, user.RefreshToken, refreshTokenExpirationDateInUtc);
 
@@ -88,7 +91,7 @@ public class IdentityService : IIdentityService
         var (jwtToken, expirationDateInUtc) = _authTokenProcessor.GenerateJwtToken(user);
         var refreshTokenValue = _authTokenProcessor.GenerateRefreshToken();
 
-        var refreshTokenExpirationDateInUtc = DateTime.UtcNow.AddDays(7);
+        var refreshTokenExpirationDateInUtc = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpirationDays);
 
         user.RefreshToken = refreshTokenValue;
         user.RefreshTokenExpiresAtUtc = refreshTokenExpirationDateInUtc;
