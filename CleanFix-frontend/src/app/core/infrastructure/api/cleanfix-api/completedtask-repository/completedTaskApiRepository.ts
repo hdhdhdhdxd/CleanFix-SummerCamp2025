@@ -21,7 +21,7 @@ const create = async (
     materialIds,
   }
 
-  const response = await fetch(environment.baseUrl + '/completedtasks', {
+  const response = await fetch(environment.baseUrl + 'completedtasks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ const getPaginated = async (
   }
 
   const response = await fetch(
-    `${environment.baseUrl}/completedtasks/paginated?${params.toString()}`,
+    `${environment.baseUrl}completedtasks/paginated?${params.toString()}`,
     {
       method: 'GET',
       headers: {
@@ -82,7 +82,7 @@ const getPaginated = async (
 }
 
 const getById = async (id: string): Promise<CompletedTask> => {
-  const response = await fetch(`${environment.baseUrl}/completedtasks/${id}`, {
+  const response = await fetch(`${environment.baseUrl}completedtasks/${id}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

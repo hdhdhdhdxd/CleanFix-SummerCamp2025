@@ -22,7 +22,7 @@ const getPaginated = async (
     params.append('filterString', filterString)
   }
 
-  const response = await fetch(`${environment.baseUrl}/incidences/paginated?${params.toString()}`)
+  const response = await fetch(`${environment.baseUrl}incidences/paginated?${params.toString()}`)
   if (!response.ok) {
     throw new Error('Error al obtener las incidencias')
   }
@@ -46,7 +46,7 @@ const getPaginated = async (
 }
 
 const getById = async (id: number): Promise<Incidence> => {
-  const response = await fetch(environment.baseUrl + `/incidences/${id}`)
+  const response = await fetch(environment.baseUrl + `incidences/${id}`)
   if (!response.ok) {
     throw new Error('Error al obtener la incidencia')
   }

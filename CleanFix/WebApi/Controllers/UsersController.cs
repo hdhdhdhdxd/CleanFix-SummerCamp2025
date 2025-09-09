@@ -39,7 +39,7 @@ public class UsersController : ControllerBase
 
     [HttpPost]
     [Route("refresh")]
-    public async Task<Results<NoContent, BadRequest<string>>> Refresh()
+    public async Task<Results<NoContent, BadRequest<string>>> Refresh([FromQuery]bool rememberMe)
     {
         var refreshToken = HttpContext.Request.Cookies[AuthCookieNames.RefreshToken];
 
@@ -48,7 +48,7 @@ public class UsersController : ControllerBase
             return TypedResults.BadRequest("Refresh token is missing in cookies.");
         }
 
-        await _sender.Send(new RefreshCommand(refreshToken));
+        await _sender.Send(new RefreshCommand(refreshToken, rememberMe));
         return TypedResults.NoContent();
     }
 }

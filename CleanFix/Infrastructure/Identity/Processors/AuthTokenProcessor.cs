@@ -60,16 +60,20 @@ public class AuthTokenProcessor : IAuthTokenProcessor
         return Convert.ToBase64String(randomNumber);
     }
 
-    public void WriteAuthTokenAsHttpOnlyCookie(string cookieName, string token, DateTime expiration)
+    public void WriteAuthTokenAsHttpOnlyCookie(string cookieName, string token, DateTime expiration, bool isPersistent)
     {
         var options = new CookieOptions
         {
             HttpOnly = true,
-            Expires = expiration,
             IsEssential = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict
+            SameSite = SameSiteMode.None
         };
+
+        if (isPersistent)
+        {
+            options.Expires = expiration;
+        }
 
         if (cookieName == AuthCookieNames.RefreshToken)
         {

@@ -1,15 +1,14 @@
-﻿using System.Security.Claims;
-using Application.Common.Models;
+﻿using Application.Common.Models;
 
 namespace Application.Common.Interfaces;
 
 public interface IIdentityService
 {
-    Task<Result> LoginAsync(string email, string password);
+    Task<Result> LoginAsync(string email, string password, bool rememberMe);
 
     Task<Result> RegisterAsync(string email, string password);
 
-    Task<Result> RefreshTokenAsync(string? refreshToken);
+    Task<Result> RefreshTokenAsync(string? refreshToken, bool rememberMe);
 
     Task<string?> GetUserNameAsync(Guid userId);
 

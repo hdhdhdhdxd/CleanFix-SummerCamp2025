@@ -36,15 +36,17 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins(
-            "https://clean-fix-summer-camp2025.vercel.app",
-            "http://localhost:4200",
             "https://cozyhousesc25.netlify.app/",
-            "https://speculab.netlify.app"
+            "https://speculab.netlify.app",
+            "https://clean-fix-summer-camp2025.vercel.app",
+            "http://localhost:4200"
         )
         .AllowAnyHeader()
-        .AllowAnyMethod();
+        .AllowAnyMethod()
+        .AllowCredentials();
     });
 });
+
 
 // Add services to the container.
 builder.Services.AddControllers();

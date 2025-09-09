@@ -21,9 +21,7 @@ const getPaginated = async (
     params.append('filterString', filterString)
   }
 
-  const response = await fetch(
-    `${environment.baseUrl}/solicitations/paginated?${params.toString()}`,
-  )
+  const response = await fetch(`${environment.baseUrl}solicitations/paginated?${params.toString()}`)
   if (!response.ok) {
     throw new Error('Error al obtener las solicitudes')
   }
@@ -47,7 +45,7 @@ const getPaginated = async (
 }
 
 const getById = async (id: number): Promise<Solicitation> => {
-  const response = await fetch(environment.baseUrl + `/solicitations/${id}`)
+  const response = await fetch(environment.baseUrl + `solicitations/${id}`)
   if (!response.ok) {
     throw new Error('Error al obtener la solicitud')
   }

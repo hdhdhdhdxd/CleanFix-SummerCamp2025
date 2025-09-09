@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Application.Users.Commands.Refresh;
 
-public record RefreshCommand(string RefreshToken) : IRequest;
+public record RefreshCommand(string RefreshToken, bool RememberMe) : IRequest;
 
 public class RefreshCommandHandler : IRequestHandler<RefreshCommand>
 {
@@ -18,7 +18,7 @@ public class RefreshCommandHandler : IRequestHandler<RefreshCommand>
 
     public async Task Handle(RefreshCommand request, CancellationToken cancellationToken)
     {
-        Result result = await _identityService.RefreshTokenAsync(request.RefreshToken);
+        Result result = await _identityService.RefreshTokenAsync(request.RefreshToken, request.RememberMe);
 
         if (!result.Succeeded)
         {

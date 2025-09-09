@@ -35,7 +35,7 @@ public class IdentityService : IIdentityService
         return result.ToApplicationResult();
     }
 
-    public async Task<Result> LoginAsync(string email, string password)
+    public async Task<Result> LoginAsync(string email, string password, bool rememberMe)
     {
         ApplicationUser? user = await _userManager.FindByEmailAsync(email);
 
@@ -63,13 +63,13 @@ public class IdentityService : IIdentityService
             return updateResult.ToApplicationResult();
         }
 
-        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie(AuthCookieNames.AccessToken, jwtToken, expirationDateInUtc);
-        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie(AuthCookieNames.RefreshToken, user.RefreshToken, refreshTokenExpirationDateInUtc);
+        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie(AuthCookieNames.AccessToken, jwtToken, expirationDateInUtc, rememberMe);
+        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie(AuthCookieNames.RefreshToken, user.RefreshToken, refreshTokenExpirationDateInUtc, rememberMe);
 
         return Result.Success();
     }
 
-    public async Task<Result> RefreshTokenAsync(string? refreshToken)
+    public async Task<Result> RefreshTokenAsync(string? refreshToken, bool rememberMe)
     {
         if (string.IsNullOrEmpty(refreshToken))
         {
@@ -102,8 +102,8 @@ public class IdentityService : IIdentityService
             return updateResult.ToApplicationResult();
         }
 
-        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie(AuthCookieNames.AccessToken, jwtToken, expirationDateInUtc);
-        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie(AuthCookieNames.RefreshToken, user.RefreshToken, refreshTokenExpirationDateInUtc);
+        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie(AuthCookieNames.AccessToken, jwtToken, expirationDateInUtc, rememberMe);
+        _authTokenProcessor.WriteAuthTokenAsHttpOnlyCookie(AuthCookieNames.RefreshToken, user.RefreshToken, refreshTokenExpirationDateInUtc, rememberMe);
 
         return Result.Success();
     }

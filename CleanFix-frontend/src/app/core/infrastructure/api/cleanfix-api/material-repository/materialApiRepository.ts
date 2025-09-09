@@ -6,7 +6,7 @@ import { MaterialDto } from './MaterialDto'
 const getRandomThree = async (issueTypeId: number): Promise<Material[]> => {
   const queryParams = new HttpParams().set('issueTypeId', issueTypeId.toString())
 
-  const response = await fetch(environment.baseUrl + `/materials/random?${queryParams}`)
+  const response = await fetch(environment.baseUrl + `materials/random?${queryParams}`)
 
   if (!response.ok) {
     throw new Error('Error al obtener los materiales')

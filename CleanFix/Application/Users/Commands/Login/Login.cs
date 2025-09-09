@@ -5,11 +5,7 @@ using MediatR;
 
 namespace Application.Users.Commands.Login;
 
-public record LoginCommand : IRequest
-{
-    public string? Email { get; init; }
-    public string? Password { get; init; }
-}
+public record LoginCommand(string Email, string Password, bool RememberMe) : IRequest;
 
 public class LoginCommandHandler : IRequestHandler<LoginCommand>
 {
@@ -20,10 +16,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand>
     }
     public async Task Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        Guard.Against.NullOrEmpty(request.Email, nameof(request.Email));
-        Guard.Against.NullOrEmpty(request.Password, nameof(request.Password));
-
-        var result = await _identityService.LoginAsync(request.Email, request.Password);
+        var result = await _identityService.LoginAsync(request.Email, request.Password, request.RememberMe);
         
         if (!result.Succeeded)
         {
