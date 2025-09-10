@@ -81,5 +81,8 @@ app.UseCors("AllowFrontend");
 
 app.UseExceptionHandler(options => { });
 
+app.UseAuthentication();   // <-- Importante
+app.UseAuthorization();    // <-- Importante
+
 app.MapControllers();
 app.Run();

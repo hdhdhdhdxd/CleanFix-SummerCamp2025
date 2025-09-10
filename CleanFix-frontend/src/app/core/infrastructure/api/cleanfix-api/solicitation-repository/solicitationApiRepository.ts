@@ -26,7 +26,7 @@ export class SolicitationApiRepository implements SolicitationRepository {
     const responseJson = await this.http
       .get<
         PaginatedDataDto<SolicitationBriefDto>
-      >(`${environment.baseUrl}solicitations/paginated`, { params })
+      >(`${environment.baseUrl}solicitations/paginated`, { params, withCredentials: true })
       .toPromise()
 
     if (!responseJson) {
@@ -51,7 +51,7 @@ export class SolicitationApiRepository implements SolicitationRepository {
 
   async getById(id: number): Promise<Solicitation> {
     const responseJson = await this.http
-      .get<SolicitationDto>(`${environment.baseUrl}solicitations/${id}`)
+      .get<SolicitationDto>(`${environment.baseUrl}solicitations/${id}`, { withCredentials: true })
       .toPromise()
 
     if (!responseJson) {
