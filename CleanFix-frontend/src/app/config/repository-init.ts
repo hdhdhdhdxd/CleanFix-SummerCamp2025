@@ -8,11 +8,12 @@ import { companyApiRepository } from '@/core/infrastructure/api/cleanfix-api/com
 import { completedTaskApiRepository } from '@/core/infrastructure/api/cleanfix-api/completedtask-repository/completedTaskApiRepository'
 import { incidenceApiRepository } from '@/core/infrastructure/api/cleanfix-api/incidence-repository/incidenceApiRepository'
 import { materialApiRepository } from '@/core/infrastructure/api/cleanfix-api/material-repository/materialApiRepository'
-import { solicitationApiRepository } from '@/core/infrastructure/api/cleanfix-api/solicitation-repository/solicitationApiRepository'
+import { SolicitationApiRepository } from '@/core/infrastructure/api/cleanfix-api/solicitation-repository/solicitationApiRepository'
 import { userApiRepository } from '@/core/infrastructure/api/cleanfix-api/user-repository/userApiRepository'
+import { HttpClient } from '@angular/common/http'
 
-export const initializeRepositories = () => {
-  solicitationService.init(solicitationApiRepository)
+export const initializeRepositories = (http: HttpClient) => {
+  solicitationService.init(new SolicitationApiRepository(http))
   incidenceService.init(incidenceApiRepository)
   companyService.init(companyApiRepository)
   materialService.init(materialApiRepository)

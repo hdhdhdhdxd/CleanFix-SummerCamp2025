@@ -9,4 +9,8 @@ export class UserService {
   login(username: string, password: string, rememberMe: boolean): Observable<void> {
     return from(userService.login(username, password, rememberMe))
   }
+
+  refreshToken(): Observable<void> {
+    return from(userService.refreshToken())
+  }
 }

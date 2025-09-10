@@ -16,6 +16,21 @@ const login = async (email: string, password: string, rememberMe: boolean) => {
   }
 }
 
+const refreshToken = async () => {
+  const response = await fetch(`${environment.baseUrl}users/refresh-token`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error('Error al refrescar el token')
+  }
+}
+
 export const userApiRepository: UserRepository = {
   login: login,
+  refreshToken: refreshToken,
 }

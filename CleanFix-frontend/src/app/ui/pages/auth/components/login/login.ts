@@ -2,7 +2,7 @@ import { UserService } from '@/ui/services/user/user-service'
 import { CommonModule } from '@angular/common'
 import { Component, inject } from '@angular/core'
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
-import { RouterLink } from '@angular/router'
+import { Router, RouterLink } from '@angular/router'
 
 @Component({
   selector: 'app-login',
@@ -12,6 +12,7 @@ import { RouterLink } from '@angular/router'
 export class Login {
   private readonly formBuilder = inject(FormBuilder)
   private readonly userService = inject(UserService)
+  private readonly router = inject(Router)
 
   loginForm = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
@@ -26,7 +27,7 @@ export class Login {
 
     this.userService.login(email!, password!, rememberMe!).subscribe({
       next: () => {
-        console.log('Login successful')
+        this.router.navigate(['/'])
       },
       error: (err) => {
         console.error('Login failed', err)

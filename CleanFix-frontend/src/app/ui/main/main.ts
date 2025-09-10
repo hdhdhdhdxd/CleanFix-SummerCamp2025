@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common'
 import { Component, inject } from '@angular/core'
+import { RepositoryInitializerService } from '@/ui/services/repository-initializer.service'
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router'
 import { Footer } from '../shared/footer/footer'
 import { Header } from '../shared/header/header'
@@ -16,6 +17,9 @@ export class Main {
   private router = inject(Router)
 
   constructor() {
+    // inicialización de los repositorios
+    inject(RepositoryInitializerService)
+
     this.router.events.subscribe((event: unknown) => {
       if (event instanceof NavigationEnd) {
         // Oculta el footer en la ruta /service-request
