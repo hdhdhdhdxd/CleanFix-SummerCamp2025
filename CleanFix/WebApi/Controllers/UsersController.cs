@@ -32,12 +32,17 @@ public class UsersController : ControllerBase
 
     [HttpPost]
     [Route("register")]
-    public async Task<Created> Register([FromBody] RegisterCommand query)
+    public async Task<ActionResult> Register([FromBody] RegisterCommand query)
     {
+        if (!ModelState.IsValid)
+        {
+            Log.Warning("POST api/users/register failed validation for user {User}. Errors: {Errors}", query.Email, string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)));
+            return BadRequest(ModelState);
+        }
         Log.Information("POST api/users/register called for user {User}", query.Email);
         await _sender.Send(query);
         Log.Information("User {User} registered successfully.", query.Email);
-        return TypedResults.Created();
+        return Created();
     }
 
     [HttpPost]

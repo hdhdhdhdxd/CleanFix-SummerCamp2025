@@ -8,6 +8,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Net.Mail;
 using System.Net;
+using Serilog;
 
 namespace WebApi.Controllers
 {
@@ -38,8 +39,10 @@ namespace WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] MensajeRequest request)
         {
+            Log.Information("POST api/chatboxia called. Mensaje={Mensaje}", request?.Mensaje);
             if (string.IsNullOrWhiteSpace(request?.Mensaje))
             {
+                Log.Warning("POST api/chatboxia failed: Mensaje is required.");
                 return BadRequest(new MensajeResponse
                 {
                     Success = false,
@@ -152,6 +155,7 @@ namespace WebApi.Controllers
             // --- PRIORIDAD: FACTURA ---
             if (esFactura)
             {
+                Log.Information("Factura flow triggered for Mensaje={Mensaje}", request.Mensaje);
                 string empresaNombre = null;
                 var materialesNombres = new List<string>();
 
@@ -277,6 +281,7 @@ namespace WebApi.Controllers
 
             // --- RESTO: TODO AL ASSISTANTSERVICE ---
             var respuestaGeneral = await _assistantService.ProcesarMensajeAsync(request.Mensaje, historial);
+            Log.Information("POST api/chatboxia completed for Mensaje={Mensaje}", request.Mensaje);
             return Ok(new MensajeResponse
             {
                 Success = true,
