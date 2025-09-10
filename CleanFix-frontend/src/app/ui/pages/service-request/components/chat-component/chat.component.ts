@@ -12,6 +12,7 @@ import { Component, ElementRef, inject, signal, ViewChild } from '@angular/core'
 import { FormsModule } from '@angular/forms'
 import { marked } from 'marked'
 import { ChatService } from 'src/app/ui/services/chat/chat.service'
+import { environment } from 'src/environments/environment'
 
 @Component({
   selector: 'app-chat',
@@ -164,7 +165,7 @@ export class ChatComponent {
     if (!data || !this.pdfUrl) return
     const pdfUrl = this.pdfUrl.startsWith('http')
       ? this.pdfUrl
-      : `https://localhost:7096${this.pdfUrl}`
+      : `https://devdemoapi2.azurewebsites.net/${this.pdfUrl}`
     const jsonBody = JSON.stringify(data)
     console.log('JSON enviado a descargarFactura:', jsonBody)
     fetch(pdfUrl, {
@@ -212,7 +213,7 @@ export class ChatComponent {
       alert('Debes introducir un email válido')
       return
     }
-    fetch('https://localhost:7096/api/chatboxia/factura/gmail', {
+    fetch(`${environment.baseUrl}chatboxia/factura/gmail`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
