@@ -4,7 +4,6 @@ using Application.Incidences.Commands.UpdateIncidence;
 using Application.Incidences.Queries.GetIncidence;
 using Application.Incidences.Queries.GetPaginatedIncidences;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
@@ -22,6 +21,7 @@ namespace WebApi.Controllers
         }
 
         // GET: api/Incidences/paginated
+        [Authorize]
         [HttpGet("paginated")]
         public async Task<ActionResult<IEnumerable<GetPaginatedIncidenceDto>>> GetPaginatedIncidences(
             [FromQuery] int pageNumber = 1,
@@ -35,6 +35,7 @@ namespace WebApi.Controllers
         }
 
         // GET: api/Incidences/{id}
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<GetIncidenceDto>> GetIncidence(int id)
         {
@@ -65,6 +66,7 @@ namespace WebApi.Controllers
         }
 
         // PUT: api/Incidences/{id}
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutIncidence(int id, [FromBody] UpdateIncidenceDto incidenceDto)
         {
@@ -98,6 +100,7 @@ namespace WebApi.Controllers
         }
 
         // DELETE: api/Incidences/{id}
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteIncidence(int id)
         {

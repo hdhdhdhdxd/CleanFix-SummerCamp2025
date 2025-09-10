@@ -6,8 +6,9 @@ using Serilog;
 
 namespace WebApi.Controllers
 {
-    [Route("api/companies")]
     [ApiController]
+    [Route("api/companies")]
+    [Authorize]
     public class CompaniesController : ControllerBase
     {
         private readonly ISender _sender;

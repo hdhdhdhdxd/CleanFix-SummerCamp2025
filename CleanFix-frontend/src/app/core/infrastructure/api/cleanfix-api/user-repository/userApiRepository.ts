@@ -19,7 +19,7 @@ export class UserApiRepository implements UserRepository {
   async refreshToken(): Promise<void> {
     await firstValueFrom(
       this.http.post(
-        `${environment.baseUrl}users/refresh-token`,
+        `${environment.baseUrl}users/refresh`,
         {},
         { withCredentials: true, headers: { 'Content-Type': 'application/json' } },
       ),

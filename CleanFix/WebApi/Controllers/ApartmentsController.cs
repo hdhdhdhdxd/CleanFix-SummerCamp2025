@@ -9,8 +9,9 @@ using Serilog;
 
 namespace WebApi.Controllers
 {
-    [Route("api/apartments")]
     [ApiController]
+    [Route("api/apartments")]
+    [Authorize]
     public class ApartmentsController : ControllerBase
     {
         private readonly ISender _sender;

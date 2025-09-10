@@ -2,13 +2,12 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
     [Route("api/materials")]
     [ApiController]
+    [Authorize]
     public class MaterialsController : ControllerBase
     {
         private readonly ISender _sender;

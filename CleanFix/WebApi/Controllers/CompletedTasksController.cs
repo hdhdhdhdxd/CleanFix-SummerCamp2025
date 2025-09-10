@@ -9,6 +9,7 @@ namespace WebApi.Controllers
 {
     [Route("api/completedtasks")]
     [ApiController]
+    [Authorize]
     public class CompletedTasksController : ControllerBase
     {
         private readonly ISender _sender;

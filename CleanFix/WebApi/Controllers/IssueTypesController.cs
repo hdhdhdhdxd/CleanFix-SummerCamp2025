@@ -6,8 +6,9 @@ using Serilog;
 
 namespace WebApi.Controllers;
 
-[ApiController]
 [Route("api/[controller]")]
+[ApiController]
+[Authorize]
 public class IssueTypesController : ControllerBase
 {
     private readonly DatabaseContext _context;

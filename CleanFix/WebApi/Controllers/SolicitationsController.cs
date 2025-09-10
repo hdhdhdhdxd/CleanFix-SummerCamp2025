@@ -3,7 +3,6 @@ using Application.Solicitations.Commands.DeleteSolicitation;
 using Application.Solicitations.Queries.GetPaginatedSolicitations;
 using Application.Solicitations.Queries.GetSolicitation;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
@@ -35,6 +34,7 @@ namespace WebApi.Controllers
         }
 
         // GET: api/solicitations/{id}
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<GetSolicitationDto>> GetSolicitation(int id)
         {
@@ -65,6 +65,7 @@ namespace WebApi.Controllers
         }
 
         // DELETE: api/solicitations/{id}
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSolicitation(int id)
         {

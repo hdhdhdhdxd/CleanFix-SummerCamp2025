@@ -14,6 +14,7 @@ namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/chatboxia")]
+    [Authorize]
     public class ChatBoxIAController : ControllerBase
     {
         private readonly IAssistantService _assistantService;
