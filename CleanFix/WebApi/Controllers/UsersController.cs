@@ -5,6 +5,7 @@ using Infrastructure.Identity.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace WebApi.Controllers;
 
@@ -23,8 +24,9 @@ public class UsersController : ControllerBase
     [Route("login")]
     public async Task<Results<Ok, NoContent>> Login([FromBody] LoginCommand query)
     {
+        Log.Information("POST api/users/login called for user {User}", query.Email);
         await _sender.Send(query);
-
+        Log.Information("User {User} logged in successfully.", query.Email);
         return TypedResults.NoContent();
     }
 
@@ -32,8 +34,9 @@ public class UsersController : ControllerBase
     [Route("register")]
     public async Task<Created> Register([FromBody] RegisterCommand query)
     {
+        Log.Information("POST api/users/register called for user {User}", query.Email);
         await _sender.Send(query);
-
+        Log.Information("User {User} registered successfully.", query.Email);
         return TypedResults.Created();
     }
 
@@ -42,13 +45,14 @@ public class UsersController : ControllerBase
     public async Task<Results<NoContent, BadRequest<string>>> Refresh([FromQuery]bool rememberMe)
     {
         var refreshToken = HttpContext.Request.Cookies[AuthCookieNames.RefreshToken];
-
+        Log.Information("POST api/users/refresh called. RememberMe={RememberMe}", rememberMe);
         if (string.IsNullOrEmpty(refreshToken))
         {
+            Log.Warning("Refresh token is missing in cookies.");
             return TypedResults.BadRequest("Refresh token is missing in cookies.");
         }
-
         await _sender.Send(new RefreshCommand(refreshToken, rememberMe));
+        Log.Information("Refresh token processed successfully.");
         return TypedResults.NoContent();
     }
 }

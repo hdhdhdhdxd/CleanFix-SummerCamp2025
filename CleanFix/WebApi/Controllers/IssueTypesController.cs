@@ -2,6 +2,7 @@ using Domain.Entities;
 using Infrastructure.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace WebApi.Controllers;
 
@@ -19,6 +20,9 @@ public class IssueTypesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<IssueType>>> GetAll()
     {
-        return await _context.IssueTypes.ToListAsync();
+        Log.Information("GET api/issuetypes called.");
+        var result = await _context.IssueTypes.ToListAsync();
+        Log.Information("GET api/issuetypes returned {Count} results.", result.Count);
+        return result;
     }
 }
