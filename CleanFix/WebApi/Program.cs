@@ -3,11 +3,20 @@ using Infrastructure.Data;
 using WebApi.CoreBot;
 using WebApi.Infrastructure;
 using WebApi.Services;
+using Serilog;
 
 // Añadir licencia Community para QuestPDF
 QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configurar Serilog desde appsettings.json
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+// Usar Serilog como proveedor de logging
+builder.Host.UseSerilog();
 
 builder.AddInfrastructureServices();
 builder.AddApplicationServices();

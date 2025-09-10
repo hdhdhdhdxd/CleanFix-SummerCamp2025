@@ -2,11 +2,17 @@
 using Ardalis.GuardClauses;
 using MediatR;
 using RegistrationFailedException = Application.Common.Exceptions.RegistrationFailedException;
+using System.ComponentModel.DataAnnotations;
 
 namespace Application.Users.Commands.Register;
 public record RegisterCommand : IRequest
 {
+    [Required]
+    [EmailAddress]
     public string? Email { get; init; }
+
+    [Required]
+    [MinLength(4)]
     public string? Password { get; init; }
 }
 
