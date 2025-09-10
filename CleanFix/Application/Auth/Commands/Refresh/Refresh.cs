@@ -3,7 +3,7 @@ using Application.Common.Models;
 using Application.Common.Exceptions;
 using MediatR;
 
-namespace Application.Users.Commands.Refresh;
+namespace Application.Auth.Commands.Refresh;
 
 public record RefreshCommand(string RefreshToken, bool RememberMe) : IRequest;
 

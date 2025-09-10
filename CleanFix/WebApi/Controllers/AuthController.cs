@@ -1,6 +1,6 @@
-﻿using Application.Users.Commands.Login;
-using Application.Users.Commands.Refresh;
-using Application.Users.Commands.Register;
+﻿using Application.Auth.Commands.Login;
+using Application.Auth.Commands.Refresh;
+using Application.Auth.Commands.Register;
 using Infrastructure.Identity.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -9,13 +9,13 @@ using Serilog;
 
 namespace WebApi.Controllers;
 
-[Route("api/users")]
+[Route("api/auth")]
 [ApiController]
-public class UsersController : ControllerBase
+public class AuthController : ControllerBase
 {
     private readonly ISender _sender;
 
-    public UsersController(ISender sender)
+    public AuthController(ISender sender)
     {
         _sender = sender;
     }
@@ -47,7 +47,7 @@ public class UsersController : ControllerBase
 
     [HttpPost]
     [Route("refresh")]
-    public async Task<Results<NoContent, BadRequest<string>>> Refresh([FromQuery]bool rememberMe)
+    public async Task<Results<NoContent, BadRequest<string>>> Refresh([FromQuery]bool rememberMe = false)
     {
         var refreshToken = HttpContext.Request.Cookies[AuthCookieNames.RefreshToken];
         Log.Information("POST api/users/refresh called. RememberMe={RememberMe}", rememberMe);

@@ -4,7 +4,8 @@ using MediatR;
 using RegistrationFailedException = Application.Common.Exceptions.RegistrationFailedException;
 using System.ComponentModel.DataAnnotations;
 
-namespace Application.Users.Commands.Register;
+namespace Application.Auth.Commands.Register;
+
 public record RegisterCommand : IRequest
 {
     [Required]

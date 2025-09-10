@@ -9,7 +9,7 @@ export class UserApiRepository implements UserRepository {
   async login(email: string, password: string, rememberMe: boolean): Promise<void> {
     await firstValueFrom(
       this.http.post(
-        `${environment.baseUrl}users/login`,
+        `${environment.baseUrl}auth/login`,
         { email, password, rememberMe },
         { withCredentials: true, headers: { 'Content-Type': 'application/json' } },
       ),
@@ -19,7 +19,7 @@ export class UserApiRepository implements UserRepository {
   async refreshToken(): Promise<void> {
     await firstValueFrom(
       this.http.post(
-        `${environment.baseUrl}users/refresh`,
+        `${environment.baseUrl}auth/refresh`,
         {},
         { withCredentials: true, headers: { 'Content-Type': 'application/json' } },
       ),

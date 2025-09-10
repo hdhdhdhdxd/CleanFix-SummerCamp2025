@@ -77,7 +77,7 @@ public class AuthTokenProcessor : IAuthTokenProcessor
 
         if (cookieName == AuthCookieNames.RefreshToken)
         {
-            options.Path = "/api/users/refresh";
+            options.Path = "/api/auth/refresh";
         }
 
         _httpContextAccessor.HttpContext!.Response.Cookies.Append(cookieName, token, options);

@@ -17,7 +17,6 @@ public class CustomExceptionHandler : IExceptionHandler
                 { typeof(NotFoundException), HandleNotFoundException },
                 { typeof(UnauthorizedAccessException), HandleUnauthorizedAccessException },
                 { typeof(ForbiddenAccessException), HandleForbiddenAccessException },
-                { typeof(UserAlreadyExistsException), HandleUserAlreadyExistsException },
                 { typeof(RegistrationFailedException), HandleRegistrationFailedException },
                 { typeof(LoginFailedException),  HandleLoginFailedException},
                 { typeof(RefreshTokenException), HandleRefreshTokenException }
@@ -100,21 +99,6 @@ public class CustomExceptionHandler : IExceptionHandler
             Status = StatusCodes.Status403Forbidden,
             Title = "Forbidden",
             Type = "https://tools.ietf.org/html/rfc7231#section-6.5.3"
-        });
-    }
-
-    private async Task HandleUserAlreadyExistsException(HttpContext httpContext, Exception ex)
-    {
-        var exception = (UserAlreadyExistsException)ex;
-
-        httpContext.Response.StatusCode = StatusCodes.Status409Conflict;
-
-        await httpContext.Response.WriteAsJsonAsync(new ProblemDetails
-        {
-            Status = StatusCodes.Status409Conflict,
-            Title = "User already exists",
-            Detail = exception.Message,
-            Type = "https://tools.ietf.org/html/rfc7231#section-6.5.8"
         });
     }
 
