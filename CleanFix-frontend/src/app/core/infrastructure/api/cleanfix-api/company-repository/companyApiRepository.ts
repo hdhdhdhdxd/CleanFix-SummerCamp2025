@@ -3,43 +3,42 @@ import { CompanyDto } from './CompanyDto'
 import { environment } from 'src/environments/environment'
 import { PaginatedData } from '@/core/domain/models/PaginatedData'
 import { PaginatedDataDto } from '../common/interfaces/PaginatedDataDto'
-import { HttpParams } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http'
+import { firstValueFrom } from 'rxjs'
+import { CompanyRepository } from '@/core/domain/repositories/CompanyRepository'
 
-const getPaginated = async (
-  pageNumber: number,
-  pageSize: number,
-  typeIssueId?: number,
-): Promise<PaginatedData<Company>> => {
-  const queryParams = new HttpParams()
-    .set('pageNumber', pageNumber.toString())
-    .set('pageSize', pageSize.toString())
-    .set('typeIssueId', typeIssueId != null ? typeIssueId.toString() : '0')
+export class CompanyApiRepository implements CompanyRepository {
+  constructor(private http: HttpClient) {}
 
-  const response = await fetch(environment.baseUrl + `companies/paginated?${queryParams}`)
-
-  if (!response.ok) {
-    throw new Error('Error al obtener las empresas')
+  async getPaginated(
+    pageNumber: number,
+    pageSize: number,
+    typeIssueId?: number,
+  ): Promise<PaginatedData<Company>> {
+    const params = new HttpParams()
+      .set('pageNumber', pageNumber.toString())
+      .set('pageSize', pageSize.toString())
+      .set('typeIssueId', typeIssueId != null ? typeIssueId.toString() : '0')
+    const responseJson = await firstValueFrom(
+      this.http.get<PaginatedDataDto<CompanyDto>>(environment.baseUrl + 'companies/paginated', {
+        params,
+        withCredentials: true,
+      }),
+    )
+    return {
+      items: responseJson.items.map((companyDto: CompanyDto) => ({
+        id: companyDto.id,
+        name: companyDto.name,
+        number: companyDto.number,
+        price: companyDto.price,
+        email: companyDto.email,
+        issueType: companyDto.issueType,
+      })),
+      pageNumber: responseJson.pageNumber,
+      totalPages: responseJson.totalPages,
+      totalCount: responseJson.totalCount,
+      hasPreviousPage: responseJson.hasPreviousPage,
+      hasNextPage: responseJson.hasNextPage,
+    }
   }
-
-  const responseJson: PaginatedDataDto<CompanyDto> = await response.json()
-
-  return {
-    items: responseJson.items.map((companyDto: CompanyDto) => ({
-      id: companyDto.id,
-      name: companyDto.name,
-      number: companyDto.number,
-      price: companyDto.price,
-      email: companyDto.email,
-      issueType: companyDto.issueType,
-    })),
-    pageNumber: responseJson.pageNumber,
-    totalPages: responseJson.totalPages,
-    totalCount: responseJson.totalCount,
-    hasPreviousPage: responseJson.hasPreviousPage,
-    hasNextPage: responseJson.hasNextPage,
-  }
-}
-
-export const companyApiRepository = {
-  getPaginated,
 }

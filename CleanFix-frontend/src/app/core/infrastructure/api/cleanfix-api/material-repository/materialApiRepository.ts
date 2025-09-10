@@ -1,28 +1,28 @@
 import { Material } from '@/core/domain/models/Material'
-import { HttpParams } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http'
 import { environment } from 'src/environments/environment'
 import { MaterialDto } from './MaterialDto'
+import { firstValueFrom } from 'rxjs'
+import { MaterialRepository } from '@/core/domain/repositories/MaterialRepository'
 
-const getRandomThree = async (issueTypeId: number): Promise<Material[]> => {
-  const queryParams = new HttpParams().set('issueTypeId', issueTypeId.toString())
+export class MaterialApiRepository implements MaterialRepository {
+  constructor(private http: HttpClient) {}
 
-  const response = await fetch(environment.baseUrl + `materials/random?${queryParams}`)
-
-  if (!response.ok) {
-    throw new Error('Error al obtener los materiales')
+  async getRandomThree(issueTypeId: number): Promise<Material[]> {
+    const params = new HttpParams().set('issueTypeId', issueTypeId.toString())
+    const responseJson = await firstValueFrom(
+      this.http.get<MaterialDto[]>(environment.baseUrl + 'materials/random', {
+        params,
+        withCredentials: true,
+      }),
+    )
+    return responseJson.map((material) => ({
+      id: material.id,
+      name: material.name,
+      cost: material.cost,
+      costPerSquareMeter: material.costPerSquareMeter,
+      available: material.available,
+      issueTypeId: material.issueTypeId,
+    }))
   }
-
-  const responseJson: MaterialDto[] = await response.json()
-  return responseJson.map((material) => ({
-    id: material.id,
-    name: material.name,
-    cost: material.cost,
-    costPerSquareMeter: material.costPerSquareMeter,
-    available: material.available,
-    issueTypeId: material.issueTypeId,
-  }))
-}
-
-export const materialApiRepository = {
-  getRandomThree,
 }

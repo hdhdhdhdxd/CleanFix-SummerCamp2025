@@ -1,5 +1,5 @@
+import { materialService } from '@/core/application/materialService'
 import { Material } from '@/core/domain/models/Material'
-import { materialApiRepository } from '@/core/infrastructure/api/cleanfix-api/material-repository/materialApiRepository'
 import { Injectable } from '@angular/core'
 import { from, Observable } from 'rxjs'
 
@@ -8,6 +8,6 @@ import { from, Observable } from 'rxjs'
 })
 export class MaterialService {
   getRandomThree(issueTypeId: number): Observable<Material[]> {
-    return from(materialApiRepository.getRandomThree(issueTypeId))
+    return from(materialService.getRandomThree(issueTypeId))
   }
 }

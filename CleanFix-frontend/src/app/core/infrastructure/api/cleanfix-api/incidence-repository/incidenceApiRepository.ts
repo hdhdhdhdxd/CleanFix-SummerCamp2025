@@ -7,63 +7,59 @@ import { IncidenceBriefDto } from './incidenceBriefDto'
 import { priorities } from './priorityMapper'
 import { IncidenceDto } from './IncidenceDto'
 import { Incidence } from '@/core/domain/models/Incidence'
+import { HttpClient, HttpParams } from '@angular/common/http'
+import { firstValueFrom } from 'rxjs'
 
-const getPaginated = async (
-  pageNumber: number,
-  pageSize: number,
-  filterString?: string,
-): Promise<PaginatedData<IncidenceBrief>> => {
-  const params = new URLSearchParams({
-    pageNumber: pageNumber.toString(),
-    pageSize: pageSize.toString(),
-  })
+export class IncidenceApiRepository implements IncidenceRepository {
+  constructor(private http: HttpClient) {}
 
-  if (filterString) {
-    params.append('filterString', filterString)
+  async getPaginated(
+    pageNumber: number,
+    pageSize: number,
+    filterString?: string,
+  ): Promise<PaginatedData<IncidenceBrief>> {
+    let params = new HttpParams()
+      .set('pageNumber', pageNumber.toString())
+      .set('pageSize', pageSize.toString())
+    if (filterString) {
+      params = params.set('filterString', filterString)
+    }
+    const responseJson = await firstValueFrom(
+      this.http.get<PaginatedDataDto<IncidenceBriefDto>>(
+        `${environment.baseUrl}incidences/paginated`,
+        { params, withCredentials: true },
+      ),
+    )
+    return {
+      items: responseJson.items.map((incidenceDto: IncidenceBriefDto) => ({
+        id: incidenceDto.id,
+        address: incidenceDto.address,
+        date: new Date(incidenceDto.date),
+        issueType: incidenceDto.issueType,
+        priority: priorities[incidenceDto.priority],
+      })),
+      pageNumber: responseJson.pageNumber,
+      totalPages: responseJson.totalPages,
+      totalCount: responseJson.totalCount,
+      hasPreviousPage: responseJson.hasPreviousPage,
+      hasNextPage: responseJson.hasNextPage,
+    }
   }
 
-  const response = await fetch(`${environment.baseUrl}incidences/paginated?${params.toString()}`)
-  if (!response.ok) {
-    throw new Error('Error al obtener las incidencias')
-  }
-
-  const responseJson: PaginatedDataDto<IncidenceBriefDto> = await response.json()
-
-  return {
-    items: responseJson.items.map((incidenceDto: IncidenceBriefDto) => ({
+  async getById(id: number): Promise<Incidence> {
+    const incidenceDto = await firstValueFrom(
+      this.http.get<IncidenceDto>(environment.baseUrl + `incidences/${id}`, {
+        withCredentials: true,
+      }),
+    )
+    return {
       id: incidenceDto.id,
-      address: incidenceDto.address,
-      date: new Date(incidenceDto.date),
       issueType: incidenceDto.issueType,
+      date: new Date(incidenceDto.date),
+      description: incidenceDto.description,
+      address: incidenceDto.address,
+      surface: incidenceDto.surface,
       priority: priorities[incidenceDto.priority],
-    })),
-    pageNumber: responseJson.pageNumber,
-    totalPages: responseJson.totalPages,
-    totalCount: responseJson.totalCount,
-    hasPreviousPage: responseJson.hasPreviousPage,
-    hasNextPage: responseJson.hasNextPage,
+    }
   }
-}
-
-const getById = async (id: number): Promise<Incidence> => {
-  const response = await fetch(environment.baseUrl + `incidences/${id}`)
-  if (!response.ok) {
-    throw new Error('Error al obtener la incidencia')
-  }
-
-  const incidenceDto: IncidenceDto = await response.json()
-  return {
-    id: incidenceDto.id,
-    issueType: incidenceDto.issueType,
-    date: new Date(incidenceDto.date),
-    description: incidenceDto.description,
-    address: incidenceDto.address,
-    surface: incidenceDto.surface,
-    priority: priorities[incidenceDto.priority],
-  }
-}
-
-export const incidenceApiRepository: IncidenceRepository = {
-  getPaginated: getPaginated,
-  getById: getById,
 }

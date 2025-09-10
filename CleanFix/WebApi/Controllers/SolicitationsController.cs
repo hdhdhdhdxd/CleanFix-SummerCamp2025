@@ -3,6 +3,7 @@ using Application.Solicitations.Commands.DeleteSolicitation;
 using Application.Solicitations.Queries.GetPaginatedSolicitations;
 using Application.Solicitations.Queries.GetSolicitation;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
@@ -20,6 +21,7 @@ namespace WebApi.Controllers
         }
 
         // GET: api/solicitations/paginated
+        [Authorize]
         [HttpGet("paginated")]
         public async Task<ActionResult<IEnumerable<GetPaginatedSolicitationDto>>> GetPaginatedSolicitations(
             [FromQuery] int pageNumber = 1,

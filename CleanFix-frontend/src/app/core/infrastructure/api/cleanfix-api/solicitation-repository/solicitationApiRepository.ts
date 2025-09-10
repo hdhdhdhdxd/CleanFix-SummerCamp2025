@@ -6,6 +6,8 @@ import { SolicitationBrief } from '@/core/domain/models/SolicitationBrief'
 import { SolicitationBriefDto } from './SolicitationBriefDto'
 import { PaginatedDataDto } from '../common/interfaces/PaginatedDataDto'
 import { Solicitation } from '@/core/domain/models/Solicitation'
+
+import { firstValueFrom } from 'rxjs'
 import { SolicitationDto } from './SolicitationDto'
 
 export class SolicitationApiRepository implements SolicitationRepository {
@@ -23,11 +25,12 @@ export class SolicitationApiRepository implements SolicitationRepository {
       params = params.set('filterString', filterString)
     }
 
-    const responseJson = await this.http
-      .get<
-        PaginatedDataDto<SolicitationBriefDto>
-      >(`${environment.baseUrl}solicitations/paginated`, { params, withCredentials: true })
-      .toPromise()
+    const responseJson = await firstValueFrom(
+      this.http.get<PaginatedDataDto<SolicitationBriefDto>>(
+        `${environment.baseUrl}solicitations/paginated`,
+        { params, withCredentials: true },
+      ),
+    )
 
     if (!responseJson) {
       throw new Error('No se pudo obtener la paginación de solicitudes')
@@ -50,9 +53,11 @@ export class SolicitationApiRepository implements SolicitationRepository {
   }
 
   async getById(id: number): Promise<Solicitation> {
-    const responseJson = await this.http
-      .get<SolicitationDto>(`${environment.baseUrl}solicitations/${id}`, { withCredentials: true })
-      .toPromise()
+    const responseJson = await firstValueFrom(
+      this.http.get<SolicitationDto>(`${environment.baseUrl}solicitations/${id}`, {
+        withCredentials: true,
+      }),
+    )
 
     if (!responseJson) {
       throw new Error('No se pudo obtener la solicitud')
