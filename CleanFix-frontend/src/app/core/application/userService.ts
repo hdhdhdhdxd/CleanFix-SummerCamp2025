@@ -14,8 +14,18 @@ const refreshToken = async () => {
   return userRepository.refreshToken()
 }
 
+const logout = async () => {
+  return userRepository.logout()
+}
+
+const me = async () => {
+  return userRepository.me()
+}
+
 export const userService = {
   init,
   login,
   refreshToken,
+  logout,
+  me,
 }

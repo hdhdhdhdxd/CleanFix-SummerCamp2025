@@ -2,7 +2,6 @@
 using System.Text.Json;
 using Application.Common.Interfaces;
 using Application.Common.Models;
-using Microsoft.Extensions.Hosting;
 
 namespace Infrastructure.Repositories;
 public class ExternalIncidenceService : IExternalIncidenceRepository
@@ -20,7 +19,7 @@ public class ExternalIncidenceService : IExternalIncidenceRepository
         {
             var requestBody = new
             {
-                companyName,
+                assignedCompany = companyName,
                 date = DateTime.UtcNow,
                 statusId = "R"
 
