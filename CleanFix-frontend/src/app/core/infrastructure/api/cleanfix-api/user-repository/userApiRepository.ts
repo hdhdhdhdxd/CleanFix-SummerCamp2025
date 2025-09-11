@@ -52,4 +52,14 @@ export class UserApiRepository implements UserRepository {
       roles: userDto.roles,
     }
   }
+
+  async isAuthenticated(): Promise<boolean> {
+    const response$ = this.http.get<boolean>(`${environment.baseUrl}auth/isAuthenticated`, {
+      withCredentials: true,
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const result = await firstValueFrom(response$)
+
+    return !!result
+  }
 }

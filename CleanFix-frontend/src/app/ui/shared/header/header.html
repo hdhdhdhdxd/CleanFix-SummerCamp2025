@@ -10,7 +10,9 @@
         <li><a href="/#hero">Inicio</a></li>
         <li><a href="/#services">Servicios</a></li>
         <li><a href="/#footer">Contacto</a></li>
-        <li><a routerLink="/management">Administración</a></li>
+        @if (showAdmin()) {
+          <li><a routerLink="/management">Administración</a></li>
+        }
       </ul>
     </nav>
 
@@ -108,7 +110,9 @@
             <li><a href="/#hero" (click)="closeMenu()">Inicio</a></li>
             <li><a href="/#services" (click)="closeMenu()">Servicios</a></li>
             <li><a href="/#footer" (click)="closeMenu()">Contacto</a></li>
-            <li><a routerLink="/management" (click)="closeMenu()">Administración</a></li>
+            @if (showAdmin()) {
+              <li><a routerLink="/management" (click)="closeMenu()">Administración</a></li>
+            }
           </ul>
           <div class="mt-auto w-full space-y-4">
             <div class="h-px bg-brand-300/30"></div>

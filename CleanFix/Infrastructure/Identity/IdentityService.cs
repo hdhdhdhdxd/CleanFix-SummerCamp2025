@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace Infrastructure.Identity;
 public class IdentityService : IIdentityService
@@ -49,7 +47,7 @@ public class IdentityService : IIdentityService
 
         if (user == null || !await _userManager.CheckPasswordAsync(user, password))
         {
-            return Result.Failure(new[] { $"Invalid login attempt for email: {email}" }); 
+            return Result.Failure(new[] { $"Invalid login attempt for email: {email}" });
         }
 
         // Obtener roles del usuario
@@ -117,19 +115,12 @@ public class IdentityService : IIdentityService
         return Result.Success();
     }
 
-    public async Task<string?> GetUserNameAsync(Guid userId)
-    {
-        var user = await _userManager.FindByIdAsync(userId.ToString());
-
-        return user?.UserName;
-    }
-
-    public async Task<(Result Result, Guid UserId)> CreateUserAsync(string userName, string password)
+    public async Task<(Result Result, Guid UserId)> CreateUserAsync(string userName, string email, string password)
     {
         var user = new ApplicationUser
         {
             UserName = userName,
-            Email = userName,
+            Email = email,
         };
 
         var result = await _userManager.CreateAsync(user, password);
@@ -144,20 +135,6 @@ public class IdentityService : IIdentityService
         return user != null && await _userManager.IsInRoleAsync(user, role);
     }
 
-    public async Task<Result> DeleteUserAsync(Guid userId)
-    {
-        var user = await _userManager.FindByIdAsync(userId.ToString());
-
-        return user != null ? await DeleteUserAsync(user) : Result.Success();
-    }
-
-    public async Task<Result> DeleteUserAsync(ApplicationUser user)
-    {
-        var result = await _userManager.DeleteAsync(user);
-
-        return result.ToApplicationResult();
-    }
-
     public async Task<UserInfoDto?> MeAsync(Guid userId)
     {
         var appUser = await _userManager.FindByIdAsync(userId.ToString());
@@ -170,7 +147,7 @@ public class IdentityService : IIdentityService
         return new UserInfoDto
         {
             Email = appUser.Email,
-            UserName = appUser.UserName,
+            Username = appUser.UserName,
             Roles = roles.ToList()
         };
     }

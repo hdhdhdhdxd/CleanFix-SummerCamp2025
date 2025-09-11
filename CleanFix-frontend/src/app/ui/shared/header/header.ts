@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, signal } from '@angular/core'
+import { Component, HostListener, inject, signal, input } from '@angular/core'
 import { Router } from '@angular/router'
 import { RouterLink } from '@angular/router'
 
@@ -12,6 +12,7 @@ export class Header {
   router = inject(Router)
   menuOpen = signal(false)
   menuClosing = signal(false)
+  showAdmin = input<boolean>()
 
   @HostListener('window:scroll')
   onWindowScroll() {

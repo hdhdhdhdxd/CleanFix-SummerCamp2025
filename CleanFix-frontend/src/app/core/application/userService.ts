@@ -22,10 +22,15 @@ const me = async () => {
   return userRepository.me()
 }
 
+const isAuthenticated = async () => {
+  return userRepository.isAuthenticated()
+}
+
 export const userService = {
   init,
   login,
   refreshToken,
+  isAuthenticated,
   logout,
   me,
 }

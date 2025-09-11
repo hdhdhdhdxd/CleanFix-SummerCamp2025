@@ -5,4 +5,5 @@ export interface UserRepository {
   refreshToken(): Promise<void>
   logout(): Promise<void>
   me(): Promise<User>
+  isAuthenticated(): Promise<boolean>
 }

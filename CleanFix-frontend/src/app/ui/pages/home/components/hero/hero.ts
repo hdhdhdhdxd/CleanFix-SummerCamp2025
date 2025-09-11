@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, input } from '@angular/core'
 import { RouterLink } from '@angular/router'
 
 @Component({
@@ -6,4 +6,6 @@ import { RouterLink } from '@angular/router'
   imports: [RouterLink],
   templateUrl: './hero.html',
 })
-export class Hero {}
+export class Hero {
+  username = input<string | undefined>()
+}

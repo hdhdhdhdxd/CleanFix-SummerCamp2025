@@ -22,4 +22,8 @@ export class UserService {
   me(): Observable<User> {
     return from(userService.me())
   }
+
+  isAuthenticated(): Observable<boolean> {
+    return from(userService.isAuthenticated())
+  }
 }

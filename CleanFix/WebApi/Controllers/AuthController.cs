@@ -80,4 +80,15 @@ public class AuthController : ControllerBase
         Log.Information("Authenticated user found: {User}", result.Email);
         return TypedResults.Ok(result);
     }
+
+    [HttpGet]
+    [Route("isAuthenticated")]
+    public ActionResult IsAuthenticated()
+    {
+        var isAuthenticated = _currentUser.Id.HasValue;
+
+        Log.Information("GET api/auth/isAuthenticated called. IsAuthenticated={IsAuthenticated}", isAuthenticated);
+
+        return Ok(isAuthenticated);
+    }
 }
