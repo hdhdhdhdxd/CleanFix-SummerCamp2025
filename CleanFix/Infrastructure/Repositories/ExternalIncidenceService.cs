@@ -20,7 +20,6 @@ public class ExternalIncidenceService : IExternalIncidenceRepository
         {
             var requestBody = new
             {
-                incidenceId,
                 companyName,
                 date = DateTime.UtcNow,
                 statusId = "R"
@@ -30,7 +29,7 @@ public class ExternalIncidenceService : IExternalIncidenceRepository
             var json = JsonSerializer.Serialize(requestBody);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PutAsync($"QFIncidence/{incidenceId}", content);
+            var response = await _httpClient.PatchAsync($"QFIncidence/{incidenceId}", content);
 
             if (response.IsSuccessStatusCode)
             {

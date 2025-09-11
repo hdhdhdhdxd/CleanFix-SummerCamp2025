@@ -1,6 +1,9 @@
 ﻿using Application.Auth.Commands.Login;
 using Application.Auth.Commands.Refresh;
 using Application.Auth.Commands.Register;
+using Application.Auth.Queries.Me;
+using Application.Common.Interfaces;
+using Application.Common.Security;
 using Infrastructure.Identity.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -14,10 +17,12 @@ namespace WebApi.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly ISender _sender;
+    private readonly IUser _currentUser;
 
-    public AuthController(ISender sender)
+    public AuthController(ISender sender, IUser currentUser)
     {
         _sender = sender;
+        _currentUser = currentUser;
     }
 
     [HttpPost]
@@ -47,7 +52,7 @@ public class AuthController : ControllerBase
 
     [HttpPost]
     [Route("refresh")]
-    public async Task<Results<NoContent, BadRequest<string>>> Refresh([FromQuery]bool rememberMe = false)
+    public async Task<Results<NoContent, BadRequest<string>>> Refresh([FromQuery] bool rememberMe = false)
     {
         var refreshToken = HttpContext.Request.Cookies[AuthCookieNames.RefreshToken];
         Log.Information("POST api/users/refresh called. RememberMe={RememberMe}", rememberMe);
@@ -59,5 +64,20 @@ public class AuthController : ControllerBase
         await _sender.Send(new RefreshCommand(refreshToken, rememberMe));
         Log.Information("Refresh token processed successfully.");
         return TypedResults.NoContent();
+    }
+
+    [Authorize]
+    [HttpGet]
+    [Route("me")]
+    public async Task<Results<Ok<UserInfoDto>, NoContent>> Me()
+    {
+        var userId = _currentUser.Id;
+
+        Log.Information("GET api/auth/me called for userId {UserId}.", userId);
+
+        var result = await _sender.Send(new MeQuery(userId!.Value));
+
+        Log.Information("Authenticated user found: {User}", result.Email);
+        return TypedResults.Ok(result);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Auth.Queries.Me;
+using Application.Common.Interfaces;
 using Application.Common.Models;
 using Infrastructure.Identity.Abstracts;
 using Infrastructure.Identity.Constants;
@@ -6,6 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace Infrastructure.Identity;
 public class IdentityService : IIdentityService
@@ -46,10 +49,13 @@ public class IdentityService : IIdentityService
 
         if (user == null || !await _userManager.CheckPasswordAsync(user, password))
         {
-            return Result.Failure(new[] { $"Invalid login attempt for email: {email}" });
+            return Result.Failure(new[] { $"Invalid login attempt for email: {email}" }); 
         }
 
-        var (jwtToken, expirationDateInUtc) = _authTokenProcessor.GenerateJwtToken(user);
+        // Obtener roles del usuario
+        var userRoles = await _userManager.GetRolesAsync(user);
+
+        var (jwtToken, expirationDateInUtc) = _authTokenProcessor.GenerateJwtToken(user, userRoles);
         var refreshTokenValue = _authTokenProcessor.GenerateRefreshToken();
 
         var refreshTokenExpirationDateInUtc = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpirationDays);
@@ -88,7 +94,10 @@ public class IdentityService : IIdentityService
             return Result.Failure(["Refresh token is expired."]);
         }
 
-        var (jwtToken, expirationDateInUtc) = _authTokenProcessor.GenerateJwtToken(user);
+        // Obtener roles del usuario
+        var userRoles = await _userManager.GetRolesAsync(user);
+
+        var (jwtToken, expirationDateInUtc) = _authTokenProcessor.GenerateJwtToken(user, userRoles);
         var refreshTokenValue = _authTokenProcessor.GenerateRefreshToken();
 
         var refreshTokenExpirationDateInUtc = DateTime.UtcNow.AddDays(_jwtOptions.RefreshTokenExpirationDays);
@@ -147,5 +156,22 @@ public class IdentityService : IIdentityService
         var result = await _userManager.DeleteAsync(user);
 
         return result.ToApplicationResult();
+    }
+
+    public async Task<UserInfoDto?> MeAsync(Guid userId)
+    {
+        var appUser = await _userManager.FindByIdAsync(userId.ToString());
+
+        if (appUser == null)
+            return null;
+
+        var roles = await _userManager.GetRolesAsync(appUser);
+
+        return new UserInfoDto
+        {
+            Email = appUser.Email,
+            UserName = appUser.UserName,
+            Roles = roles.ToList()
+        };
     }
 }

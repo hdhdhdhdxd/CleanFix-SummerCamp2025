@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Application.Common.Interfaces;
 
 namespace WebApi.Services;
@@ -22,9 +23,9 @@ public class CurrentUser : IUser
             {
                 return null;
             }
-            
+
             var idString = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
+
             return Guid.TryParse(idString, out var guid) ? guid : null;
         }
     }

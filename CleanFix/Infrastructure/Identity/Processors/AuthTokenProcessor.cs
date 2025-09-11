@@ -20,7 +20,7 @@ public class AuthTokenProcessor : IAuthTokenProcessor
         _jwtOptions = jwtOptions.Value;
     }
 
-    public (string jwtToken, DateTime expiresAtUtc) GenerateJwtToken(ApplicationUser user)
+    public (string jwtToken, DateTime expiresAtUtc) GenerateJwtToken(ApplicationUser user, IEnumerable<string>? roles = null)
     {
         var signingKey = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(_jwtOptions.Secret));
@@ -29,14 +29,21 @@ public class AuthTokenProcessor : IAuthTokenProcessor
             signingKey,
             SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.UserName ?? "")
         };
+
+        if (roles != null)
+        {
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+        }
 
         var expires = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpirationTimeInMinutes);
 
