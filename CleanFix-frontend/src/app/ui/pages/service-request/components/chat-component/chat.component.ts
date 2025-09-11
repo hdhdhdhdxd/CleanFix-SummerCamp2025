@@ -174,6 +174,7 @@ export class ChatComponent {
         'Content-Type': 'application/json',
       },
       body: jsonBody,
+      credentials: 'include',
     })
       .then(async (response) => {
         if (!response.ok) throw new Error('Error al descargar la factura')
@@ -223,6 +224,7 @@ export class ChatComponent {
         materialesNombres: data.materialesNombres,
         emailDestino: this.emailDestino,
       }),
+      credentials: 'include',
     })
       .then(async (response) => {
         if (!response.ok) throw new Error('Error al enviar la factura por email')

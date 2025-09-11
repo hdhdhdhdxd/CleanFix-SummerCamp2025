@@ -18,7 +18,11 @@ export class CompanyApiRepository implements CompanyRepository {
     const params = new HttpParams()
       .set('pageNumber', pageNumber.toString())
       .set('pageSize', pageSize.toString())
-      .set('typeIssueId', typeIssueId != null ? typeIssueId.toString() : '0')
+
+    if (typeIssueId != null) {
+      params.set('typeIssueId', typeIssueId.toString())
+    }
+
     const responseJson = await firstValueFrom(
       this.http.get<PaginatedDataDto<CompanyDto>>(environment.baseUrl + 'companies/paginated', {
         params,

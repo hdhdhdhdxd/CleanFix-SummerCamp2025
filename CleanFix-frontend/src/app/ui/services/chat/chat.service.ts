@@ -16,14 +16,18 @@ export interface ChatboxIAResponse {
   providedIn: 'root',
 })
 export class ChatService {
-  private apiUrl = `${environment.baseUrl}/chatboxia`
+  private apiUrl = `${environment.baseUrl}chatboxia`
 
   private http = inject(HttpClient)
 
   sendMessage(message: string, historial: string[] = []): Observable<ChatboxIAResponse> {
-    return this.http.post<ChatboxIAResponse>(this.apiUrl, {
-      mensaje: message,
-      historial: historial,
-    })
+    return this.http.post<ChatboxIAResponse>(
+      this.apiUrl,
+      {
+        mensaje: message,
+        historial: historial,
+      },
+      { withCredentials: true },
+    )
   }
 }
