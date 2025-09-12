@@ -9,5 +9,8 @@
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/hdhdhdhdxd/CleanFix-SummerCamp2025)
 
 <!--Cuenta CleanFix para iniciar sesión-->
-User: admin@cleanfix.com
+Admin: admin@cleanfix.com
+Pass: Password123.
+
+User: test@gmail.com
 Pass: Password123.
