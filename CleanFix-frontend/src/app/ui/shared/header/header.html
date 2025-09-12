@@ -137,43 +137,62 @@
               <li><a routerLink="/management" (click)="closeMenu()">Administración</a></li>
             }
           </ul>
-          @if (showLogout()) {
-            <button
-              class="mt-6 w-full rounded-xl bg-red-600 px-4 py-2 font-semibold text-brand-0 transition hover:bg-red-700"
-              (click)="logout()"
-            >
-              Cerrar sesión
-            </button>
-          }
-          <div class="mt-auto w-full space-y-4">
-            <div class="h-px bg-brand-300/30"></div>
-            <a
-              routerLink="/service-request"
-              class="group flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-ai-500 to-ai-600 px-6 py-4 text-lg font-bold text-brand-0 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95"
-              (click)="closeMenu()"
-            >
-              <div class="relative">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5 transition-transform duration-300 group-hover:scale-110"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
+          <div class="mt-auto flex w-full flex-col gap-2.5">
+            @if (showLogout()) {
+              <div class="mt-auto flex w-full flex-col gap-4">
+                <button
+                  class="group flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-brand-0/20 bg-brand-900/20 px-6 py-4 text-lg font-semibold text-brand-0 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:border-brand-0/30 hover:bg-brand-900/30 hover:shadow-xl focus:ring-2 focus:ring-brand-0/50 focus:ring-offset-2 focus:ring-offset-transparent focus:outline-none active:scale-95"
+                  (click)="logout()"
                 >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
-                  />
-                </svg>
-                <div
-                  class="absolute -top-1 -right-1 h-2 w-2 animate-pulse rounded-full bg-accent-500"
-                ></div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="mr-2 h-5 w-5 transition-transform duration-200 group-hover:-translate-x-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H7a2 2 0 01-2-2V7a2 2 0 012-2h4a2 2 0 012 2v1"
+                    />
+                  </svg>
+                  Cerrar sesión
+                </button>
               </div>
-              <span>Asistente IA</span>
-            </a>
-            <p class="text-center text-xs text-brand-200/80">💬 Chat inteligente disponible 24/7</p>
+            }
+            <div class="flex w-full flex-col gap-4">
+              <a
+                routerLink="/service-request"
+                class="group flex w-full items-center justify-center gap-3 rounded-2xl bg-gradient-to-r from-ai-500 to-ai-600 px-6 py-4 text-lg font-bold text-brand-0 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl active:scale-95"
+                (click)="closeMenu()"
+              >
+                <div class="relative">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5 transition-transform duration-300 group-hover:scale-110"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                    />
+                  </svg>
+                  <div
+                    class="absolute -top-1 -right-1 h-2 w-2 animate-pulse rounded-full bg-accent-500"
+                  ></div>
+                </div>
+                <span>Asistente IA</span>
+              </a>
+              <p class="text-center text-xs text-brand-200/80">
+                💬 Chat inteligente disponible 24/7
+              </p>
+            </div>
           </div>
         </aside>
       </div>

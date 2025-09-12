@@ -27,10 +27,10 @@ export class Header {
   logout() {
     this.userService.logout().subscribe({
       next: () => {
-        this.router.navigate(['/'])
+        this.router.navigate(['/auth/login'])
       },
       error: () => {
-        this.router.navigate(['/'])
+        this.router.navigate(['/auth/login'])
       },
     })
   }
