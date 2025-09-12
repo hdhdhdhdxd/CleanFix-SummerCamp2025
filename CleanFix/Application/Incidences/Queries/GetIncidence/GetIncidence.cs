@@ -1,9 +1,13 @@
 using Application.Common.Interfaces;
+using Application.Common.Security;
 using AutoMapper;
+using Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Incidences.Queries.GetIncidence;
+
+[Authorize(Roles = Roles.Administrator)]
 public record GetIncidenceQuery(int Id) : IRequest<GetIncidenceDto>;
 
 public class GetIncidenceQueryHandler : IRequestHandler<GetIncidenceQuery, GetIncidenceDto>

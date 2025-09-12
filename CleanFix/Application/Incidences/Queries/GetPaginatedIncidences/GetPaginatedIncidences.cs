@@ -4,11 +4,14 @@ using Application.Common.Models;
 using Application.Common.Security;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Domain.Constants;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Incidences.Queries.GetPaginatedIncidences;
+
+[Authorize(Roles = Roles.Administrator)]
 public record GetPaginatedIncidencesQuery(int PageNumber, int PageSize, string? FilterString) : IRequest<PaginatedList<GetPaginatedIncidenceDto>>;
 
 public class GetPaginatedIncidencesQueryHandler : IRequestHandler<GetPaginatedIncidencesQuery, PaginatedList<GetPaginatedIncidenceDto>>

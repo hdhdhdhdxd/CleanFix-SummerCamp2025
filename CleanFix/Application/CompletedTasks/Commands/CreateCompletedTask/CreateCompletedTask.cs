@@ -1,11 +1,14 @@
-using Application.Common.Interfaces;
 using Application.Common.Exceptions;
+using Application.Common.Interfaces;
+using Application.Common.Security;
 using AutoMapper;
+using Domain.Constants;
 using Domain.Entities;
 using MediatR;
 
 namespace Application.CompletedTasks.Commands.CreateCompletedTask;
 
+[Authorize(Roles = Roles.Administrator)]
 public record CreateCompletedTaskCommand : IRequest<int>
 {
     public CreateCompletedTaskDto CompletedTask { get; init; }

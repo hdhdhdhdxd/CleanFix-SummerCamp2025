@@ -1,8 +1,11 @@
 using Application.Common.Interfaces;
+using Application.Common.Security;
+using Domain.Constants;
 using MediatR;
 
 namespace Application.Incidences.Commands.DeleteIncidence;
 
+[Authorize(Roles = Roles.Administrator)]
 public record DeleteIncidenceCommand(int Id) : IRequest<bool>;
 
 public class DeleteIncidenceCommandHandler : IRequestHandler<DeleteIncidenceCommand, bool>

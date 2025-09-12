@@ -1,11 +1,14 @@
 using Application.Common.Interfaces;
+using Application.Common.Security;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Materials.Queries.GetRandomMaterialsByIssueType;
 
+[Authorize(Roles = Roles.Administrator)]
 public class GetRandomMaterialsByIssueTypeQuery : IRequest<List<GetRandomMaterialDto>>
 {
     public int IssueTypeId { get; set; }

@@ -1,9 +1,12 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Security;
 using Ardalis.GuardClauses;
 using MediatR;
 
 
 namespace Application.Auth.Queries.Me;
+
+[Authorize]
 public record MeQuery(Guid UserId) : IRequest<UserInfoDto>;
 
 public class MeQueryHandler : IRequestHandler<MeQuery, UserInfoDto>

@@ -3,9 +3,12 @@ using AutoMapper;
 using Domain.Entities;
 using MediatR;
 using Application.Common.Utils;
+using Application.Common.Security;
+using Domain.Constants;
 
 namespace Application.Solicitations.Commands.CreateSolicitation;
 
+[Authorize(Roles = Roles.Administrator)]
 public record CreateSolicitationCommand : IRequest<int>
 {
     public CreateSolicitationDto Solicitation { get; init; }

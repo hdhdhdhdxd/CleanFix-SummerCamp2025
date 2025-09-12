@@ -1,12 +1,16 @@
 using Application.Common.Interfaces;
 using Application.Common.Mappings;
 using Application.Common.Models;
+using Application.Common.Security;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.CompletedTasks.Queries.GetPaginatedCompletedTasks;
+
+[Authorize(Roles = Roles.Administrator)]
 public record GetPaginatedCompletedTasksQuery(int PageNumber, int PageSize, string? FilterString) : IRequest<PaginatedList<GetPaginatedCompletedTaskDto>>;
 
 public class GetPaginatedCompletedTasksQueryHandler : IRequestHandler<GetPaginatedCompletedTasksQuery, PaginatedList<GetPaginatedCompletedTaskDto>>

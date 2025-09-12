@@ -1,12 +1,16 @@
 using Application.Common.Interfaces;
 using Application.Common.Mappings;
 using Application.Common.Models;
+using Application.Common.Security;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Solicitations.Queries.GetPaginatedSolicitations;
+
+[Authorize(Roles = Roles.Administrator)]
 public record GetPaginatedSolicitationsQuery(int PageNumber, int PageSize, string? FilterString) : IRequest<PaginatedList<GetPaginatedSolicitationDto>>;
 
 public class GetPaginatedSolicitationsQueryHandler : IRequestHandler<GetPaginatedSolicitationsQuery, PaginatedList<GetPaginatedSolicitationDto>>

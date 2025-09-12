@@ -1,11 +1,14 @@
 using Application.Common.Interfaces;
+using Application.Common.Security;
+using Application.Common.Utils;
 using AutoMapper;
+using Domain.Constants;
 using Domain.Entities;
 using MediatR;
-using Application.Common.Utils;
 
 namespace Application.Incidences.Commands.CreateIncidence;
 
+[Authorize(Roles = Roles.Administrator)]
 public record CreateIncidenceCommand : IRequest<int>
 {
     public CreateIncidenceDto Incidence { get; init; }

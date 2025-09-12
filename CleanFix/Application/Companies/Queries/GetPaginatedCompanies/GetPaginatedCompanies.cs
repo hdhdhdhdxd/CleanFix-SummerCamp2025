@@ -1,12 +1,16 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Mappings;
 using Application.Common.Models;
+using Application.Common.Security;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Companies.Queries.GetPaginatedCompanies;
+
+[Authorize(Roles = Roles.Administrator)]
 public record GetPaginatedCompaniesQuery(int PageNumber, int PageSize, int? TypeIssueId) : IRequest<PaginatedList<GetPaginatedCompanyDto>>;
 
 public class GetPaginatedCompaniesQueryHandler : IRequestHandler<GetPaginatedCompaniesQuery, PaginatedList<GetPaginatedCompanyDto>>

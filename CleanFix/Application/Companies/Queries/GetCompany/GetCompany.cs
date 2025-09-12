@@ -1,9 +1,13 @@
 using Application.Common.Interfaces;
+using Application.Common.Security;
 using AutoMapper;
+using Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Companies.Queries.GetCompany;
+
+[Authorize(Roles = Roles.Administrator)]
 public record GetCompanyQuery(int Id) : IRequest<GetCompanyDto>;
 
 public class GetCompanyQueryHandler : IRequestHandler<GetCompanyQuery, GetCompanyDto>

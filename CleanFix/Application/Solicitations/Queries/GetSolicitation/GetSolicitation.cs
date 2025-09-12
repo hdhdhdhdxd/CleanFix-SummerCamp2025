@@ -1,9 +1,13 @@
 using Application.Common.Interfaces;
+using Application.Common.Security;
 using AutoMapper;
+using Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Solicitations.Queries.GetSolicitation;
+
+[Authorize(Roles = Roles.Administrator)]
 public record GetSolicitationQuery(int Id) : IRequest<GetSolicitationDto>;
 
 public class GetSolicitationQueryHandler : IRequestHandler<GetSolicitationQuery, GetSolicitationDto>

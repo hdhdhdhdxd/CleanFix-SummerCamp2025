@@ -1,8 +1,11 @@
 using Application.Common.Interfaces;
+using Application.Common.Security;
+using Domain.Constants;
 using MediatR;
 
 namespace Application.Solicitations.Commands.DeleteSolicitation;
 
+[Authorize(Roles = Roles.Administrator)]
 public record DeleteSolicitationCommand(int Id) : IRequest<bool>;
 
 public class DeleteSolicitationCommandHandler : IRequestHandler<DeleteSolicitationCommand, bool>

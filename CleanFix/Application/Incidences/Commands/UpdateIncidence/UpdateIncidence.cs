@@ -1,12 +1,15 @@
 using Application.Common.Interfaces;
+using Application.Common.Security;
+using Application.Common.Utils;
 using AutoMapper;
+using Domain.Constants;
 using Domain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Application.Common.Utils;
 
 namespace Application.Incidences.Commands.UpdateIncidence;
 
+[Authorize(Roles = Roles.Administrator)]
 public record UpdateIncidenceCommand : IRequest
 {
     public UpdateIncidenceDto Incidence { get; init; }

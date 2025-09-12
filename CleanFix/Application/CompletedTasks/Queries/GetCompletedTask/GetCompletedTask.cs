@@ -1,9 +1,13 @@
 using Application.Common.Interfaces;
+using Application.Common.Security;
 using AutoMapper;
+using Domain.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.CompletedTasks.Queries.GetCompletedTask;
+
+[Authorize(Roles = Roles.Administrator)]
 public record GetCompletedTaskQuery(int Id) : IRequest<GetCompletedTaskDto>;
 
 public class GetCompletedTaskQueryHandler : IRequestHandler<GetCompletedTaskQuery, GetCompletedTaskDto>
