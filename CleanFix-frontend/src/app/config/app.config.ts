@@ -5,7 +5,12 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from '@angular/core'
-import { provideRouter, withComponentInputBinding, withViewTransitions } from '@angular/router'
+import {
+  provideRouter,
+  withComponentInputBinding,
+  withViewTransitions,
+  withRouterConfig,
+} from '@angular/router'
 
 import { provideHttpClient, withInterceptors } from '@angular/common/http'
 import { routes } from './app.routes'
@@ -16,7 +21,12 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideRouter(routes, withComponentInputBinding(), withViewTransitions()),
+    provideRouter(
+      routes,
+      withComponentInputBinding(),
+      withViewTransitions(),
+      withRouterConfig({ onSameUrlNavigation: 'reload' }),
+    ),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAppInitializer(() => {
       inject(RepositoryInitializerService)

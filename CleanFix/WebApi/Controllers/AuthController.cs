@@ -91,4 +91,30 @@ public class AuthController : ControllerBase
 
         return Ok(isAuthenticated);
     }
+
+    [HttpPost]
+    [Route("logout")]
+    public IActionResult Logout()
+    {
+        // Eliminar las cookies ACCESS_TOKEN y REFRESH_TOKEN
+        Response.Cookies.Append(AuthCookieNames.AccessToken, "", new CookieOptions
+        {
+            Expires = DateTimeOffset.UtcNow.AddDays(-1),
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            IsEssential = true
+        });
+        Response.Cookies.Append(AuthCookieNames.RefreshToken, "", new CookieOptions
+        {
+            Expires = DateTimeOffset.UtcNow.AddDays(-1),
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None,
+            IsEssential = true,
+            Path = "/api/auth/refresh"
+        });
+        Log.Information("POST api/auth/logout called. Cookies ACCESS_TOKEN and REFRESH_TOKEN removed.");
+        return NoContent();
+    }
 }

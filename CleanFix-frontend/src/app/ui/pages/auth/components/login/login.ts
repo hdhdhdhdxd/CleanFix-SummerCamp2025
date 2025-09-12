@@ -1,6 +1,7 @@
 import { UserService } from '@/ui/services/user/user-service'
 import { CommonModule } from '@angular/common'
 import { Component, inject } from '@angular/core'
+import { SnackbarService } from '@/ui/shared/snackbar/snackbar.service'
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms'
 import { Router, RouterLink } from '@angular/router'
 
@@ -13,6 +14,7 @@ export class Login {
   private readonly formBuilder = inject(FormBuilder)
   private readonly userService = inject(UserService)
   private readonly router = inject(Router)
+  private readonly snackbar = inject(SnackbarService)
 
   loginForm = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
@@ -31,6 +33,7 @@ export class Login {
       },
       error: (err) => {
         console.error('Login failed or error loading user', err)
+        this.snackbar.show('Usuario o contraseña incorrectos', false, 4000)
       },
     })
   }

@@ -1,6 +1,8 @@
 import { Component, HostListener, inject, signal, input } from '@angular/core'
 import { Router } from '@angular/router'
 import { RouterLink } from '@angular/router'
+import { UserService } from '../../services/user/user-service'
+import { AuthStateService } from '../../services/auth-state/auth-state.service'
 
 @Component({
   selector: 'app-header',
@@ -13,10 +15,24 @@ export class Header {
   menuOpen = signal(false)
   menuClosing = signal(false)
   showAdmin = input<boolean>()
+  showLogout = input<boolean>()
+  userService = inject(UserService)
+  authStateService = inject(AuthStateService)
 
   @HostListener('window:scroll')
   onWindowScroll() {
     this.isScrolled.set(window.scrollY > 50)
+  }
+
+  logout() {
+    this.userService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/'])
+      },
+      error: () => {
+        this.router.navigate(['/'])
+      },
+    })
   }
 
   isHome(): boolean {
