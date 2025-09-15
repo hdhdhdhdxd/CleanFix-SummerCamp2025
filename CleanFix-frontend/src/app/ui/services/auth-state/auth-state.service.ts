@@ -1,6 +1,8 @@
-import { Injectable, signal, computed } from '@angular/core'
-import { BehaviorSubject } from 'rxjs'
+import { Injectable, signal, computed, inject } from '@angular/core'
+import { BehaviorSubject, of } from 'rxjs'
+import { switchMap, catchError } from 'rxjs/operators'
 import { User } from '@/core/domain/models/User'
+import { UserService } from '@/ui/services/user/user-service'
 
 export interface AuthState {
   user: User | null
@@ -16,13 +18,14 @@ export class AuthStateService {
     isLoading: true,
   })
 
-  // Signals derivadas para uso en componentes
+  private refreshFailed = false
+  private refreshInProgress: Promise<unknown> | null = null
+
   user = computed(() => this._authState().user)
   isLoggedIn = computed(() => !!this._authState().user)
   isAdmin = computed(() => this._authState().user?.roles?.includes('Administrator') ?? false)
   isLoading = computed(() => this._authState().isLoading)
 
-  // Observable para compatibilidad con código existente
   private _authState$ = new BehaviorSubject<AuthState>({
     user: null,
     isLoading: true,
@@ -31,8 +34,42 @@ export class AuthStateService {
   authState$ = this._authState$.asObservable()
 
   /**
-   * Actualiza el estado de autenticación con nueva información del usuario
+   * Inicializa el estado de autenticación global (para AppInitializer)
    */
+  initAuthState(): Promise<void> {
+    if (this.getCurrentIsLoggedIn()) return Promise.resolve()
+    if (this.hasRefreshFailed()) return Promise.resolve()
+    const refreshPromise = this.getRefreshInProgress()
+    if (refreshPromise) return refreshPromise as Promise<void>
+    const userService = inject(UserService)
+    const refresh$ = userService.refreshToken().pipe(
+      switchMap(() => userService.me()),
+      catchError(() => of(null)),
+    )
+    const promise = new Promise<void>((resolve) => {
+      refresh$.subscribe({
+        next: (user) => {
+          if (user && typeof user === 'object' && 'username' in user) {
+            this.setUser(user)
+          } else {
+            this.setUser(null)
+          }
+          resolve()
+        },
+        error: () => {
+          this.setUser(null)
+          this.setRefreshFailed()
+          resolve()
+        },
+        complete: () => {
+          this.clearRefreshInProgress()
+        },
+      })
+    })
+    this.setRefreshInProgress(promise)
+    return promise
+  }
+
   setUser(user: User | null): void {
     const newState: AuthState = {
       user,
@@ -42,9 +79,6 @@ export class AuthStateService {
     this._authState$.next(newState)
   }
 
-  /**
-   * Marca el estado como cargando
-   */
   setLoading(loading: boolean): void {
     const currentState = this._authState()
     const newState: AuthState = {
@@ -55,9 +89,6 @@ export class AuthStateService {
     this._authState$.next(newState)
   }
 
-  /**
-   * Resetea el estado de autenticación (logout)
-   */
   clearUser(): void {
     const newState: AuthState = {
       user: null,
@@ -65,25 +96,36 @@ export class AuthStateService {
     }
     this._authState.set(newState)
     this._authState$.next(newState)
+    this.refreshFailed = false
+    this.refreshInProgress = null
   }
 
-  /**
-   * Obtiene el estado actual de autenticación
-   */
+  setRefreshFailed(): void {
+    this.refreshFailed = true
+  }
+
+  hasRefreshFailed(): boolean {
+    return this.refreshFailed
+  }
+
+  setRefreshInProgress(promise: Promise<unknown>): void {
+    this.refreshInProgress = promise
+  }
+  getRefreshInProgress(): Promise<unknown> | null {
+    return this.refreshInProgress
+  }
+  clearRefreshInProgress(): void {
+    this.refreshInProgress = null
+  }
+
   getCurrentUser(): User | null {
     return this._authState().user
   }
 
-  /**
-   * Verifica si el usuario actual está autenticado
-   */
   getCurrentIsLoggedIn(): boolean {
     return this.isLoggedIn()
   }
 
-  /**
-   * Verifica si el usuario actual es administrador
-   */
   getCurrentIsAdmin(): boolean {
     return this.isAdmin()
   }

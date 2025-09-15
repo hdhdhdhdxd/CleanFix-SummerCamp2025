@@ -1,28 +1,30 @@
 import { inject } from '@angular/core'
 import { CanActivateFn, Router } from '@angular/router'
-import { UserService } from '../../services/user/user-service'
-import { map, catchError, switchMap, take } from 'rxjs/operators'
+import { AuthStateService } from '../../services/auth-state/auth-state.service'
 import { of } from 'rxjs'
 
 export const guestGuard: CanActivateFn = () => {
-  const userService = inject(UserService)
+  const authState = inject(AuthStateService)
   const router = inject(Router)
 
-  return userService.isAuthenticated().pipe(
-    take(1),
-    switchMap((isAuth) => {
-      if (isAuth) return of(router.createUrlTree(['/']))
+  // Si ya está autenticado, redirigir a home
+  if (authState.getCurrentIsLoggedIn()) return of(router.createUrlTree(['/']))
 
-      return userService.refreshToken().pipe(
-        switchMap(() =>
-          userService.isAuthenticated().pipe(
-            take(1),
-            map((nowAuth) => (!nowAuth ? true : router.createUrlTree(['/']))),
-          ),
-        ),
-        catchError(() => of(true)),
-      )
-    }),
-    catchError(() => of(true)),
-  )
+  // Si el refresh ya falló, permitir acceso como invitado
+  if (authState.hasRefreshFailed && authState.hasRefreshFailed()) {
+    return of(true)
+  }
+
+  // Si hay un refresh en curso, esperar a que termine y luego decidir
+  const refreshPromise = authState.getRefreshInProgress && authState.getRefreshInProgress()
+  if (refreshPromise) {
+    return new Promise((resolve) => {
+      refreshPromise.then(() => {
+        resolve(authState.getCurrentIsLoggedIn() ? router.createUrlTree(['/']) : true)
+      })
+    })
+  }
+
+  // Por defecto, permitir acceso como invitado
+  return of(true)
 }

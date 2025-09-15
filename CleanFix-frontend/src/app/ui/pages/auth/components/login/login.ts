@@ -1,4 +1,5 @@
 import { UserService } from '@/ui/services/user/user-service'
+import { AuthStateService } from '@/ui/services/auth-state/auth-state.service'
 import { CommonModule } from '@angular/common'
 import { Component, inject } from '@angular/core'
 import { SnackbarService } from '@/ui/shared/snackbar/snackbar.service'
@@ -15,6 +16,7 @@ export class Login {
   private readonly userService = inject(UserService)
   private readonly router = inject(Router)
   private readonly snackbar = inject(SnackbarService)
+  private readonly authStateService = inject(AuthStateService)
 
   loginForm = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
@@ -29,7 +31,16 @@ export class Login {
 
     this.userService.login(email!, password!, rememberMe!).subscribe({
       next: () => {
-        this.router.navigate(['/'])
+        // Obtener el usuario y actualizar el estado global antes de navegar
+        this.userService.me().subscribe({
+          next: (user) => {
+            this.authStateService.setUser(user)
+            this.router.navigate(['/'])
+          },
+          error: () => {
+            console.error('Error al cargar el usuario')
+          },
+        })
       },
       error: (err) => {
         console.error('Login failed or error loading user', err)

@@ -1,35 +1,34 @@
 import { inject } from '@angular/core'
 import { CanActivateFn, Router } from '@angular/router'
-import { UserService } from '../../services/user/user-service'
-import { map, catchError, switchMap, take } from 'rxjs/operators'
+import { AuthStateService } from '../../services/auth-state/auth-state.service'
 import { of } from 'rxjs'
 
 export const adminGuard: CanActivateFn = () => {
-  const userService = inject(UserService)
+  const authState = inject(AuthStateService)
   const router = inject(Router)
 
-  return userService.me().pipe(
-    take(1),
-    switchMap((user) => {
-      if (user)
-        return of(
-          user && (user.roles?.includes('Administrator') ?? false)
+  // Si ya está autenticado y es admin, permitir acceso
+  if (authState.getCurrentIsAdmin && authState.getCurrentIsAdmin()) return of(true)
+
+  // Si el refresh ya falló, redirigir al login
+  if (authState.hasRefreshFailed && authState.hasRefreshFailed()) {
+    return of(router.createUrlTree(['/auth/login']))
+  }
+
+  // Si hay un refresh en curso, esperar a que termine y luego decidir
+  const refreshPromise = authState.getRefreshInProgress && authState.getRefreshInProgress()
+  if (refreshPromise) {
+    return new Promise((resolve) => {
+      refreshPromise.then(() => {
+        resolve(
+          authState.getCurrentIsAdmin && authState.getCurrentIsAdmin()
             ? true
             : router.createUrlTree(['/']),
         )
+      })
+    })
+  }
 
-      return userService.refreshToken().pipe(
-        switchMap(() =>
-          userService.me().pipe(
-            take(1),
-            map((u) =>
-              u && u.roles?.includes('Administrator') ? true : router.createUrlTree(['/']),
-            ),
-          ),
-        ),
-        catchError(() => of(router.createUrlTree(['/auth/login']))),
-      )
-    }),
-    catchError(() => of(router.createUrlTree(['/auth/login']))),
-  )
+  // Por defecto, redirigir a home
+  return of(router.createUrlTree(['/']))
 }
